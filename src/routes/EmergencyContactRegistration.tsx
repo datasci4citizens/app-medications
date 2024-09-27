@@ -13,11 +13,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { GoogleLogin } from '@react-oauth/google';
 
-const PatientRegistration = () => {
+const EmergencyContactRegistration = () => {
 	const [name, setName] = useState('');
 	const [phone, setPhone] = useState('');
 	const [birthdate, setBirthdate] = useState('');
-	const [comorbidities, setComorbidities] = useState('');
+	const [emergencyContact, setEmergencyContact] = useState('');
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -27,7 +27,7 @@ const PatientRegistration = () => {
 
 	return (
 		<div className="container mx-auto p-6">
-			<h1 className="text-2xl font-bold mb-6">Cadastro paciente</h1>
+			<h1 className="text-2xl font-bold mb-6">Contato de emergência</h1>
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<div>
 					<Label htmlFor="name">Nome</Label>
@@ -48,26 +48,8 @@ const PatientRegistration = () => {
 						required
 					/>
 				</div>
-				<div>
-					<Label htmlFor="birthdate">Data de nascimento</Label>
-					<Input
-						id="birthdate"
-						type="date"
-						value={birthdate}
-						onChange={(e) => setBirthdate(e.target.value)}
-						required
-					/>
-				</div>
-				<div>
-					<Label htmlFor="comorbidities">Problemas de saúde</Label>
-					<Textarea
-						id="comorbidities"
-						value={comorbidities}
-						onChange={(e) => setComorbidities(e.target.value)}
-					/>
-				</div>
-				<div className="flex flex-col items-center justify-center">
-					<Button type="submit" className="mt-8">
+                <div className="flex flex-col items-center justify-center">
+					<Button type="submit" className="mt-4">
 						Cadastrar
 					</Button>
 				</div>
@@ -76,4 +58,4 @@ const PatientRegistration = () => {
 	);
 };
 
-export default PatientRegistration;
+export default EmergencyContactRegistration;

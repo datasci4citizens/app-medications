@@ -1,6 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginPage from './routes/Login';
-import PatienteRegistration from './routes/PatientRegistration'
+import PatientRegistration from './routes/PatientRegistration';
+import CaregiverRegistration from './routes/CaregiverRegistration';
+import EmergencyContactRegistration from './routes/EmergencyContactRegistration';
 
 const router = createBrowserRouter([
   {
@@ -8,8 +10,16 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: '/patient-registration',
-    element: < PatienteRegistration/>
+    path: '/registro-paciente',
+    element: < PatientRegistration/>
+  },
+  {
+    path: '/registro-cuidador',
+    element: < CaregiverRegistration/>
+  },
+  {
+    path: '/registro-contato-de-emergencia',
+    element: < EmergencyContactRegistration/>
   },
 ]);
 
