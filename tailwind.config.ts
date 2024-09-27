@@ -60,7 +60,7 @@ export default {
 				primary: {
 					// biome-ignore lint/style/useNamingConvention: external naming
 					DEFAULT: "#0C4A6E",
-					foreground: "#0C4A6E",
+					foreground: "white",
 				},
 				secondary: {
 					// biome-ignore lint/style/useNamingConvention: external naming

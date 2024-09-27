@@ -13,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { GoogleLogin } from '@react-oauth/google';
 
-const RegisterPage = () => {
+const PatientRegistration = () => {
 	const [name, setName] = useState('');
 	const [phone, setPhone] = useState('');
 	const [birthdate, setBirthdate] = useState('');
@@ -51,7 +51,7 @@ const RegisterPage = () => {
 					/>
 				</div>
 				<div>
-					<Label htmlFor="birthdate">Data de Nascimento</Label>
+					<Label htmlFor="birthdate">Data de nascimento</Label>
 					<Input
 						id="birthdate"
 						type="date"
@@ -61,36 +61,21 @@ const RegisterPage = () => {
 					/>
 				</div>
 				<div>
-					<Label htmlFor="comorbidities">Comorbidades</Label>
+					<Label htmlFor="comorbidities">Problemas de saúde</Label>
 					<Textarea
 						id="comorbidities"
 						value={comorbidities}
 						onChange={(e) => setComorbidities(e.target.value)}
 					/>
 				</div>
-				<div className="flex items-center space-x-2">
-					<Switch id="drinks" checked={drinks} onCheckedChange={setDrinks} />
-					<Label htmlFor="drinks">Bebe</Label>
+				<div className="flex flex-col items-center justify-center">
+					<Button type="submit" className="mt-8">
+						Cadastrar
+					</Button>
 				</div>
-				<div>
-					<Label htmlFor="smokes">Fuma</Label>
-					<Select value={smokes} onValueChange={setSmokes}>
-						<SelectTrigger>
-							<SelectValue placeholder="Selecione uma opção" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="quantidade1">Quantidade 1</SelectItem>
-							<SelectItem value="quantidade2">Quantidade 2</SelectItem>
-							<SelectItem value="quantidade3">Quantidade 3</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
-				<Button type="submit" className="w-full">
-					Cadastrar
-				</Button>
 			</form>
 		</div>
 	);
 };
 
-export default RegisterPage;
+export default PatientRegistration;
