@@ -1,5 +1,7 @@
 import type { Medication, MedicationTime } from "@/data/medicationListFake.ts";
 import { Check } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card.tsx";
+import { useState } from "react";
 
 export function MedicationTimeGroup({time, medications}: MedicationTime) {
     return (
@@ -13,16 +15,22 @@ export function MedicationTimeGroup({time, medications}: MedicationTime) {
 }
 
 function MedicationItem({name, dosageStrength, adultDosage}: Medication) {
+    const [isChecked, setIsChecked] = useState(false)
+
     return (
-        <div className="mb-4 p-3 w-full bg-white rounded-lg shadow-lg inline-flex justify-between items-start">
-            <div className="flex-1">
-                <div className="text-base font-semibold text-black mb-1">{name}</div>
-                <div className="text-sm text-gray-500">Dosagem: {dosageStrength}</div>
-                <div className="text-sm text-gray-500">Quantidade: {adultDosage}</div>
-            </div>
-            <div className="w-6 h-6 border border-gray-300 rounded-sm justify-center items-center">
-                {<Check className="text-black"/>}
-            </div>
-        </div>
-    );
+        <Card className="mb-4 w-full shadow-sm border-b border-gray-200">
+            <CardContent className="p-4 flex justify-between items-center">
+                <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{name}</h3>
+                    <p className="text-sm text-gray-500">Dosagem: {dosageStrength}</p>
+                    <p className="text-sm text-gray-500">Quantidade: {adultDosage}</p>
+                </div>
+                <div
+                    className={`border border-gray-300 rounded flex items-center justify-center cursor-pointer  ${isChecked ? 'bg-blue-500' : 'bg-white'}`}
+                    onClick={() => setIsChecked(!isChecked)}>
+                    <Check className="text-black" size={32}/>
+                </div>
+            </CardContent>
+        </Card>
+    )
 }
