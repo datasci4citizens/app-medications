@@ -1,15 +1,9 @@
+import type { Medication } from "@/components/common/MedicationItem.tsx";
+
 export interface MedicationTime {
     id: string;
     time: string;
     medications: Medication[];
-}
-
-export interface Medication {
-    id: string;
-    name: string;
-    dosageStrength: string;
-    adultDosage: string;
-    pediatric_dosage: string;
 }
 
 export const medicationsList: MedicationTime[] = [
