@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,9 +11,13 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { GoogleLogin } from '@react-oauth/google';
+import { googleLogout, useGoogleLogin, GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
 const PatientRegistration = () => {
+	const [user, setUser] = useState([]);
+	const [profile, setProfile] = useState([]);
+
 	const [name, setName] = useState('');
 	const [phoneNumber, setPhoneNumber] = useState('');
 	const [birthdate, setBirthdate] = useState('');
@@ -36,16 +40,38 @@ const PatientRegistration = () => {
 		});
 	};
 
+	useEffect(() => {
+		if (user) {
+			axios
+				.get(
+					`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
+					{
+						headers: {
+							Authorization: `Bearer ${user.access_token}`,
+							Accept: 'application/json',
+						},
+					},
+				)
+				.then((res) => {
+					setProfile(res.data);
+				})
+				.catch((err) => console.log(err));
+		}
+	}, [user]);
+
 	return (
-		<div className="container mx-auto p-16">
+		<div className="container mx-auto p-16 h-screen">
 			<h1 className="text-2xl font-bold mb-6">Cadastro paciente</h1>
-			<form onSubmit={handleSubmit} className="space-y-8">
+			<form
+				onSubmit={handleSubmit}
+				className="space-y-8 overflow-auto h-[80vh]"
+			>
 				<div>
 					<Label htmlFor="name">Nome</Label>
 					<Input
 						id="name"
 						placeholder="Nome"
-						value={name}
+						value={profile.name}
 						onChange={(e) => setName(e.target.value)}
 						required
 					/>

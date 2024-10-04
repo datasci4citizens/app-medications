@@ -26,31 +26,38 @@ const EmergencyContactRegistration = () => {
 	};
 
 	return (
-		<div className="container mx-auto p-6">
-			<h1 className="text-2xl font-bold mb-6">Contato de emergência</h1>
-			<form onSubmit={handleSubmit} className="space-y-4">
+		<div className="container mx-auto p-16  h-screen">
+			<h1 className="text-2xl font-bold mb-6">Cadastro emergência</h1>
+			<form
+				onSubmit={handleSubmit}
+				className="space-y-8 overflow-auto h-[80vh]"
+			>
 				<div>
-					<Label htmlFor="name">Nome</Label>
+					<Label htmlFor="name">Nome do contato de emergência</Label>
 					<Input
 						id="name"
+						placeholder="Nome"
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						required
 					/>
 				</div>
 				<div>
-					<Label htmlFor="phone">Telefone</Label>
+					<Label htmlFor="phone">Telefone do contato de emergência</Label>
 					<Input
 						id="phone"
+						placeholder="(00) 00000-0000"
 						type="tel"
 						value={phone}
 						onChange={(e) => setPhone(e.target.value)}
 						required
 					/>
 				</div>
-                <div className="flex flex-col items-center justify-center">
+				<div className="flex flex-col items-center justify-center space-y-4">
+					<Button className="mt-4">Entrar</Button>
+					<p>ou</p>
 					<Button type="submit" className="mt-4">
-						Cadastrar
+						Adicionar cuidador(a)
 					</Button>
 				</div>
 			</form>
