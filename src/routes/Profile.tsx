@@ -13,10 +13,10 @@ export default function Profile() {
     );
 
     return (
-        <div className="flex flex-col h-full w-full items-center px-8">
-            <div className="flex flex-col items-center w-full">
-                <h1 className="text-2xl font-bold mb-4">Meus Medicamentos</h1>
-                <div className="relative w-full mt-12">
+        <div className='flex h-full w-full flex-col items-center px-8'>
+            <div className='flex w-full flex-col items-center'>
+                <h1 className='mb-4 font-bold text-2xl'>Meus Medicamentos</h1>
+                <div className='relative mt-12 w-full'>
                     <Input
                         type="text"
                         placeholder="Pesquise o medicamento"
@@ -24,10 +24,10 @@ export default function Profile() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pr-10"
                     />
-                    <Search className="absolute right-3 top-2.5 text-gray-400" size={20}/>
+                    <Search className='absolute top-2.5 right-3 text-gray-400' size={20}/>
                 </div>
             </div>
-            <div className="flex-1 w-full overflow-y-auto mt-6">
+            <div className='mt-6 w-full flex-1 overflow-y-auto'>
                 {filteredMedications.map((medication, index) => (
                     <MedicationItem key={index} id={medication.id}
                                     name={medication.name}

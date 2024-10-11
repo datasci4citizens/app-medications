@@ -1,17 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { GoogleLogin } from '@react-oauth/google';
 
 const EmergencyContactRegistration = () => {
 	const [name, setName] = useState('');
@@ -22,15 +12,16 @@ const EmergencyContactRegistration = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// Handle form submission here
-		console.log({ name, phone, birthdate, comorbidities, drinks, smokes });
+		// biome-ignore lint/suspicious/noConsoleLog: <explanation>
+				console.log({ name, phone, birthdate });
 	};
 
 	return (
-		<div className="container mx-auto p-16  h-screen">
-			<h1 className="text-2xl font-bold mb-6">Cadastro emergência</h1>
+		<div className='container mx-auto h-screen p-16'>
+			<h1 className='mb-6 font-bold text-2xl'>Cadastro emergência</h1>
 			<form
 				onSubmit={handleSubmit}
-				className="space-y-8 overflow-auto h-[80vh]"
+				className='h-[80vh] space-y-8 overflow-auto'
 			>
 				<div>
 					<Label htmlFor="name">Nome do contato de emergência</Label>

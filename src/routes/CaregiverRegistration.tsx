@@ -1,17 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { GoogleLogin } from '@react-oauth/google';
 
 const CaregiverRegistration = () => {
 	const [name, setName] = useState('');
@@ -22,15 +13,16 @@ const CaregiverRegistration = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// Handle form submission here
+		// biome-ignore lint/suspicious/noConsoleLog: <explanation>
 		console.log({ name, phone, birthdate, comorbidities, drinks, smokes });
 	};
 
 	return (
-		<div className="container mx-auto p-16 h-screen">
-			<h1 className="text-2xl font-bold mb-6">Cadastro cuidador(a)</h1>
+		<div className='container mx-auto h-screen p-16'>
+			<h1 className='mb-6 font-bold text-2xl'>Cadastro cuidador(a)</h1>
 			<form
 				onSubmit={handleSubmit}
-				className="space-y-4 overflow-auto h-[80vh]"
+				className='h-[80vh] space-y-4 overflow-auto'
 			>
 				<div>
 					<Label htmlFor="name">Nome</Label>

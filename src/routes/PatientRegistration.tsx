@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import {
 	Select,
 	SelectContent,
@@ -11,7 +10,6 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { googleLogout, useGoogleLogin, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
 const PatientRegistration = () => {
@@ -29,7 +27,8 @@ const PatientRegistration = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// Handle form submission here
-		console.log({
+		// biome-ignore lint/suspicious/noConsoleLog: <explanation>
+				console.log({
 			name,
 			phoneNumber,
 			birthdate,
@@ -60,11 +59,11 @@ const PatientRegistration = () => {
 	}, [user]);
 
 	return (
-		<div className="container mx-auto p-16 h-screen">
-			<h1 className="text-2xl font-bold mb-6">Cadastro paciente</h1>
+		<div className='container mx-auto h-screen p-16'>
+			<h1 className='mb-6 font-bold text-2xl'>Cadastro paciente</h1>
 			<form
 				onSubmit={handleSubmit}
-				className="space-y-8 overflow-auto h-[80vh]"
+				className='h-[80vh] space-y-8 overflow-auto'
 			>
 				<div>
 					<Label htmlFor="name">Nome</Label>
