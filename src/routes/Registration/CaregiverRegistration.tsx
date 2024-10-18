@@ -3,18 +3,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const CaregiverRegistration = () => {
 	const [name, setName] = useState('');
 	const [phone, setPhone] = useState('');
-	const [birthdate, setBirthdate] = useState('');
 	const [emergencyContact, setEmergencyContact] = useState('');
+	const navigate = useNavigate();
 
 	const handleSubmit = (e) => {
-		e.preventDefault();
-		// Handle form submission here
-		// biome-ignore lint/suspicious/noConsoleLog: <explanation>
-		console.log({ name, phone, birthdate, comorbidities, drinks, smokes });
+		navigate("/");
 	};
 
 	return (
@@ -31,7 +29,6 @@ const CaregiverRegistration = () => {
 						placeholder="Nome"
 						value={name}
 						onChange={(e) => setName(e.target.value)}
-						required
 					/>
 				</div>
 				<div>
@@ -42,7 +39,6 @@ const CaregiverRegistration = () => {
 						type="tel"
 						value={phone}
 						onChange={(e) => setPhone(e.target.value)}
-						required
 					/>
 				</div>
 				<div className="flex items-center space-x-2">

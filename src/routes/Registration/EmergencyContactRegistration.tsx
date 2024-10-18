@@ -2,12 +2,22 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const EmergencyContactRegistration = () => {
 	const [name, setName] = useState('');
 	const [phone, setPhone] = useState('');
 	const [birthdate, setBirthdate] = useState('');
 	const [emergencyContact, setEmergencyContact] = useState('');
+	const navigate = useNavigate();
+
+	const handleGoToHome = (e) => {
+		navigate("/");
+	};
+
+	const addCaregiver = (e) => {
+		navigate("/registro-cuidador");
+	};
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -30,7 +40,6 @@ const EmergencyContactRegistration = () => {
 						placeholder="Nome"
 						value={name}
 						onChange={(e) => setName(e.target.value)}
-						required
 					/>
 				</div>
 				<div>
@@ -41,13 +50,12 @@ const EmergencyContactRegistration = () => {
 						type="tel"
 						value={phone}
 						onChange={(e) => setPhone(e.target.value)}
-						required
 					/>
 				</div>
 				<div className="flex flex-col items-center justify-center space-y-4">
-					<Button className="mt-4">Entrar</Button>
+					<Button className="mt-4" onClick={handleGoToHome}>Entrar</Button>
 					<p>ou</p>
-					<Button type="submit" className="mt-4">
+					<Button className="mt-4" onClick={addCaregiver}>
 						Adicionar cuidador(a)
 					</Button>
 				</div>
