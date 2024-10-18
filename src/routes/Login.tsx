@@ -3,11 +3,15 @@ import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 import Cookies from 'js-cookie';
 import GoogleButton from 'react-google-button';
 import { useNavigate } from 'react-router-dom';
+import useSWR from 'swr';
 
 const LoginPage = () => {
 	const [user, setUser] = useState([]);
 	const [profile, setProfile] = useState([]);
     const navigate = useNavigate();
+	
+	const fetcher = (...args) => fetch(...args).then(res => res.json())
+	const { data, error, isLoading } = useSWR('http://localhost:8000/patients', fetcher)
 
 	const onLoginSuccess = (credentialResponse) => {
 		console.log(credentialResponse);
@@ -21,6 +25,27 @@ const LoginPage = () => {
 	const onLoginError = () => {
 		console.log('Failed to sign in with google');
 	};
+
+	async function sendRequest(url, { arg }: { arg: {
+		name: string;
+		  email: string;
+		  phone_number: string;
+		  birthday: Date;
+		  is_smoker: boolean;
+		  drink_frequency: "never" | "sometimes" | "often";
+		  accept_tcle: boolean;
+		  observations?: string | undefined}}) {
+		console.log('=== sending request to ===')
+		console.log(url)
+		return await fetch(url, {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json'
+		  },
+		  body: JSON.stringify(arg)
+		}).then(res => res.json())
+	  }
+	  
 
 	function handleCredentialResponse(response) {
 		const accessToken = response.code;
@@ -82,8 +107,12 @@ const LoginPage = () => {
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-primary">
-			<div className="w-64 h-64 bg-white rounded-full"></div>
-			<div className="mt-8">
+			<img
+				src="/medications.svg"
+				alt="Logo medicamentos"
+				className="w-64 h-64 rounded-full object-contain"
+			/>
+			<div className="mt-40">
 				<GoogleButton label="Entrar com o Google" onClick={login} />
 			</div>
 		</div>

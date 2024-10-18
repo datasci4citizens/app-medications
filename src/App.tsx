@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginPage from './routes/Login';
-import PatientRegistration from './routes/PatientRegistration';
-import CaregiverRegistration from './routes/CaregiverRegistration';
-import EmergencyContactRegistration from './routes/EmergencyContactRegistration';
+import PatientRegistration from './routes/Registration/PatientRegistration';
+import CaregiverRegistration from './routes/Registration/CaregiverRegistration';
+import EmergencyContactRegistration from './routes/Registration/EmergencyContactRegistration';
 import Home from '@/routes/Home.tsx';
 import SearchMedication from '@/routes/SearchMedication.tsx';
 import AddMedication from '@/routes/AddMedication.tsx';
