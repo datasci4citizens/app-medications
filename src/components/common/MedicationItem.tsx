@@ -13,7 +13,7 @@ export interface Medication {
     onDelete?: () => void;
 }
 
-export default function MedicationItem({id, name, dosageStrength, adultDosage, onCheck, onEdit, onDelete}: Medication) {
+export default function MedicationItem({name, dosageStrength, adultDosage, onCheck, onEdit, onDelete}: Medication) {
     const [isChecked, setIsChecked] = useState(false)
 
     const handleCheck = () => {
@@ -40,7 +40,6 @@ export default function MedicationItem({id, name, dosageStrength, adultDosage, o
                 }
                 {onEdit &&
                     <div
-
                         className={`border border-gray-300 rounded flex items-center justify-center cursor-pointer ms-1.5`}
                         onClick={() => onEdit?.()}>
                         <Edit className="text-black p-2" size={32}/>

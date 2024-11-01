@@ -1,14 +1,27 @@
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
-import { useState } from "react";
-import { medicationSearchList } from "@/data/medicationSearchList.ts";
+import { useEffect, useState } from "react";
+import type { Medication } from "@/components/common/MedicationItem.tsx";
 import MedicationItem from "@/components/common/MedicationItem.tsx";
+import useSWRMutation from "swr/mutation";
+import type { UserDrug } from "@/data/common/Mapper.ts";
+import { mapUserDrugToMedications } from "@/data/common/Mapper.ts";
+import { getRequest } from "@/data/common/HttpExtensions.ts";
 
 
 export default function Profile() {
+    const {data, trigger} = useSWRMutation<UserDrug[]>('http://localhost:8000/user_drugs/2', getRequest);
+
+    useEffect(() => {
+        trigger();
+    }, [trigger]);
+
+    const medications: Medication[] = mapUserDrugToMedications(data);
+
+
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredMedications = medicationSearchList.filter(med =>
+    const filteredMedications = medications.filter(med =>
         med.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
