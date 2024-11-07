@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import LoginPage from './routes/Login';
+import ProfileSelection from './routes/Registration/ProfileSelection';
+import PatientRegistrationType from './routes/Registration/PatientRegistrationType';
 import PatientRegistration from './routes/Registration/PatientRegistration';
 import CaregiverRegistration from './routes/Registration/CaregiverRegistration';
 import EmergencyContactRegistration from './routes/Registration/EmergencyContactRegistration';
@@ -8,6 +10,7 @@ import SearchMedication from '@/routes/SearchMedication.tsx';
 import AddMedication from '@/routes/AddMedication.tsx';
 import Profile from '@/routes/Profile.tsx';
 import AppLayout from '@/components/home/AppLayout.tsx';
+import AddPatient from './routes/Registration/AddPatient';
 
 export const router = createBrowserRouter([
 	{
@@ -15,10 +18,34 @@ export const router = createBrowserRouter([
 		element: <LoginPage />,
 	},
 	{
+		path: '/cadastro-perfil',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<ProfileSelection />
+			</AppLayout>
+		),
+	},
+	{
+		path: '/cadastro-paciente-tipo',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<PatientRegistrationType />
+			</AppLayout>
+		),
+	},
+	{
 		path: '/registro-paciente',
 		element: (
 			<AppLayout showBottomNav={false}>
 				<PatientRegistration />
+			</AppLayout>
+		),
+	},
+	{
+		path: '/adicionar-paciente',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<AddPatient />
 			</AppLayout>
 		),
 	},
