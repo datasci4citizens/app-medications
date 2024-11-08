@@ -13,39 +13,9 @@ const LoginPage = () => {
 	const fetcher = (...args) => fetch(...args).then(res => res.json())
 	const { data, error, isLoading } = useSWR('http://localhost:8000/patients', fetcher)
 
-	const onLoginSuccess = (credentialResponse) => {
-		console.log(credentialResponse);
-	};
-
-	const login = useGoogleLogin({
-		onSuccess: (codeResponse) => handleCredentialResponse(codeResponse),
-		flow: 'auth-code',
-	});
-
 	const onLoginError = () => {
 		console.log('Failed to sign in with google');
-	};
-
-	async function sendRequest(url, { arg }: { arg: {
-		name: string;
-		  email: string;
-		  phone_number: string;
-		  birthday: Date;
-		  is_smoker: boolean;
-		  drink_frequency: "never" | "sometimes" | "often";
-		  accept_tcle: boolean;
-		  observations?: string | undefined}}) {
-		console.log('=== sending request to ===')
-		console.log(url)
-		return await fetch(url, {
-		  method: 'POST',
-		  headers: {
-			'Content-Type': 'application/json'
-		  },
-		  body: JSON.stringify(arg)
-		}).then(res => res.json())
-	  }
-	  
+	};	  
 
 	function handleCredentialResponse(response) {
 		const accessToken = response.code;
@@ -54,7 +24,7 @@ const LoginPage = () => {
 
         navigate("/registro-paciente");
 
-		fetch('http://localhost:8000/auth/google', {
+		fetch(`${import.meta.env.SERVER_URL}/auth/google`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -103,6 +73,11 @@ const LoginPage = () => {
 	function saveAccessToken(accessToken) {
 		Cookies.set('accessToken', accessToken, { expires: 1 });
 		console.log('Token saved to cookie!');
+	}
+
+	function login() {
+		// window.location.href = `${import.meta.env.VITE_SERVER_URL}/auth/login/google`;
+		window.location.href = "http://localhost:8000/auth/login/google";
 	}
 
 	return (
