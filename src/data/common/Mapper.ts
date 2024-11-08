@@ -1,7 +1,7 @@
 import type { Medication } from "@/components/common/MedicationItem.tsx";
 
 export interface Drug {
-    code: string
+    id: number
     comercial_name: string
     active_ingredients: ActiveIngredient[]
     presentations: Presentation[],
@@ -13,7 +13,7 @@ interface ActiveIngredient {
     active_ingredient: string
 }
 
-interface Presentation {
+export interface Presentation {
     id: number
     value: string
 }
@@ -21,7 +21,9 @@ interface Presentation {
 export function mapDrugsToMedications(data: Drug[] | undefined): Medication[] {
     return data?.flatMap((drug) =>
         drug.presentations.map((presentation) => ({
-            id: `${drug.code}-${presentation.id}`,
+            id: `${drug.id}-${presentation.id}`,
+            comercialNameId: drug.id,
+            presentationId: presentation.id,
             name: drug.comercial_name,
             dosageStrength: presentation.value,
         }))
@@ -43,9 +45,11 @@ export interface UserDrug {
 }
 
 export function mapUserDrugToMedications(data: UserDrug[] | undefined): Medication[] {
-    return data?.map((item) => ({
-        id: item.id.toString(),
-        name: item.comercial_name.comercial_name,
-        dosageStrength: item.presentation.value
-    })) || [];
+    return Array.isArray(data)
+        ? data.flatMap((item) => ({
+            id: item.id.toString(),
+            name: item.comercial_name.comercial_name,
+            dosageStrength: item.presentation.value,
+        }))
+        : [];
 }

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button.tsx";
 import useSWRMutation from "swr/mutation";
 import type { Drug } from "@/data/common/Mapper.ts";
 import { mapDrugsToMedications } from "@/data/common/Mapper.ts";
-import { getRequest } from "@/data/common/HttpExtensions.ts";
+import { getRequest, postRequest } from "@/data/common/HttpExtensions.ts";
 import { useEffect, useState } from "react";
 import type { Medication } from "@/components/common/MedicationItem.tsx";
 import { Plus } from "lucide-react"
@@ -25,6 +25,16 @@ interface FormValues {
     selectedDays: string[];
     observations: string;
     times: { time: string }[];
+}
+
+interface MedicationPayload {
+    comercial_name_id: number;
+    presentation_id: number;
+    start_date: string;
+    end_date: string;
+    observation: string;
+    quantity: number;
+    status: string;
 }
 
 export default function AddMedication() {
@@ -44,32 +54,92 @@ export default function AddMedication() {
 
     const [isMedicationSelected, setIsMedicationSelected] = useState(false);
 
-    const onSubmit = (data: FormValues) => {
-        console.log(data);
-    };
-
     const {data, trigger} = useSWRMutation<Drug[]>('http://localhost:8000/drugs', getRequest);
-
     useEffect(() => {
         trigger();
     }, [trigger]);
-
     const medications: Medication[] = mapDrugsToMedications(data);
 
     const daysOfWeek = [
-        {label: 'D', fullName: 'sunday'},
-        {label: 'S', fullName: 'monday'},
-        {label: 'T', fullName: 'tuesday'},
-        {label: 'Q', fullName: 'wednesday'},
-        {label: 'Q', fullName: 'thursday'},
-        {label: 'S', fullName: 'friday'},
-        {label: 'S', fullName: 'saturday'}
+        {label: 'D', fullName: 'sunday', id: '0'},
+        {label: 'S', fullName: 'monday', id: '1'},
+        {label: 'T', fullName: 'tuesday', id: '2'},
+        {label: 'Q', fullName: 'wednesday', id: '3'},
+        {label: 'Q', fullName: 'thursday', id: '4'},
+        {label: 'S', fullName: 'friday', id: '5'},
+        {label: 'S', fullName: 'saturday', id: '6'}
     ];
 
-    const { fields, append } = useFieldArray<FormValues>({
+    const {fields, append} = useFieldArray<FormValues>({
         control: form.control,
         name: "times",
     });
+
+    const {trigger: postTrigger} = useSWRMutation('http://localhost:8000/drugs/1/', postRequest);
+    const {trigger: postScheculeTrigger} = useSWRMutation('http://localhost:8000/schedule/1/schedule', postRequest);
+
+    const postSchedule = async (drugUseId: number, selectedDays: string[], times: { time: string }[]) => {
+        try {
+            const dayPromises = selectedDays.map(selectedDay => {
+                const dayPayload = {
+                    drug_use_id: drugUseId,
+                    type: "D",
+                    value: daysOfWeek.find(day => day.fullName === selectedDay)?.id,
+                };
+                return postScheculeTrigger(dayPayload);
+            });
+
+            const timePromises = times.map(time => {
+                const timePayload = {
+                    drug_use_id: drugUseId,
+                    type: "H",
+                    value: parseInt(time.time, 10) || 0,
+                };
+                return postScheculeTrigger(timePayload);
+            });
+            const results = await Promise.all([...dayPromises, ...timePromises]);
+
+            console.log('All day and time data posted successfully:', results);
+            return results;
+        } catch (error) {
+            console.error('Error posting day and time data:', error);
+            throw error;
+        }
+    };
+
+    const onSubmit = async (data: FormValues) => {
+        try {
+            const medication = medications.find(medication => medication.id === data.medication);
+            if (!medication) {
+                throw new Error('Medication not found');
+            }
+
+            const payload: MedicationPayload = {
+                comercial_name_id: medication.comercialNameId || 0,
+                presentation_id: medication.presentationId || 0,
+                start_date: data.startDate ? data.startDate.toISOString() : "",
+                end_date: data.endDate ? data.endDate.toISOString() : "",
+                observation: data.observations || "",
+                quantity: Math.max(parseInt(data.quantity, 10) || 1, 1),
+                status: 'active',
+            };
+
+            console.log('Sending payload:', payload);
+            const result = await postTrigger(payload);
+            console.log('Result:', result);
+
+            if (result && result.id) {
+                await postSchedule(result.id, data.selectedDays, data.times);
+            } else {
+                throw new Error('No drug use ID returned');
+            }
+
+            return result;
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            throw error;
+        }
+    };
 
     return (
         <div className="flex flex-col w-full h-full items-center">

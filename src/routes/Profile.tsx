@@ -10,7 +10,7 @@ import { getRequest } from "@/data/common/HttpExtensions.ts";
 
 
 export default function Profile() {
-    const {data, trigger} = useSWRMutation<UserDrug[]>('http://localhost:8000/user_drugs/2', getRequest);
+    const {data, trigger} = useSWRMutation<UserDrug[]>('http://localhost:8000/drugs/1/', getRequest);
 
     useEffect(() => {
         trigger();
