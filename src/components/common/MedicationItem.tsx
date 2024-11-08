@@ -4,7 +4,10 @@ import { Check, Edit, Trash } from "lucide-react";
 
 export interface Medication {
     id: string;
+    comercialNameId?: number;
+    presentationId?: number;
     name: string;
+    hourSchedule?: number;
     dosageStrength?: string;
     adultDosage?: string;
     pediatric_dosage?: string;
