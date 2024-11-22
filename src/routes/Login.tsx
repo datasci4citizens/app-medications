@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
-import Cookies from 'js-cookie';
 import GoogleButton from 'react-google-button';
 import { useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
@@ -11,40 +9,11 @@ const LoginPage = () => {
     const navigate = useNavigate();
 	
 	const fetcher = (...args) => fetch(...args).then(res => res.json())
-	const { data, error, isLoading } = useSWR('http://localhost:8000/patients', fetcher)
+	const { data, error, isLoading } = useSWR(`${import.meta.env.VITE_SERVER_URL}/patients`, fetcher)
 
 	const onLoginError = () => {
 		console.log('Failed to sign in with google');
 	};	  
-
-	function handleCredentialResponse(response) {
-		const accessToken = response.code;
-
-		console.log(response);
-
-        navigate("/registro-paciente");
-
-		fetch(`${import.meta.env.SERVER_URL}/auth/google`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-Requested-With': 'XMLHttpRequest',
-			},
-			body: JSON.stringify({ access_token: accessToken }),
-			credentials: 'include',
-		})
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error('Error while authenticating with server');
-				}
-				return response.json();
-			})
-			.then((data) => {
-				console.log('Access token:', data.access_token);
-				saveAccessToken(data.access_token);
-			})
-			.catch((error) => console.error('Error:', error));
-	}
 
 	function fetchProtectedEndpoint() {
 		fetch('http://localhost:8000/users/me', {
@@ -70,14 +39,8 @@ const LoginPage = () => {
 			});
 	}
 
-	function saveAccessToken(accessToken) {
-		Cookies.set('accessToken', accessToken, { expires: 1 });
-		console.log('Token saved to cookie!');
-	}
-
 	function login() {
-		// window.location.href = `${import.meta.env.VITE_SERVER_URL}/auth/login/google`;
-		window.location.href = "http://localhost:8000/auth/login/google";
+		window.location.href = `${import.meta.env.VITE_BASE_URL_SERVER}/auth/login/google`;
 	}
 
 	return (

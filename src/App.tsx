@@ -11,6 +11,9 @@ import AddMedication from '@/routes/AddMedication.tsx';
 import Profile from '@/routes/Profile.tsx';
 import AppLayout from '@/components/home/AppLayout.tsx';
 import AddPatient from './routes/Registration/AddPatient';
+import AuthGuard from './guards/auth';
+import { SWRConfig } from 'swr';
+import { AuthProvider } from '@/lib/hooks/auth-context.tsx';
 
 export const router = createBrowserRouter([
 	{
@@ -18,88 +21,106 @@ export const router = createBrowserRouter([
 		element: <LoginPage />,
 	},
 	{
-		path: '/cadastro-perfil',
-		element: (
-			<AppLayout showBottomNav={false}>
-				<ProfileSelection />
-			</AppLayout>
-		),
-	},
-	{
-		path: '/cadastro-paciente-tipo',
-		element: (
-			<AppLayout showBottomNav={false}>
-				<PatientRegistrationType />
-			</AppLayout>
-		),
-	},
-	{
-		path: '/registro-paciente',
-		element: (
-			<AppLayout showBottomNav={false}>
-				<PatientRegistration />
-			</AppLayout>
-		),
-	},
-	{
-		path: '/adicionar-paciente',
-		element: (
-			<AppLayout showBottomNav={false}>
-				<AddPatient />
-			</AppLayout>
-		),
-	},
-	{
-		path: '/registro-cuidador',
-		element: (
-			<AppLayout showBottomNav={false}>
-				<CaregiverRegistration />
-			</AppLayout>
-		),
-	},
-	{
-		path: '/registro-contato-de-emergencia',
-		element: (
-			<AppLayout showBottomNav={false}>
-				<EmergencyContactRegistration />
-			</AppLayout>
-		),
-	},
-	{
 		path: '/',
 		element: (
-			<AppLayout showBottomNav={true}>
-				<Home />
-			</AppLayout>
+			<AuthGuard /> 
 		),
-	},
-	{
-		path: '/search',
-		element: (
-			<AppLayout showBottomNav={true}>
-				<SearchMedication />
-			</AppLayout>
-		),
-	},
-	{
-		path: '/add',
-		element: (
-			<AppLayout showBottomNav={true}>
-				<AddMedication />
-			</AppLayout>
-		),
-	},
-	{
-		path: '/profile',
-		element: (
-			<AppLayout showBottomNav={true}>
-				<Profile />
-			</AppLayout>
-		),
+		children: [
+			{
+				path: "/",
+				element: (
+					<AppLayout showBottomNav={true}>
+						<Home />
+					</AppLayout>
+				)
+			}, 
+			{
+				path: '/cadastro-paciente-tipo',
+				element: (
+					<AppLayout showBottomNav={false}>
+						<PatientRegistrationType />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/cadastro-perfil',
+				element: (
+					<AppLayout showBottomNav={false}>
+						<ProfileSelection />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/registro-paciente',
+				element: (
+					<AppLayout showBottomNav={false}>
+						<PatientRegistration />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/adicionar-paciente',
+				element: (
+					<AppLayout showBottomNav={false}>
+						<AddPatient />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/registro-cuidador',
+				element: (
+					<AppLayout showBottomNav={false}>
+						<CaregiverRegistration />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/registro-contato-de-emergencia',
+				element: (
+					<AppLayout showBottomNav={false}>
+						<EmergencyContactRegistration />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/search',
+				element: (
+					<AppLayout showBottomNav={true}>
+						<SearchMedication />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/add',
+				element: (
+					<AppLayout showBottomNav={true}>
+						<AddMedication />
+					</AppLayout>
+				),
+			},
+			{
+				path: '/profile',
+				element: (
+					<AppLayout showBottomNav={true}>
+						<Profile />
+					</AppLayout>
+				),
+			},
+		]
 	},
 ]);
 
 export function App() {
-	return <RouterProvider router={router} />;
-	// Add autentication logic
+	return (
+		<AuthProvider>
+			<SWRConfig
+				value={{
+					fetcher: (url, args) =>
+						fetch(`${import.meta.env.BASE_URL_SERVER}${url}`, ...args),
+				}}
+			>
+				<RouterProvider router={router} />
+			</SWRConfig>
+		</AuthProvider>
+	);
 }
