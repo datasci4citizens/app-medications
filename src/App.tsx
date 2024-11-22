@@ -115,8 +115,7 @@ export function App() {
 		<AuthProvider>
 			<SWRConfig
 				value={{
-					fetcher: (url, args) =>
-						fetch(`${import.meta.env.BASE_URL_SERVER}${url}`, ...args),
+					fetcher: (url, args) => fetch(`${import.meta.env.VITE_SERVER_URL}${url}`, { credentials: 'include', ...args }).then(res => res.json())
 				}}
 			>
 				<RouterProvider router={router} />

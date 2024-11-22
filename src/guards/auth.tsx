@@ -1,17 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/lib/hooks/auth-context';
+import { UserContextProvider } from "@/lib/hooks/use-user";
+import { Outlet, useNavigate } from "react-router-dom";
+import LoadingPage from '@/components/ui/loading-page';
+import useSWR from 'swr';
 
-const AuthGuard: React.FC = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+const AuthGuard = () => {
+	const { data, error, isLoading } = useSWR("/users_authentication")
 
-  if (!isAuthenticated) {
-    // Se não estiver autenticado, redireciona para a página de login
-    return <Navigate to="/login" replace />;
+  if (isLoading) {
+    return <LoadingPage />
   }
 
-  return <>{children}</>;
+  if (error) {
+    console.error("Error while authenticating", error);
+  }
+
+	if (JSON. stringify(data) === '{}') {
+		// If user is not authenticated, i.e, data returned is empty, redirect to login page.
+		return <Navigate to="/login" replace />;
+	}
+
+	return <UserContextProvider value={{ name: "" }}>
+          <Outlet />
+        </UserContextProvider>
 };
 
 export default AuthGuard;
-
