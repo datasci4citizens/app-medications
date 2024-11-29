@@ -1,6 +1,7 @@
 export async function getRequest(url: string) {
     return fetch(url, {
         method: 'GET',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
