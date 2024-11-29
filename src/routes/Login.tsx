@@ -16,7 +16,7 @@ const LoginPage = () => {
 			<img
 				src="/medications.svg"
 				alt="Logo medicamentos"
-				className="w-64 h-64 rounded-full object-contain"
+				className="w-64 h-64 object-contain"
 			/>
 			<div className="mt-40">
 				<GoogleButton label="Entrar com o Google" onClick={login} />
