@@ -4,11 +4,12 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form.tsx";
-import { getRequest, postRequest } from "@/data/HttpExtensions.ts";
+import { getRequest, postRequest, putRequest } from "@/data/HttpExtensions.ts";
 import useSWRMutation from "swr/mutation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { fillForm } from "@/data/FormContextProvider";
 
 export interface ContactPayload {
     name: string;
@@ -17,13 +18,14 @@ export interface ContactPayload {
 
 const EmergencyContactRegistration = () => {
 	const navigate = useNavigate();
+	const { formData, setFormData } = fillForm();
 
 	const addCaregiver = (e) => {
 		navigate("/registro-cuidador");
 	};
 
 	// Review route
-	const {trigger: postTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/create_user`, postRequest);
+	const {trigger: putTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/create_user`, putRequest);
 
 	const FormSchema = z.object({
 		name: z.string().min(1, "Campo obrigatório"),
@@ -40,13 +42,14 @@ const EmergencyContactRegistration = () => {
 
 	const onSubmit = async (data: z.infer<typeof FormSchema>) => {
         try {
-            const payload: ContactPayload = {
-                name: data.name,
-                phone_number: data.phone_number,
+			const registrationData = { 
+                ...formData,
+				emergency_contact_name: data.name,
+				emergency_contact_number: data.phone_number,
             };
 
-            console.log('Sending payload:', payload);
-            await postTrigger(payload);
+            console.log('Registration information:', JSON.stringify(registrationData));			
+            await putTrigger(registrationData);
 			navigate("/");
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -93,10 +96,6 @@ const EmergencyContactRegistration = () => {
 
 					<div className="flex flex-col items-center justify-center space-y-4">
 						<Button type="submit" className="mt-4">Entrar</Button>
-						<p>ou</p>
-						<Button className="mt-4" onClick={addCaregiver}>
-							Adicionar cuidador(a)
-						</Button>
 					</div>
 
                 </form>

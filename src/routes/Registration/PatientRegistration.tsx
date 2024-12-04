@@ -16,6 +16,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { getRequest, postRequest } from "@/data/HttpExtensions.ts";
 import useSWRMutation from "swr/mutation";
 import { useNavigate } from "react-router-dom";
+import { fillForm } from "@/data/FormContextProvider";
 
 // Local Data
 import educationLevel from "@/localdata/education-level.json";
@@ -70,6 +71,7 @@ const otherComorbiditiesInitialValue = [
 const PatientRegistration = () => {
 	// Review route
 	const {trigger: postTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/create_user`, postRequest);
+    const { formData, setFormData } = fillForm();
 
 	const navigate = useNavigate();
 
@@ -91,21 +93,21 @@ const PatientRegistration = () => {
 
     const onSubmit = async (data: z.infer<typeof FormSchema>) => {
         try {
-            const payload: PatientPayload = {
+            setFormData({ 
+                ...formData,
                 name: data.name,
-				phone_number: data.phone_number,
-				birthday: data.birthday ? data.birthday.toISOString().split('T')[0] : "",
-				education_level: data.education_level,
-				gender: data.gender,
-				state: data.state,
-				city: data.city,
-				neighborhood: data.neighborhood,
-                comorbidities: data.comorbidities,
-                comorbidities_to_add: data.other_comorbidities,
-            };
+                email: "", // Needs to retrieve user email from cookie
+                birth_date: data.birthday ? data.birthday.toISOString().split('T')[0] : "",
+                phone_number: data.phone_number,
+                scholarship: data.education_level,
+                accept_tcle: true,
+                gender: data.gender,
+                sex: data.gender,
+                is_caretaker: false,
+            });
 
-            console.log('Sending payload:', payload);
-            await postTrigger(payload);
+            console.log("Filled informations: ", formData);
+
             return navigate("/registro-contato-de-emergencia")
         } catch (error) {
             console.error('Error submitting form:', error);

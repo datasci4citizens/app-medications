@@ -14,6 +14,8 @@ import AddPatient from './routes/Registration/AddPatient';
 import AuthGuard from './guards/auth';
 import { SWRConfig } from 'swr';
 import { AuthProvider } from '@/lib/hooks/auth-context.tsx';
+import { FormProvider } from "@/data/FormContextProvider";
+
 
 export const router = createBrowserRouter([
 	{
@@ -112,14 +114,16 @@ export const router = createBrowserRouter([
 
 export function App() {
 	return (
-		<AuthProvider>
-			<SWRConfig
-				value={{
-					fetcher: (url, args) => fetch(`${import.meta.env.VITE_SERVER_URL}${url}`, { credentials: 'include', ...args }).then(res => res.json())
-				}}
-			>
-				<RouterProvider router={router} />
-			</SWRConfig>
-		</AuthProvider>
+		<FormProvider>
+			<AuthProvider>
+				<SWRConfig
+					value={{
+						fetcher: (url, args) => fetch(`${import.meta.env.VITE_SERVER_URL}${url}`, { credentials: 'include', ...args }).then(res => res.json())
+					}}
+				>
+					<RouterProvider router={router} />
+				</SWRConfig>
+			</AuthProvider>
+		</FormProvider>
 	);
 }
