@@ -37,7 +37,7 @@ export default function DatePicker({field, onSelect, disabled}: DatePickerPopove
                     onSelect={(date) => {
                         {
                             if (date === undefined || onSelect == null) {
-                                field.onChange
+                                field.onChange(date)
                             } else {
                                 onSelect(date)
                             }

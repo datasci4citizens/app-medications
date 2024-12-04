@@ -4,7 +4,10 @@ import { Check, Edit, Trash } from "lucide-react";
 
 export interface Medication {
     id: string;
+    comercialNameId?: number;
+    presentationId?: number;
     name: string;
+    hourSchedule?: number;
     dosageStrength?: string;
     adultDosage?: string;
     pediatric_dosage?: string;
@@ -13,7 +16,7 @@ export interface Medication {
     onDelete?: () => void;
 }
 
-export default function MedicationItem({id, name, dosageStrength, adultDosage, onCheck, onEdit, onDelete}: Medication) {
+export default function MedicationItem({name, dosageStrength, adultDosage, onCheck, onEdit, onDelete}: Medication) {
     const [isChecked, setIsChecked] = useState(false)
 
     const handleCheck = () => {
@@ -40,7 +43,6 @@ export default function MedicationItem({id, name, dosageStrength, adultDosage, o
                 }
                 {onEdit &&
                     <div
-
                         className={`border border-gray-300 rounded flex items-center justify-center cursor-pointer ms-1.5`}
                         onClick={() => onEdit?.()}>
                         <Edit className="text-black p-2" size={32}/>

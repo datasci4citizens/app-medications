@@ -4,6 +4,7 @@ import {
 	green,
 	orange,
 	red,
+	sky,
 	stone,
 	white,
 	yellow,
@@ -59,8 +60,8 @@ export default {
 				},
 				primary: {
 					// biome-ignore lint/style/useNamingConvention: external naming
-					DEFAULT: "#0C4A6E",
-					foreground: "white",
+					DEFAULT: sky[900],
+					foreground: sky[50],
 				},
 				secondary: {
 					// biome-ignore lint/style/useNamingConvention: external naming

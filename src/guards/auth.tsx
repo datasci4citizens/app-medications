@@ -15,7 +15,7 @@ const AuthGuard = () => {
   if (error) {
     console.error("Error while authenticating", error);
   }
-
+  
 	if (JSON. stringify(data) === '{}') {
 		// If user is not authenticated, i.e, data returned is empty, redirect to login page.
 		return <Navigate to="/login" replace />;

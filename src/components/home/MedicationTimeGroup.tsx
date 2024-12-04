@@ -1,10 +1,10 @@
-import type { MedicationTime } from "@/data/medicationTimeListFake.ts";
 import MedicationItem from "@/components/common/MedicationItem.tsx";
+import type { MedicationByTime } from "@/routes/Home/SchuduleMapper.tsx";
 
-export function MedicationTimeGroup({time, medications}: MedicationTime) {
+export function MedicationTimeGroup({time, medications}: MedicationByTime) {
     return (
-        <div className={"mb-16 w-full"}>
-            <div className="text-black text-xl font-semibold mb-8 columns-1">{time}</div>
+        <div className={"mb-8 w-full"}>
+            <div className="text-black text-xl font-semibold mb-4 columns-1">{time}</div>
             {medications.map((med, index) => (
                 <MedicationItem key={index} {...med} />
             ))}
