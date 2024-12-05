@@ -3,12 +3,12 @@ export async function getRequest(url: string) {
         method: 'GET',
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         },
         mode: 'cors'
     }).then(res => {
         const json = res.json()
-        console.log("AAAAAAAA")
         console.log(json)
 
         return json
@@ -21,7 +21,8 @@ export async function postRequest(url: string, { arg }: { arg: any }) {  // Chan
             method: 'POST',
             credentials: 'include',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(arg)  // Use arg directly, as SWR wraps the data
         });
@@ -36,6 +37,32 @@ export async function postRequest(url: string, { arg }: { arg: any }) {  // Chan
         return response.json();
     } catch (error) {
         console.error('POST request failed:', error);
+        throw error;
+    }
+}
+
+export async function putRequest(url: string, { arg }: { arg: any }) {
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(arg)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(`Request failed with status ${response.status}: ${
+                errorData ? JSON.stringify(errorData) : 'No error details'
+            }`);
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('PUT request failed:', error);
         throw error;
     }
 }

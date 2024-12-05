@@ -54,7 +54,7 @@ export default function AddMedication() {
 
     const [isMedicationSelected, setIsMedicationSelected] = useState(false);
 
-    const {data, trigger} = useSWRMutation<Drug[]>('http://localhost:8000/drugs', getRequest);
+    const {data, trigger} = useSWRMutation<Drug[]>(`${import.meta.env.VITE_SERVER_URL}/drugs`, getRequest);
     useEffect(() => {
         trigger();
     }, [trigger]);
@@ -75,8 +75,8 @@ export default function AddMedication() {
         name: "times",
     });
 
-    const {trigger: postTrigger} = useSWRMutation('http://localhost:8000/drugs/1/', postRequest);
-    const {trigger: postScheculeTrigger} = useSWRMutation('http://localhost:8000/schedule/1/schedule', postRequest);
+    const {trigger: postTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/drugs/1/`, postRequest);
+    const {trigger: postScheculeTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/schedule/1/schedule`, postRequest);
 
     const postSchedule = async (drugUseId: number, selectedDays: string[], times: { time: string }[]) => {
         try {

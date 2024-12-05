@@ -1,0 +1,15 @@
+{ 
+    "0": "Sem escolaridade",
+    "1": "Educação Infantil",
+    "2": "Ensino Fundamental Completo",
+    "3": "Ensino Fundamental Incompleto",
+    "4": "Ensino Médio Completo",
+    "5": "Ensino Médio Incompleto",
+    "6": "Ensino Técnico Completo",
+    "7": "Ensino Técnico Incompleto",
+    "8": "Ensino Superior Completo",
+    "9": "Ensino Superior Incompleto",
+    "10": "Pós-graduação (Especialização)",
+    "11": "Mestrado",
+    "12":  "Doutorado"
+}
