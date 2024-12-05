@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -17,6 +17,8 @@ import { getRequest, postRequest } from "@/data/HttpExtensions.ts";
 import useSWRMutation from "swr/mutation";
 import { useNavigate } from "react-router-dom";
 import { fillForm } from "@/data/FormContextProvider";
+import jwtDecode from "jwt-decode";
+// import { getCookie } from 'typescript-cookie';
 
 // Local Data
 import educationLevel from "@/localdata/education-level.json";
@@ -35,6 +37,13 @@ export interface PatientPayload {
     comorbidities?: number[];
     comorbidities_to_add?: string[];
 }
+
+interface JwtPayload {
+    state: string ;
+    id: string;
+    email: string;
+    name: string;
+} 
 
 const FormSchema = z.object({
     name: z.string().min(1, "Campo obrigatório"),
@@ -73,6 +82,27 @@ const PatientRegistration = () => {
 	const {trigger: postTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/create_user`, postRequest);
     const { formData, setFormData } = fillForm();
 
+    function getCookie(cname: string): string {
+        const name = cname + '=';
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return '';
+    }
+
+    useEffect(() => {
+        const cookies = document.cookie; // Returns a string of cookies (e.g., "key1=value1; key2=value2")
+        console.log(cookies);
+    }, []);
+
 	const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -93,6 +123,9 @@ const PatientRegistration = () => {
 
     const onSubmit = async (data: z.infer<typeof FormSchema>) => {
         try {
+
+            // const userEmail: string = jwt !== undefined ? jwtDecode<JwtPayload>(jwt).email : "";
+
             setFormData({ 
                 ...formData,
                 name: data.name,

@@ -25,7 +25,7 @@ const EmergencyContactRegistration = () => {
 	};
 
 	// Review route
-	const {trigger: putTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/create_user`, putRequest);
+	const {trigger: putTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/user`, putRequest);
 
 	const FormSchema = z.object({
 		name: z.string().min(1, "Campo obrigatório"),
