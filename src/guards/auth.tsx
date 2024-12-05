@@ -6,7 +6,7 @@ import LoadingPage from '@/components/ui/loading-page';
 import useSWR from 'swr';
 
 const AuthGuard = () => {
-	const { data, error, isLoading } = useSWR("/users_authentication")
+	const { data, error, isLoading } = useSWR("/user")
 
   if (isLoading) {
     return <LoadingPage />
@@ -15,11 +15,13 @@ const AuthGuard = () => {
   if (error) {
     console.error("Error while authenticating", error);
   }
-  
-	if (JSON. stringify(data) === '{}') {
-		// If user is not authenticated, i.e, data returned is empty, redirect to login page.
+
+	if (data["detail"] === 'User not authenticated') {
+		// If user is not authenticated, redirects to login page.
 		return <Navigate to="/login" replace />;
 	}
+  
+  // TODO: Review if user registration is not completed
 
 	return <UserContextProvider value={{ name: "" }}>
           <Outlet />
