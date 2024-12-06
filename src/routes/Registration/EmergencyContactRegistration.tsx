@@ -95,7 +95,7 @@ const EmergencyContactRegistration = () => {
 					</div>
 
 					<div className="flex flex-col items-center justify-center space-y-4">
-						<Button type="submit" className="mt-4">Entrar</Button>
+						<Button type="submit" className="mt-4">Cadastrar</Button>
 					</div>
 
                 </form>
