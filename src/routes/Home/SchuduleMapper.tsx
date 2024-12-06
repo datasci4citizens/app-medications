@@ -54,6 +54,7 @@ export function getMedicationsByWeekday(schedules: ScheduleResponse[] = []): Med
         console.log("dailySchedules", dailySchedules);
         dailySchedules.forEach((dailySchedule) => {
             const hourlySchedules = schedule.schedules.filter((s) => s.type === 'H');
+            console.log("hourlySchedules", hourlySchedules);
             hourlySchedules.forEach((hourlySchedule) => {
                 console.log("hourlySchedule", hourlySchedule);
                 const medication: Medication = {

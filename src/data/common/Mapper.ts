@@ -26,7 +26,7 @@ export function mapDrugsToMedications(data: Drug[] | undefined): Medication[] {
             comercialNameId: drug.id,
             presentationId: presentation.id,
             name: drug.comercial_name,
-            dosageStrength: presentation.value,
+            dosageStrength: presentation.concentration,
         }))
     ) || [];
 }
@@ -50,7 +50,7 @@ export function mapUserDrugToMedications(data: UserDrug[] | undefined): Medicati
         ? data.flatMap((item) => ({
             id: item.id.toString(),
             name: item.comercial_name.comercial_name,
-            dosageStrength: item.presentation.value,
+            dosageStrength: item.presentation.concentration,
         }))
         : [];
 }

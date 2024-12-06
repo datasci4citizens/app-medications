@@ -11,7 +11,7 @@ import { mapDrugsToMedications } from "@/data/common/Mapper.ts";
 export default function SearchMedication() {
     const {
         data, trigger, isMutating,
-    } = useSWRMutation<Drug[]>(`${import.meta.env.VITE_SERVER_URL}/drugs`, getRequest);
+    } = useSWRMutation<Drug[]>(`${import.meta.env.VITE_SERVER_URL}/drugs/all`, getRequest);
 
     useEffect(() => {
         trigger();
