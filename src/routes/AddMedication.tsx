@@ -54,7 +54,7 @@ export default function AddMedication() {
 
     const [isMedicationSelected, setIsMedicationSelected] = useState(false);
 
-    const {data, trigger} = useSWRMutation<Drug[]>(`${import.meta.env.VITE_SERVER_URL}/drugs`, getRequest);
+    const {data, trigger} = useSWRMutation<Drug[]>(`${import.meta.env.VITE_SERVER_URL}/drugs/all`, getRequest);
     useEffect(() => {
         trigger();
     }, [trigger]);
