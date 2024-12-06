@@ -10,6 +10,9 @@ interface FormData {
   gender: string;
   sex: string;
   is_caretaker: boolean;
+  district: string,
+  city: string,
+  state: string,
   emergency_contact_name: string;
   emergency_contact_number: string;
 }

@@ -17,43 +17,21 @@ import { getRequest, postRequest } from "@/data/HttpExtensions.ts";
 import useSWRMutation from "swr/mutation";
 import { useNavigate } from "react-router-dom";
 import { fillForm } from "@/data/FormContextProvider";
-import jwtDecode from "jwt-decode";
-// import { getCookie } from 'typescript-cookie';
 
 // Local Data
 import educationLevel from "@/localdata/education-level.json";
 import genders from "@/localdata/genders.json";
 
-export interface PatientPayload {
-    name: string;
-	phone_number?: string;
-	birthday?: string;
-	education_level?: string;
-    gender?: string;
-    state?: string;
-	city?: string;
-	neighborhood?: string;
-    accept_tcle?: boolean;
-    comorbidities?: number[];
-    comorbidities_to_add?: string[];
-}
-
-interface JwtPayload {
-    state: string ;
-    id: string;
-    email: string;
-    name: string;
-} 
-
 const FormSchema = z.object({
     name: z.string().min(1, "Campo obrigatório"),
     phone_number: z.string().optional(),
+    email: z.string().optional(),
 	birthday: z.date().nullable().refine(date => date !== null, {message: "Campo obrigatório"}),
 	education_level: z.string().min(1, "Campo obrigatório"),
     gender: z.string().min(1, "Campo obrigatório"),
-	state: z.string().min(2, "Campo obrigatório"),
-	city: z.string().min(2, "Campo obrigatório"),
-	neighborhood: z.string().min(2, "Campo obrigatório"),
+	state: z.string().optional(),
+	city: z.string().optional(),
+	district: z.string().optional(),
     comorbidities:
         z.array(z.string()).optional(), // Ensure this matches your data type
     other_comorbidities:
@@ -82,27 +60,6 @@ const PatientRegistration = () => {
 	const {trigger: postTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/create_user`, postRequest);
     const { formData, setFormData } = fillForm();
 
-    function getCookie(cname: string): string {
-        const name = cname + '=';
-        const decodedCookie = decodeURIComponent(document.cookie);
-        const ca = decodedCookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return '';
-    }
-
-    useEffect(() => {
-        const cookies = document.cookie; // Returns a string of cookies (e.g., "key1=value1; key2=value2")
-        console.log(cookies);
-    }, []);
-
 	const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -110,12 +67,13 @@ const PatientRegistration = () => {
         defaultValues: {
 			name: "",
 			phone_number: "",
+            email: "",
 			birthday: undefined,
 			education_level: "",
 			gender: "",
 			state: "",
 			city: "",
-			neighborhood: "",
+			district: "",
 			comorbidities: [],
 			comorbidities_to_add: [],
         },
@@ -129,7 +87,7 @@ const PatientRegistration = () => {
             setFormData({ 
                 ...formData,
                 name: data.name,
-                email: "", // Needs to retrieve user email from cookie
+                email: data.email,
                 birth_date: data.birthday ? data.birthday.toISOString().split('T')[0] : "",
                 phone_number: data.phone_number,
                 scholarship: data.education_level,
@@ -137,6 +95,9 @@ const PatientRegistration = () => {
                 gender: data.gender,
                 sex: data.gender,
                 is_caretaker: false,
+                state: data.state,
+                city: data.city,
+                district: data.district,
             });
 
             console.log("Filled informations: ", formData);
@@ -225,6 +186,20 @@ function PatientInfoFields({form}) {
 
             <FormField
                 control={form.control}
+                name="email"
+                render={({field}) => (
+                    <FormItem>
+                        <FormLabel>E-mail*</FormLabel>
+                        <FormControl>
+                            <Input {...field} placeholder="E-mail"/>
+                        </FormControl>
+                        <FormMessage/>
+                    </FormItem>
+                )}
+            />
+
+            <FormField
+                control={form.control}
                 name="birthday"
                 render={({field}) => (
                     <FormItem>
@@ -270,7 +245,7 @@ function PatientInfoFields({form}) {
                 name="gender"
                 render={({field}) => (
                     <FormItem>
-                        <FormLabel>Gênero*</FormLabel>
+                        <FormLabel>Sexo*</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger>
@@ -318,7 +293,7 @@ function PatientInfoFields({form}) {
 
 			<FormField
                 control={form.control}
-                name="neighborhood"
+                name="district"
                 render={({field}) => (
                     <FormItem>
                         <FormLabel>Bairro</FormLabel>

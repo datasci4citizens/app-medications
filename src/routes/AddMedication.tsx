@@ -75,8 +75,8 @@ export default function AddMedication() {
         name: "times",
     });
 
-    const {trigger: postTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/drugs/1/`, postRequest);
-    const {trigger: postScheculeTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/schedule/1/schedule`, postRequest);
+    const {trigger: postTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/drugs`, postRequest);
+    const {trigger: postScheculeTrigger} = useSWRMutation(`${import.meta.env.VITE_SERVER_URL}/schedule/schedule`, postRequest);
 
     const postSchedule = async (drugUseId: number, selectedDays: string[], times: { time: string }[]) => {
         try {

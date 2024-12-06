@@ -10,7 +10,7 @@ import { getRequest } from "@/data/common/HttpExtensions.ts";
 
 
 export default function Profile() {
-    const {data, trigger} = useSWRMutation<UserDrug[]>(`${import.meta.env.VITE_SERVER_URL}/drugs/1/`, getRequest);
+    const {data, trigger} = useSWRMutation<UserDrug[]>(`${import.meta.env.VITE_SERVER_URL}/drugs`, getRequest);
 
     useEffect(() => {
         trigger();

@@ -8,7 +8,7 @@ import { getMedicationsByWeekday } from "@/routes/Home/SchuduleMapper.tsx";
 export default function Home() {
     const [currentDate, setCurrentDate] = useState('');
 
-    const {data, trigger} = useSWRMutation<ScheduleResponse[]>(`${import.meta.env.VITE_SERVER_URL}/schedule/1/schedule`, getRequest);
+    const {data, trigger} = useSWRMutation<ScheduleResponse[]>(`${import.meta.env.VITE_SERVER_URL}/schedule/schedule`, getRequest);
     useEffect(() => {
         const today = new Date();
         const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: 'numeric', month: 'long' };

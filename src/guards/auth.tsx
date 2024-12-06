@@ -16,11 +16,14 @@ const AuthGuard = () => {
     console.error("Error while authenticating", error);
   }
 
-	if (data["detail"] === 'User not authenticated') {
+  console.log("User data", data);
+
+	// if (data["detail"] === 'User not authenticated') {
+  if (data === undefined) {
 		// If user is not authenticated, redirects to login page.
 		return <Navigate to="/login" replace />;
 	}
-  
+
   // TODO: Review if user registration is not completed
 
 	return <UserContextProvider value={{ name: "" }}>
