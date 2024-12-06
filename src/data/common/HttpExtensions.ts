@@ -1,4 +1,5 @@
 export async function getRequest(url: string) {
+    console.log("Getting request for: ", url);
     return fetch(url, {
         method: 'GET',
         credentials: 'include',
@@ -7,12 +8,17 @@ export async function getRequest(url: string) {
         },
         mode: 'cors'
     }).then(res => {
-        const json = res.json()
-        console.log("AAAAAAAA")
-        console.log(json)
-
-        return json
-    })
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+    }).then(json => {
+        console.log("Response JSON:", json);
+        return json;
+    }).catch(error => {
+        console.error("Fetch error:", error);
+        throw error;
+    });
 }
 
 export async function postRequest(url: string, { arg }: { arg: any }) {  // Change the signature to match SWR's format
