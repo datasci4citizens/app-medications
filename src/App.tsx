@@ -23,6 +23,54 @@ export const router = createBrowserRouter([
 		element: <LoginPage />,
 	},
 	{
+		path: '/cadastro-paciente-tipo',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<PatientRegistrationType />
+			</AppLayout>
+		),
+	},
+	{
+		path: '/cadastro-perfil',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<ProfileSelection />
+			</AppLayout>
+		),
+	},
+	{
+		path: '/registro-paciente',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<PatientRegistration />
+			</AppLayout>
+		),
+	},
+	{
+		path: '/adicionar-paciente',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<AddPatient />
+			</AppLayout>
+		),
+	},
+	{
+		path: '/registro-cuidador',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<CaregiverRegistration />
+			</AppLayout>
+		),
+	},
+	{
+		path: '/registro-contato-de-emergencia',
+		element: (
+			<AppLayout showBottomNav={false}>
+				<EmergencyContactRegistration />
+			</AppLayout>
+		),
+	},
+	{
 		path: '/',
 		element: (
 			<AuthGuard /> 
@@ -36,54 +84,6 @@ export const router = createBrowserRouter([
 					</AppLayout>
 				)
 			}, 
-			{
-				path: '/cadastro-paciente-tipo',
-				element: (
-					<AppLayout showBottomNav={false}>
-						<PatientRegistrationType />
-					</AppLayout>
-				),
-			},
-			{
-				path: '/cadastro-perfil',
-				element: (
-					<AppLayout showBottomNav={false}>
-						<ProfileSelection />
-					</AppLayout>
-				),
-			},
-			{
-				path: '/registro-paciente',
-				element: (
-					<AppLayout showBottomNav={false}>
-						<PatientRegistration />
-					</AppLayout>
-				),
-			},
-			{
-				path: '/adicionar-paciente',
-				element: (
-					<AppLayout showBottomNav={false}>
-						<AddPatient />
-					</AppLayout>
-				),
-			},
-			{
-				path: '/registro-cuidador',
-				element: (
-					<AppLayout showBottomNav={false}>
-						<CaregiverRegistration />
-					</AppLayout>
-				),
-			},
-			{
-				path: '/registro-contato-de-emergencia',
-				element: (
-					<AppLayout showBottomNav={false}>
-						<EmergencyContactRegistration />
-					</AppLayout>
-				),
-			},
 			{
 				path: '/search',
 				element: (
