@@ -16,12 +16,18 @@ interface DrugUse {
 interface ComercialName {
     id: number;
     comercial_name: string;
+    active_principles: ActivePrinciple[]
+}
+
+interface ActivePrinciple {
+    id: number,
+    code: string,
+    active_ingredient: string
 }
 
 interface Schedule {
     id: number;
     type: string;
-    drug_use_id: number;
     value: number;
 }
 
@@ -36,23 +42,30 @@ export interface MedicationByTime {
 }
 
 export function getMedicationsByWeekday(schedules: ScheduleResponse[] = []): MedicationByTime[] {
+
+    console.log("SCHEDULES", schedules);
     const today = getDay(new Date());
 
     const medicationsByTime: MedicationByTime[] = [];
 
     schedules.forEach((schedule) => {
+        console.log("schedule", schedule);
         const dailySchedules = schedule.schedules.filter((s) => s.type === 'D' && s.value === today);
+        console.log("dailySchedules", dailySchedules);
         dailySchedules.forEach((dailySchedule) => {
-            const hourlySchedules = schedule.schedules.filter((s) => s.type === 'H' && s.drug_use_id === dailySchedule.drug_use_id);
+            const hourlySchedules = schedule.schedules.filter((s) => s.type === 'H');
             hourlySchedules.forEach((hourlySchedule) => {
+                console.log("hourlySchedule", hourlySchedule);
                 const medication: Medication = {
                     id: hourlySchedule.id.toString(),
                     comercialNameId: schedule.drug_use.comercial_name.id,
                     presentationId: schedule.drug_use.presentation.id,
                     name: schedule.drug_use.comercial_name.comercial_name,
-                    dosageStrength: schedule.drug_use.presentation.value,
+                    dosageStrength: schedule.drug_use.presentation.concentration,
                     hourSchedule: hourlySchedule.value,
                 };
+
+                console.log("MEDICATION", medication);
 
                 const existingMedicationIndex = medicationsByTime.findIndex((item) => item.time === hourlySchedule.value);
                 if (medicationsByTime[existingMedicationIndex]) {

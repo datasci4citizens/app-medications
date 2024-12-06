@@ -19,6 +19,8 @@ export default function Home() {
         trigger();
     }, [trigger]);
 
+    console.log("SCHEDULES DATA", data);
+
     const medications = getMedicationsByWeekday(data);
     console.log(medications);
 

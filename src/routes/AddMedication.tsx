@@ -14,6 +14,7 @@ import type { Medication } from "@/components/common/MedicationItem.tsx";
 import { Plus } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { useNavigate } from 'react-router-dom';
 
 interface FormValues {
     medication: string;
@@ -107,6 +108,8 @@ export default function AddMedication() {
         }
     };
 
+    const navigate = useNavigate();
+
     const onSubmit = async (data: FormValues) => {
         try {
             const medication = medications.find(medication => medication.id === data.medication);
@@ -133,6 +136,8 @@ export default function AddMedication() {
             } else {
                 throw new Error('No drug use ID returned');
             }
+
+            navigate("/");
 
             return result;
         } catch (error) {

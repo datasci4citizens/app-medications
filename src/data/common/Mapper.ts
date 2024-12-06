@@ -15,7 +15,8 @@ interface ActiveIngredient {
 
 export interface Presentation {
     id: number
-    value: string
+    concentration: string
+    pharmaceutical_form: string
 }
 
 export function mapDrugsToMedications(data: Drug[] | undefined): Medication[] {
