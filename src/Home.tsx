@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
 
@@ -7,6 +7,7 @@ import { DateSelector } from "./components/DateSelector";
 import { MedicationCard } from "./components/MedicationCard";
 import type { Medication } from "./types";
 import { mockMedication } from "./data/mockMedication";
+import { isSameDay } from "./utils/dateHelpers";
 
 export function Home() {
   const navigate = useNavigate();
@@ -17,26 +18,48 @@ export function Home() {
     return savedData ? JSON.parse(savedData) : mockMedication;
   });
 
-  const toggleMedication = (id: string) => {
+  // Filtrar medicamentos pela data selecionada
+  const filteredMedications = useMemo(() => {
+    return medications.filter(med => {
+      if (!med.scheduledDate) return true; // Mostra se não tem data
+      const medDate = new Date(med.scheduledDate);
+      return isSameDay(medDate, selectedDate);
+    });
+  }, [medications, selectedDate]);
+
+  // Encontrar o próximo medicamento pendente
+  const nextMedication = useMemo(() => {
+    const pending = filteredMedications
+      .filter(med => med.status === 'pending')
+      .sort((a, b) => a.time.localeCompare(b.time));
+    return pending[0];
+  }, [filteredMedications]);
+
+  // Marcar como tomado
+  const handleTake = (id: string) => {
     setMedications(currentList => {
-      // Cria a nova lista com a alteração
-      const newList = currentList.map(med => {
-        if (med.id === id) {
-          return { ...med, taken: !med.taken };
-        }
-        return med;
-      });
-
-      // Salva no cofre para não perder se der F5
+      const newList = currentList.map(med =>
+        med.id === id ? { ...med, status: 'taken' as const, taken: true } : med
+      );
       localStorage.setItem("my_medications", JSON.stringify(newList));
-
       return newList;
     });
-  }
+  };
+
+  // Marcar como esquecido
+  const handleSkip = (id: string) => {
+    setMedications(currentList => {
+      const newList = currentList.map(med =>
+        med.id === id ? { ...med, status: 'skipped' as const, taken: false } : med
+      );
+      localStorage.setItem("my_medications", JSON.stringify(newList));
+      return newList;
+    });
+  };
 
   const editMedication = (id: string) => {
-    navigate(`/edit/${id}`)
-  }
+    navigate(`/edit/${id}`);
+  };
 
   const deleteMedication = (id: string) => {
     if (!confirm("Tem certeza?")) return;
@@ -44,51 +67,61 @@ export function Home() {
     setMedications(currentList => {
       const newList = currentList.filter(med => med.id !== id);
       localStorage.setItem("my_medications", JSON.stringify(newList));
-
       return newList;
     });
-  }
-
-  const goToToday = () => {
-    setSelectedDate(new Date());
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      
-      <Header onTitleClick={goToToday} />
-      
-      <DateSelector 
-        selectedDate={selectedDate} 
-        onDateChange={setSelectedDate} 
+
+      <Header />
+
+      <DateSelector
+        selectedDate={selectedDate}
+        onDateChange={setSelectedDate}
       />
 
       <main className="max-w-md mx-auto px-4 py-6">
+
+        {/* PRÓXIMO HORÁRIO */}
+        {nextMedication && (
+          <div className="mb-6">
+            <h2 className="text-purple-600 font-bold text-lg uppercase tracking-wide">
+              Próximo Horário: {nextMedication.time}
+            </h2>
+          </div>
+        )}
+
+        {/* Lista de Medicamentos */}
         <div className="flex flex-col">
-          {medications.map((med) => (
+          {filteredMedications.map((med) => (
             <MedicationCard
               key={med.id}
               medication={med}
-              onToggle={toggleMedication}
+              onTake={handleTake}
+              onSkip={handleSkip}
               onDelete={deleteMedication}
               onEdit={editMedication}
             />
           ))}
         </div>
 
-        {medications.length === 0 && (
+        {/* Estado vazio */}
+        {filteredMedications.length === 0 && (
           <p className="text-center text-gray-500 mt-10">
-            Nenhum medicamento para hoje.
+            Nenhum medicamento para este dia.
           </p>
         )}
+
       </main>
 
-      <button 
+      <button
         onClick={() => navigate("/add")}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        className="fixed bottom-6 right-6 bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-colors"
       >
         <FiPlus size={24} />
       </button>
 
     </div>
-  )}
+  );
+}
