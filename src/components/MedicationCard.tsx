@@ -24,7 +24,7 @@ export function MedicationCard({ medication, onTake, onSkip, onDelete, onEdit }:
 
       {/* Faixa Lateral */}
       <div className={`
-      w-10 shrink-0
+      absolute left-3 top-0 bottom-0 w-4 shadow-sm
       ${isTaken ? 'bg-green-500' :
           isSkipped ? 'bg-red-500' :
             'bg-pink-600'}
@@ -32,7 +32,7 @@ export function MedicationCard({ medication, onTake, onSkip, onDelete, onEdit }:
 
       {/* Container de Conteudo */}
 
-      <div className="flex flex-1 items-center justify-between p-4 pl-5">
+      <div className="flex flex-1 items-center justify-between p-4 pl-12">
         {/* Info dos Medicamentos */}
 
         <div className="flex flex-col gap-1">
