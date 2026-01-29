@@ -19,7 +19,7 @@ export function MedicationCard({ medication, onTake, onSkip, onDelete, onEdit }:
 
     <div className={`
     group relative flex w-full rounded-2xl shadow-md overflow-hidden transition-all
-    ${isTaken ? 'bg-green-50 opacity-80' : isSkipped ? 'bg-green-50 opacity-80' : 'bg-fuchsia-50 hover:shadow-lg'}
+    ${isTaken ? 'bg-green-50 opacity-80' : isSkipped ? 'bg-red-50 opacity-80' : 'bg-fuchsia-50 hover:shadow-lg'}
   `}>
 
       {/* Faixa Lateral */}
@@ -49,6 +49,11 @@ export function MedicationCard({ medication, onTake, onSkip, onDelete, onEdit }:
               Marca: {medication.brand}
             </span>
           )}
+
+          {medication.brand && (
+            <span className="items-center flex gap-1 text-gray-500 text-sm"> <FiClock size={14}/> {medication.time} </span>
+          )}
+
         </div>
 
         {/* Botão Principal de Ação */}
@@ -95,4 +100,3 @@ export function MedicationCard({ medication, onTake, onSkip, onDelete, onEdit }:
 
     </div>);
 }
-

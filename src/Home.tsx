@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
 
 import { Header } from "./components/Header";
-import { DateSelector } from "./components/DateSelector";
+import { DateSelector } from "./components/DateSelector.tsx";
 import { MedicationCard } from "./components/MedicationCard";
 import type { Medication } from "./types";
 import { mockMedication } from "./data/mockMedication";
@@ -17,6 +17,11 @@ export function Home() {
     const savedData = localStorage.getItem("my_medications");
     return savedData ? JSON.parse(savedData) : mockMedication;
   });
+
+  // Persiste no localStorage sempre que a lista de medicamentos mudar
+  useEffect(() => {
+    localStorage.setItem("my_medications", JSON.stringify(medications));
+  }, [medications]);
 
   // Filtrar medicamentos pela data selecionada
   const filteredMedications = useMemo(() => {
@@ -38,22 +43,18 @@ export function Home() {
   // Marcar como tomado
   const handleTake = (id: string) => {
     setMedications(currentList => {
-      const newList = currentList.map(med =>
+      return currentList.map(med =>
         med.id === id ? { ...med, status: 'taken' as const, taken: true } : med
       );
-      localStorage.setItem("my_medications", JSON.stringify(newList));
-      return newList;
     });
   };
 
   // Marcar como esquecido
   const handleSkip = (id: string) => {
     setMedications(currentList => {
-      const newList = currentList.map(med =>
+      return currentList.map(med =>
         med.id === id ? { ...med, status: 'skipped' as const, taken: false } : med
       );
-      localStorage.setItem("my_medications", JSON.stringify(newList));
-      return newList;
     });
   };
 
@@ -65,16 +66,15 @@ export function Home() {
     if (!confirm("Tem certeza?")) return;
 
     setMedications(currentList => {
-      const newList = currentList.filter(med => med.id !== id);
-      localStorage.setItem("my_medications", JSON.stringify(newList));
-      return newList;
+      return currentList.filter(med => med.id !== id);
     });
   };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
 
-      <Header />
+      <Header onTitleClick={() => navigate("/home")} />
+
 
       <DateSelector
         selectedDate={selectedDate}
@@ -93,7 +93,7 @@ export function Home() {
         )}
 
         {/* Lista de Medicamentos */}
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-4">
           {filteredMedications.map((med) => (
             <MedicationCard
               key={med.id}

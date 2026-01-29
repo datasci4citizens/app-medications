@@ -11,6 +11,8 @@ export function AddMedication() {
    const [name, setName] = useState("");
    const [dosage, setDosage] = useState("");
    const [time, setTime] = useState("");
+   const [brand, setBrand] = useState("");
+   const [scheduledDate, setScheduledDate] = useState("");
 
    useEffect(() => {
       if (id) {
@@ -30,11 +32,11 @@ export function AddMedication() {
    function handleSave(e: React.FormEvent) {
       e.preventDefault();
 
-      if(!name || !dosage || !time) {
+      if (!name || !dosage || !time) {
          alert("Por favor, preencha todos os campos.");
          return;
       }
-      
+
       const savedData = localStorage.getItem("my_medications");
       const currentList: Medication[] = savedData ? JSON.parse(savedData) : [];
 
@@ -51,9 +53,12 @@ export function AddMedication() {
             id: Date.now().toString(),
             name,
             dosage,
+            brand,
             time,
+            scheduledDate,
             type: 'tablet',
-            taken: false
+            taken: false,
+            status: 'pending'
          };
          updatedList = [...currentList, newMedication];
       }
@@ -122,6 +127,26 @@ export function AddMedication() {
                      required
                   />
                </div>
+
+               <div className="flex flex-col gap-2">
+                  <label htmlFor="brand" className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Marca</label>
+                  <input id="brand" type="text" value={brand} placeholder="Ex: EMS, Medley, Ache..." onChange={(e) => setBrand(e.target.value)} className="p-4 rounded-lg border border-gray-300 text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" />
+               </div>
+
+               <div className="flex flex-col gap-2">
+                  <label htmlFor="scheduledDate" className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                     Data
+                  </label>
+                  <input
+                     id="scheduledDate"
+                     type="date"
+                     value={scheduledDate}
+                     onChange={(e) => setScheduledDate(e.target.value)}
+                     className="p-4 rounded-lg border border-gray-300 text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all bg-white"
+                     required
+                  />
+               </div>
+
                <button
                   type="submit"
                   className="mt-4 bg-blue-600 text-white font-bold text-lg p-4 rounded-xl shadow-lg hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
