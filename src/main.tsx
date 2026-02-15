@@ -1,24 +1,32 @@
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './index.css';
-import App from './App.tsx';
-import { Home } from './Home.tsx'
 import { AddMedication } from './AddMedication.tsx';
+import App from './App.tsx';
+import { Home } from './Home.tsx';
+// controle de login
+import { AuthProvider } from './contexts/AuthContext.tsx';
+import { GuestRoute, ProtectedRoute } from './utils/ProtectedRoute.tsx';
+
+
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={clientId}>
       <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<App />} />
-          <Route path='/home' element={<Home />} />
-          <Route path="/add" element={<AddMedication />} />
-          <Route path="/edit/:id" element={<AddMedication />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<GuestRoute><App /></GuestRoute>} />
+            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/add" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
+            <Route path="/edit/:id" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>
   </StrictMode>,
