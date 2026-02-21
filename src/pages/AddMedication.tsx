@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { FiArrowLeft, FiSave } from 'react-icons/fi';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { Medication } from './types';
+import type { Medication } from '../types';
+import { useMedications } from '../hooks/useMedications';
 
 export function AddMedication() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = Boolean(id);
+  const { addMedication, updateMedication, getMedicationById } = useMedications();
 
   const [name, setName] = useState('');
   const [dosage, setDosage] = useState('');
@@ -16,18 +18,16 @@ export function AddMedication() {
 
   useEffect(() => {
     if (id) {
-      const savedData = localStorage.getItem('my_medications');
-      if (savedData) {
-        const list: Medication[] = JSON.parse(savedData);
-        const found = list.find((item) => item.id === id);
-        if (found) {
-          setName(found.name);
-          setDosage(found.dosage);
-          setTime(found.time);
-        }
+      const found = getMedicationById(id);
+      if (found) {
+        setName(found.name);
+        setDosage(found.dosage);
+        setTime(found.time);
+        setBrand(found.brand || '');
+        setScheduledDate(found.scheduledDate || '');
       }
     }
-  }, [id]);
+  }, [id, getMedicationById]);
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -37,18 +37,16 @@ export function AddMedication() {
       return;
     }
 
-    const savedData = localStorage.getItem('my_medications');
-    const currentList: Medication[] = savedData ? JSON.parse(savedData) : [];
-
-    let updatedList: Medication[];
-
-    if (isEditing) {
-      updatedList = currentList.map((item) =>
-        item.id === id ? { ...item, name, dosage, time } : item,
-      );
+    if (isEditing && id) {
+      updateMedication(id, {
+        name,
+        dosage,
+        time,
+        brand,
+        scheduledDate,
+      });
     } else {
-      const newMedication: Medication = {
-        id: Date.now().toString(),
+      addMedication({
         name,
         dosage,
         brand,
@@ -56,12 +54,9 @@ export function AddMedication() {
         scheduledDate,
         type: 'tablet',
         taken: false,
-        status: 'pending',
-      };
-      updatedList = [...currentList, newMedication];
+      });
     }
 
-    localStorage.setItem('my_medications', JSON.stringify(updatedList));
     alert(`Medicamento ${isEditing ? 'atualizado' : 'salvo'} com sucesso!`);
     navigate('/home');
   }

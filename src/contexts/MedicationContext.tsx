@@ -1,8 +1,6 @@
-// src/contexts/MedicationContext.tsx
-
 import { createContext, useEffect, useState } from 'react';
 import type { Medication } from '../types';
-import { medicationStorage } from '../utils/storage';
+import { medicationStorage } from '../utils/storage.ts';
 import { mockMedication } from '../data/mockMedication';
 
 // ============================================
@@ -27,6 +25,7 @@ interface MedicationContextType {
 
 export const MedicationContext = createContext<MedicationContextType>({} as MedicationContextType);
 
+
 // ============================================
 // PROVIDER
 // ============================================
@@ -41,7 +40,7 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     const loadMedications = () => {
       try {
-        const saved = medicationStorage.getMedications<Medication>();
+        const saved = medicationStorage.getMedications();
         
         if (saved && saved.length > 0) {
           setMedications(saved);

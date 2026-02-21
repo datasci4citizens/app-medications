@@ -1,27 +1,31 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { DateSelector } from '../components/medication/DateSelector.tsx';
 import { Header } from '../components/layout/Header';
 import { MedicationCard } from '../components/medication/MedicationCard';
-import { mockMedication } from '../data/mockMedication';
 import type { Medication } from '../types/';
 import { isSameDay } from '../utils/dateHelpers';
 
+import { useMedications } from '../hooks/useMedications.ts';
+import { ConfirmModal } from '../components/common/Modal.tsx';
+
 
 export function Home() {
+
+  const { medications, markAsTaken, markAsSkipped, deleteMedication } = useMedications();
+  const [medicationToDelete, setMedicationToDelete] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [medications, setMedications] = useState<Medication[]>(() => {
-    const savedData = localStorage.getItem('my_medications');
-    return savedData ? JSON.parse(savedData) : mockMedication;
-  });
+  // const [medications, setMedications] = useState<Medication[]>(() => {
+  //   const savedData = localStorage.getItem('my_medications');
+  //   return savedData ? JSON.parse(savedData) : mockMedication;
+  // });
 
-  // Persiste no localStorage sempre que a lista de medicamentos mudar
-  useEffect(() => {
-    localStorage.setItem('my_medications', JSON.stringify(medications));
-  }, [medications]);
+  // Nota: A persistência é feita automaticamente pelo MedicationContext
+  // Não é necessário salvar novamente aqui
 
   // Filtrar medicamentos pela data selecionada
   const filteredMedications = useMemo(() => {
@@ -42,32 +46,21 @@ export function Home() {
 
   // Marcar como tomado
   const handleTake = (id: string) => {
-    setMedications((currentList) => {
-      return currentList.map((med) =>
-        med.id === id ? { ...med, status: 'taken' as const, taken: true } : med,
-      );
-    });
+    markAsTaken(id);
   };
 
   // Marcar como esquecido
   const handleSkip = (id: string) => {
-    setMedications((currentList) => {
-      return currentList.map((med) =>
-        med.id === id ? { ...med, status: 'skipped' as const, taken: false } : med,
-      );
-    });
+    markAsSkipped(id)
   };
 
   const editMedication = (id: string) => {
     navigate(`/edit/${id}`);
   };
 
-  const deleteMedication = (id: string) => {
-    if (!confirm('Tem certeza?')) return;
-
-    setMedications((currentList) => {
-      return currentList.filter((med) => med.id !== id);
-    });
+  const handleDelete = (id: string) => {
+    setMedicationToDelete(id);
+    setIsModalOpen(true);
   };
 
   return (
@@ -94,7 +87,7 @@ export function Home() {
               medication={med}
               onTake={handleTake}
               onSkip={handleSkip}
-              onDelete={deleteMedication}
+              onDelete={handleDelete}
               onEdit={editMedication}
             />
           ))}
@@ -112,6 +105,18 @@ export function Home() {
       >
         <FiPlus size={24} />
       </button>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        title="Tem certeza de que deseja excluir este item?"
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={() => {
+          if (medicationToDelete) {
+            deleteMedication(medicationToDelete); // 1. Apaga usando o ID salvo na memória
+            setIsModalOpen(false);                // 2. Fecha o modal
+          }
+        }}
+      />
     </div>
   );
 }
