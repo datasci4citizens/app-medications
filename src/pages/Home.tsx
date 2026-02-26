@@ -58,6 +58,10 @@ export function Home() {
     navigate(`/edit/${id}`);
   };
 
+  const handleCardClick = (id: string) => {
+    navigate(`/medication/user/${id}`);
+  };
+
   const handleDelete = (id: string) => {
     setMedicationToDelete(id);
     setIsModalOpen(true);
@@ -89,6 +93,7 @@ export function Home() {
               onSkip={handleSkip}
               onDelete={handleDelete}
               onEdit={editMedication}
+              onClick={handleCardClick}
             />
           ))}
         </div>

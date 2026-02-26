@@ -1,5 +1,5 @@
 import { FiCheck, FiClock, FiEdit, FiTrash2, FiX } from 'react-icons/fi';
-import type { Medication } from '../types';
+import type { Medication } from '../../types/';
 
 interface MedicationCardProps {
   medication: Medication;
@@ -7,6 +7,7 @@ interface MedicationCardProps {
   onSkip: (id: string) => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
+  onClick: (id: string) => void;
 }
 
 export function MedicationCard({
@@ -15,6 +16,7 @@ export function MedicationCard({
   onSkip,
   onDelete,
   onEdit,
+  onClick,
 }: MedicationCardProps) {
   const isTaken = medication.status === 'taken';
   const isSkipped = medication.status === 'skipped';
@@ -22,8 +24,9 @@ export function MedicationCard({
 
   return (
     <div
+      onClick={() => onClick(medication.id)}
       className={`
-    group relative flex w-full rounded-2xl shadow-md overflow-hidden transition-all
+    group relative flex w-full rounded-2xl shadow-md overflow-hidden transition-all cursor-pointer
     ${isTaken ? 'bg-green-50 opacity-80' : isSkipped ? 'bg-red-50 opacity-80' : 'bg-fuchsia-50 hover:shadow-lg'}
   `}
     >
@@ -67,7 +70,10 @@ export function MedicationCard({
         <div className="flex flex-col items-end gap-2">
           {isPending && (
             <button
-              onClick={() => onTake(medication.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onTake(medication.id);
+              }}
               className="bg-green-500 text-white px-8 py-2.5 rounded-full font-semibold text-base hover:bg-green-600 active:scale-95 transition-all shadow-sm"
             >
               Tomar
@@ -93,7 +99,10 @@ export function MedicationCard({
       <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         {isPending && (
           <button
-            onClick={() => onSkip(medication.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSkip(medication.id);
+            }}
             className="p-1.5 text-gray-400 hover:text-red-500 bg-white/50 rounded-full"
             title="Marcar como esquecido"
           >
@@ -101,13 +110,19 @@ export function MedicationCard({
           </button>
         )}
         <button
-          onClick={() => onEdit(medication.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(medication.id);
+          }}
           className="p-1.5 text-gray-400 hover:text-blue-500 bg-white/50 rounded-full"
         >
           <FiEdit size={14} />
         </button>
         <button
-          onClick={() => onDelete(medication.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(medication.id);
+          }}
           className="p-1.5 text-gray-400 hover:text-red-500 bg-white/50 rounded-full"
         >
           <FiTrash2 size={14} />

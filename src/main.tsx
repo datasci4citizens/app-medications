@@ -36,7 +36,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/add" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
               <Route path="/edit/:id" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
               <Route path='/search' element={<ProtectedRoute> <SearchMedication/> </ProtectedRoute>}/> 
-              <Route path='/medication/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
+              <Route path='/medication/user/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
+              <Route path='/medication/search/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
             </Routes>
           </MedicationProvider>
         </AuthProvider>
