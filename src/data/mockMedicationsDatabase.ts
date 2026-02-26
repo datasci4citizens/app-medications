@@ -1,13 +1,4 @@
-// src/data/mockMedicationsDatabase.ts
-
-export interface MedicationInfo {
-   id: string;
-   name: string;
-   activeIngredient: string;
-   type: 'Comprimido' | 'Cápsula' | 'Ampola' | 'Líquido' | 'Injeção';
-   commonBrands?: string[];
-}
-
+import type { MedicationInfo } from "../types";
 
 export const medicationsDatabase: MedicationInfo[] = [
   {
@@ -16,6 +7,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'butilbrometo de escopolamina',
     type: 'Ampola',
     commonBrands: ['Ache', 'Hyoscine'],
+    whenToTake: 'Independente',
+    canSplit: false,
   },
   {
     id: '2',
@@ -23,6 +16,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'metamizol sódico',
     type: 'Líquido',
     commonBrands: ['Novalgina', 'Medley'],
+    whenToTake: 'Independente',
+    canSplit: false,
   },
   {
     id: '3',
@@ -30,6 +25,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'acetaminofeno',
     type: 'Comprimido',
     commonBrands: ['Tylenol', 'EMS'],
+    whenToTake: 'Após Refeição',
+    canSplit: true,
   },
   {
     id: '4',
@@ -37,6 +34,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'amoxicilina tri-hidratada',
     type: 'Cápsula',
     commonBrands: ['Amoxil', 'Eurofarma'],
+    whenToTake: 'Com Refeição',
+    canSplit: false,
   },
   {
     id: '5',
@@ -44,6 +43,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'losartana potássica',
     type: 'Comprimido',
     commonBrands: ['Aradois', 'Neo Química'],
+    whenToTake: 'Independente',
+    canSplit: true,
   },
   {
     id: '6',
@@ -51,6 +52,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'omeprazol',
     type: 'Cápsula',
     commonBrands: ['Losec', 'Prati-Donaduzzi'],
+    whenToTake: 'Antes da Refeição',
+    canSplit: false,
   },
   {
     id: '7',
@@ -58,6 +61,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'simeticona',
     type: 'Líquido',
     commonBrands: ['Luftal', 'Cimed'],
+    whenToTake: 'Após Refeição',
+    canSplit: false,
   },
   {
     id: '8',
@@ -65,6 +70,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'ibuprofeno',
     type: 'Comprimido',
     commonBrands: ['Advil', 'Alivium'],
+    whenToTake: 'Com Refeição',
+    canSplit: true,
   },
   {
     id: '9',
@@ -72,6 +79,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'insulina humana',
     type: 'Injeção',
     commonBrands: ['Novo Nordisk', 'Eli Lilly'],
+    whenToTake: 'Independente',
+    canSplit: false,
   },
   {
     id: '10',
@@ -79,14 +88,17 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'ácido ascórbico',
     type: 'Comprimido',
     commonBrands: ['Cebion', 'Redoxon'],
+    whenToTake: 'Com Refeição',
+    canSplit: true,
   },
-  // teste de outro composto ativo
   {
     id: '11',
     name: 'Tylenol',
     activeIngredient: 'acetaminofeno',
     type: 'Comprimido',
     commonBrands: ['Kenvue'],
+    whenToTake: 'Após Refeição',
+    canSplit: true,
   },
   {
     id: '12',
@@ -94,6 +106,8 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'ibuprofeno',
     type: 'Cápsula',
     commonBrands: ['Haleon'],
+    whenToTake: 'Com Refeição',
+    canSplit: false,
   },
   {
     id: '13',
@@ -101,28 +115,21 @@ export const medicationsDatabase: MedicationInfo[] = [
     activeIngredient: 'metamizol sódico',
     type: 'Comprimido',
     commonBrands: ['Sanofi'],
+    whenToTake: 'Independente',
+    canSplit: true,
   },
 ];
 
-// Sistema de Busca ficticio (tem que arrumar com o backend depois)
+export function searchMedication(query: string): MedicationInfo[] {
+  if (!query || query.trim().length == 0) {
+    return [];
+  }
 
-/**
- * Busca medicamentos por nome ou princípio ativo
- * @param query - Texto digitado pelo usuário
- * @returns Lista de medicamentos que combinam
- */
+  const searchTerm = query.toLowerCase().trim();
 
-export function searchMedication(query: string) : MedicationInfo[] {
-   
-   if(!query || query.trim().length == 0) {
-      return [];
-   }
-
-   const searchTerm = query.toLowerCase().trim();
-
-   return medicationsDatabase.filter((med) => {
-      const nameMatch = med.name.toLowerCase().includes(searchTerm);
-      const ingredientMatch = med.activeIngredient.toLowerCase().includes(searchTerm);
-      return nameMatch || ingredientMatch;
-   })
+  return medicationsDatabase.filter((med) => {
+    const nameMatch = med.name.toLowerCase().includes(searchTerm);
+    const ingredientMatch = med.activeIngredient.toLowerCase().includes(searchTerm);
+    return nameMatch || ingredientMatch;
+  });
 }

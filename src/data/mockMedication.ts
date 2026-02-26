@@ -7,10 +7,12 @@ export const mockMedication: Medication[] = [
     brand: 'EMS',
     dosage: '50mg',
     time: '08:00',
-    scheduledDate: '2026-02-09', // Hoje
+    scheduledDate: '2026-02-09',
     type: 'tablet',
+    endDate: '2026-03-15',
     taken: false,
     status: 'pending',
+    medicationInfoId: '5',
   },
   {
     id: '2',
@@ -18,10 +20,12 @@ export const mockMedication: Medication[] = [
     brand: 'Medley',
     dosage: '1g',
     time: '14:00',
-    scheduledDate: '2026-02-09', // Hoje
+    scheduledDate: '2026-02-09',
     type: 'liquid',
+    endDate: '2026-02-20',
     taken: false,
     status: 'pending',
+    medicationInfoId: '2',
   },
   {
     id: '3',
@@ -29,7 +33,7 @@ export const mockMedication: Medication[] = [
     brand: 'Ache',
     dosage: '25mg',
     time: '20:00',
-    scheduledDate: '2026-02-09', // Hoje
+    scheduledDate: '2026-02-09',
     type: 'tablet',
     taken: false,
     status: 'pending',
@@ -40,10 +44,11 @@ export const mockMedication: Medication[] = [
     brand: 'Addera',
     dosage: '2000UI',
     time: '09:00',
-    scheduledDate: '2026-02-10', // Amanhã
+    scheduledDate: '2026-02-10',
     type: 'capsule',
     taken: false,
     status: 'pending',
+    medicationInfoId: '10',
   },
   {
     id: '5',
@@ -51,9 +56,11 @@ export const mockMedication: Medication[] = [
     brand: 'Genérico',
     dosage: '20mg',
     time: '07:30',
-    scheduledDate: '2026-02-08', // Ontem
+    scheduledDate: '2026-02-08',
     type: 'capsule',
+    endDate: '2026-04-01',
     taken: true,
     status: 'taken',
+    medicationInfoId: '6',
   },
 ];

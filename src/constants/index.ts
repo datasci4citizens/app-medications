@@ -1,3 +1,9 @@
+import boxImage from '../assets/medications/caixa_generica_1.png';
+import comprimidoImage from '../assets/medications/comprimido.png';
+import ampolaImage from '../assets/medications/ampola.png';
+import capsulaImage from '../assets/medications/capsula.png';
+import liquidoImage from '../assets/medications/liquido.png';
+
 
 export const COLORS = {
   primary: {
@@ -60,6 +66,37 @@ export const MEDICATION_STATUS_LABELS: Record<string, string> = {
 // ============================================
 // STORAGE KEYS
 // ============================================
+// ============================================
+// BRAND COLORS
+// ============================================
+export const BRAND_COLORS: Record<string, string> = {
+  ACHE: '#ef4444', // red-500
+  HYOSCINE: '#8b5cf6', // violet-500
+  NOVALGINA: '#64748b', // slate-500
+  MEDLEY: '#06b6d4', // cyan-500
+  TYLENOL: '#ec4899', // pink-500
+  EMS: '#0ea5e9', // sky-500
+  AMOXIL: '#6366f1', // indigo-500
+  EUROFARMA: '#10b981', // emerald-500
+  ARADOIS: '#f59e0b', // amber-500
+  'NEO QUÍMICA': '#8b5cf6', // violet-500
+  LOSEC: '#7c3aed', // violet-600
+  'PRATI-DONADUZZI': '#06b6d4', // cyan-500
+  LUFTAL: '#41833b', // yellow-500
+  CIMED: '#fbbf24', // amber-400
+  'NOVO NORDISK': '#1e40af', // blue-700
+  'ELI LILLY': '#b91c1c', // red-700
+  CEBION: '#f97316', // orange-500
+  REDOXON: '#f87171', // red-400
+  KENVUE: '#1f2937', // gray-800
+  HALEON: '#06b6d4', // cyan-500
+  SANOFI: '#ffffff', // white
+  GENÉRICO: '#9ca3af', // gray-400
+} as const;
+
+// ============================================
+// STORAGE KEYS
+// ============================================
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'auth_token',
   USER: 'user',
@@ -87,3 +124,27 @@ export const STORAGE_KEYS = {
 //   },
 // } as const;
 
+
+// export const BRAND_COLORS = {
+//   CIMED: '#FFC600', // Amarelo principal (logo vibrante)
+//   MEDLEY: '#40E0D0', // Turquesa principal (azul-esverdeado)
+//   ACHE: '#015A80', // Azul escuro
+//   EMS: '#003366', // Azul marinho
+//   EUROFARMA: '#CC1715', // Vermelho
+//   NEO_QUIMICA: '#242B6B', // Azul escuro
+// } as const;
+
+
+export const MEDICATION_TYPE_IMAGES: Record<string, { 
+  image: string; 
+  position: string;
+  size: string;
+}> = {
+  'Comprimido': { image: comprimidoImage, position: 'bottom-0 right-2', size: 'w-28' },
+  'Cápsula':    { image: capsulaImage,    position: 'bottom-0 right-2', size: 'w-24' },
+  'Ampola':     { image: ampolaImage,     position: 'bottom-2 right-4', size: 'w-20' },
+  'Líquido':    { image: liquidoImage,    position: 'bottom-0 right-2', size: 'w-20' },
+  'Injeção':    { image: comprimidoImage, position: 'bottom-0 right-2', size: 'w-20' }, // fallback
+};
+
+export const BOX_IMAGE = boxImage;
