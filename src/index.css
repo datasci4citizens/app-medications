@@ -8,3 +8,31 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Animação de entrada da direita */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Animação de saída para a direita */
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.page-transition-right {
+  animation: slideInFromRight 0.3s ease-out forwards;
+}
+
+.page-exit-right {
+  animation: slideOutToRight 0.3s ease-in forwards;
+}

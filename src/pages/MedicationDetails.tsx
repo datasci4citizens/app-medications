@@ -1,4 +1,4 @@
-import { useNavigate, useParams, Navigate } from "react-router-dom"
+import { useNavigate, useParams, Navigate, useLocation } from "react-router-dom"
 import { useEffect, useState } from "react";
 import { useMedications } from "../hooks/useMedications";
 import { medicationsDatabase } from "../data/mockMedicationsDatabase";
@@ -16,39 +16,54 @@ export function MedicationDetails() {
 
    const navigate = useNavigate();
    const { id } = useParams()
-   // const location = useLocation();
+   const location = useLocation();
 
-   const { getMedicationById, markAsTaken, markAsSkipped, deleteMedication } = useMedications();
+   const { medications, getMedicationById, markAsTaken, markAsSkipped, deleteMedication } = useMedications();
    const [medication, setMedication] = useState<Medication>();
    const [medicationInfo, setMedicationInfo] = useState<MedicationInfo>();
    const [haveUser, setHaveUser] = useState<boolean>(false);
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+   const [isExiting, setIsExiting] = useState(false);
 
-
+   // Tem que arrumar esse sistema de ID que não esta organizado (criar issue)
    useEffect(() => {
-      const newMed = getMedicationById(String(id))
+      const isUserRoute = location.pathname.includes('/user/');
 
-      if (newMed) {
-         setHaveUser(true)
-         setMedication(newMed)
-         // Se o medicamento do usuário tiver um link para a base global, buscamos as informações extras
-         if (newMed.medicationInfoId) {
-            const dbMed = medicationsDatabase.find((medicine) => medicine.id === newMed.medicationInfoId)
-            setMedicationInfo(dbMed)
-         } else {
-            // Tenta buscar pelo nome se não tiver ID vinculado (fallback)
-            const dbMed = medicationsDatabase.find((medicine) => medicine.name.toLowerCase() === newMed.name.toLowerCase())
+      if (isUserRoute) {
+         const userMed = getMedicationById(String(id))
+         if (userMed) {
+            setHaveUser(true)
+            setMedication(userMed)
+            // Busca info extra na base global pelo ID vinculado ou pelo nome
+            const dbMed = medicationsDatabase.find((m) => m.id === userMed.medicationInfoId) || 
+                          medicationsDatabase.find((m) => m.name.toLowerCase() === userMed.name.toLowerCase());
             setMedicationInfo(dbMed)
          }
       } else {
-         setHaveUser(false)
-         const dbMed = medicationsDatabase.find((medicine) => medicine.id === id)
+         // Se viemos da Busca, o ID é o ID da base global
+         const dbMed = medicationsDatabase.find((m) => m.id === id)
          setMedicationInfo(dbMed)
+         const userMed = medications.find(m => m.medicationInfoId === id);
+         
+         if (userMed) {
+            setHaveUser(true)
+            setMedication(userMed)
+         } else {
+            setHaveUser(false)
+            setMedication(undefined)
+         }
       }
-   }, [id, getMedicationById])
+   }, [id, getMedicationById, location.pathname, medications])
 
    // Dados a exibir dependendo da fonte
    const displayData = haveUser ? medication : medicationInfo;
+
+   function handleBack() {
+      setIsExiting(true);
+      setTimeout(() => {
+         navigate(-1);
+      }, 250);
+   }
 
    const handleTake = () => {
       if (medication) {
@@ -69,14 +84,17 @@ export function MedicationDetails() {
    const handleDelete = () => {
       if (medication) {
          deleteMedication(medication.id);
-         navigate('/home');
+         setIsExiting(true);
+         setTimeout(() => {
+            navigate('/home');
+         }, 250);
       }
    };
 
    if (!displayData) {
       return (
-         <div className="min-h-screen bg-[#eeeef4] px-6 py-8 flex items-center justify-center">
-            <button onClick={() => navigate(-1)} className="absolute top-8 left-6 text-gray-600 hover:text-purple-600 transition-colors">
+         <div className={`min-h-screen bg-[#eeeef4] px-6 py-8 flex items-center justify-center ${isExiting ? 'page-exit-right' : 'page-transition-right'}`}>
+            <button onClick={handleBack} className="absolute top-8 left-6 text-gray-600 hover:text-purple-600 transition-colors">
                <FiArrowLeft size={24} />
             </button>
             <p className="text-gray-500 text-center">Medicamento não encontrado</p>
@@ -89,10 +107,10 @@ export function MedicationDetails() {
    const isPending = medication?.status === 'pending';
 
    return (
-      <div className=" max-w-md mx-auto min-h-screen bg-[#eeeef4] px-6 py-8 pb-32">
+      <div className={`max-w-md mx-auto min-h-screen bg-[#eeeef4] px-6 py-8 pb-32 ${isExiting ? 'page-exit-right' : 'page-transition-right'}`}>
 
          {/* Botão Voltar */}
-         <button onClick={() => navigate(-1)} className="mb-6 text-gray-600 hover:text-purple-600 transition-colors p-2 -ml-2 rounded-full hover:bg-white/50">
+         <button onClick={handleBack} className="mb-6 text-gray-600 hover:text-purple-600 transition-colors p-2 -ml-2 rounded-full hover:bg-white/50">
             <FiArrowLeft size={24} />
          </button>
 

@@ -9,6 +9,7 @@ export function SearchMedication() {
    const [query, setQuery] = useState('');
    const navigate = useNavigate();
    const [medications, setMedications] = useState<MedicationInfo[]>([]);
+   const [isExiting, setIsExiting] = useState(false);
 
    function handleQuery(e: string) {
       setQuery(e);
@@ -19,15 +20,22 @@ export function SearchMedication() {
       }
    }
 
+   function handleBack() {
+      setIsExiting(true);
+      setTimeout(() => {
+         navigate(-1);
+      }, 250); // Tempo um pouco menor que a animação (300ms) para suavidade
+   }
+
    return (
-      <div className="min-h-screen bg-[#ffffff] px-6 py-8">
+      <div className={`min-h-screen bg-[#ffffff] px-6 py-8 ${isExiting ? 'page-exit-right' : 'page-transition-right'}`}>
          {/* Cabeçalho */}
          <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-black text-gray-900 tracking-tight">
                Buscar<br />Medicamento
             </h1>
             <button
-               onClick={() => navigate(-1)}
+               onClick={handleBack}
                className="p-3 bg-gray-100 rounded-full text-gray-600 hover:bg-purple-100 hover:text-purple-600 transition-all duration-300 shadow-sm"
             >
                <FiX size={24} />

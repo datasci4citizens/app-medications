@@ -1,5 +1,6 @@
 import { FiCheck, FiClock, FiEdit, FiTrash2, FiX } from 'react-icons/fi';
 import type { Medication } from '../../types/';
+import { getBrandColor } from '../../utils/brandColorHelper';
 
 interface MedicationCardProps {
   medication: Medication;
@@ -22,6 +23,8 @@ export function MedicationCard({
   const isSkipped = medication.status === 'skipped';
   const isPending = medication.status === 'pending';
 
+  const brandColor = getBrandColor(medication.brand);
+
   return (
     <div
       onClick={() => onClick(medication.id)}
@@ -32,10 +35,8 @@ export function MedicationCard({
     >
       {/* Faixa Lateral */}
       <div
-        className={`
-      absolute left-3 top-0 bottom-0 w-4 shadow-sm
-      ${isTaken ? 'bg-green-500' : isSkipped ? 'bg-red-500' : 'bg-pink-600'}
-    `}
+        style={{ backgroundColor: brandColor }}
+        className="absolute left-3 top-0 bottom-0 w-4 shadow-sm"
       />
 
       {/* Container de Conteudo */}
