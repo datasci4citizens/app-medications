@@ -20,7 +20,7 @@ export function SearchMedication() {
    }
 
    return (
-      <div className="min-h-screen bg-white px-6 py-8">
+      <div className="min-h-screen bg-[#ffffff] px-6 py-8">
          {/* Cabeçalho */}
          <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-black text-gray-900 tracking-tight">
@@ -44,7 +44,7 @@ export function SearchMedication() {
                value={query}
                onChange={(e) => handleQuery(e.target.value)}
                placeholder="Buscar"
-               className="w-full bg-gray-100 border-none rounded-[10px] py-4 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-purple-500 transition-all outline-none"
+               className="w-full bg-gray-100 border-none rounded-[10px] py-4 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:ring-2 ring-purple-500 transition-all outline-none"
             />
          </div>
 

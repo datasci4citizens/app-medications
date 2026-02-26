@@ -105,7 +105,7 @@ export function Home() {
       </main>
 
       <button
-        onClick={() => navigate('/add')}
+        onClick={() => navigate('/search')}
         className="fixed bottom-6 right-6 bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-colors"
       >
         <FiPlus size={24} />
