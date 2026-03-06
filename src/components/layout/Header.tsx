@@ -1,7 +1,9 @@
 import { FiUser, FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 import { useAuth } from '../../contexts/AuthContext';
+import { ConfirmModal } from '../common/Modal';
 
 
 interface HeaderProps {
@@ -12,14 +14,17 @@ export function Header({ onTitleClick }: HeaderProps) {
 
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
-    if (confirm('Deseja Sair')) {
-      logout();
-      navigate('/')
-
-    }
+    setIsLogoutModalOpen(true);
   }
+
+  const confirmLogout = () => {
+    logout();
+    navigate('/');
+  }
+
   return (
     <header className="bg-purple-600 rounded-b-3xl shadow-lg">
       <div className="max-w-md mx-auto px-6 py-6">
@@ -55,6 +60,17 @@ export function Header({ onTitleClick }: HeaderProps) {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        title="Deseja Sair?"
+        message="Sua sessão será encerrada."
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={confirmLogout}
+        confirmText="Sair"
+        cancelText="Voltar"
+        variant="warning"
+      />
     </header>
   );
 }

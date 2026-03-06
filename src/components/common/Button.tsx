@@ -1,7 +1,7 @@
 // src/components/common/Button.tsx
 
 import type { ButtonHTMLAttributes } from 'react';
-import { COLORS } from '../../constants';
+// import { COLORS } from '../../constants';
 
 // ============================================
 // TIPOS

@@ -9,6 +9,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Ache', 'Hyoscine'],
     whenToTake: 'Independente',
     canSplit: false,
+    dosageInterval: 8,
   },
   {
     id: '2',
@@ -18,6 +19,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Novalgina', 'Medley'],
     whenToTake: 'Independente',
     canSplit: false,
+    dosageInterval: 6,
   },
   {
     id: '3',
@@ -27,6 +29,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Tylenol', 'EMS'],
     whenToTake: 'Após Refeição',
     canSplit: true,
+    dosageInterval: 6,
   },
   {
     id: '4',
@@ -36,6 +39,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Amoxil', 'Eurofarma'],
     whenToTake: 'Com Refeição',
     canSplit: false,
+    dosageInterval: 8,
   },
   {
     id: '5',
@@ -45,6 +49,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Aradois', 'Neo Química'],
     whenToTake: 'Independente',
     canSplit: true,
+    dosageInterval: 24,
   },
   {
     id: '6',
@@ -54,6 +59,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Losec', 'Prati-Donaduzzi'],
     whenToTake: 'Antes da Refeição',
     canSplit: false,
+    dosageInterval: 24,
   },
   {
     id: '7',
@@ -63,6 +69,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Luftal', 'Cimed'],
     whenToTake: 'Após Refeição',
     canSplit: false,
+    dosageInterval: 6,
   },
   {
     id: '8',
@@ -72,6 +79,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Advil', 'Alivium'],
     whenToTake: 'Com Refeição',
     canSplit: true,
+    dosageInterval: 12,
   },
   {
     id: '9',
@@ -81,6 +89,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Novo Nordisk', 'Eli Lilly'],
     whenToTake: 'Independente',
     canSplit: false,
+    dosageInterval: 12,
   },
   {
     id: '10',
@@ -90,6 +99,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Cebion', 'Redoxon'],
     whenToTake: 'Com Refeição',
     canSplit: true,
+    dosageInterval: 24,
   },
   {
     id: '11',
@@ -99,6 +109,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Kenvue'],
     whenToTake: 'Após Refeição',
     canSplit: true,
+    dosageInterval: 6,
   },
   {
     id: '12',
@@ -108,6 +119,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Haleon'],
     whenToTake: 'Com Refeição',
     canSplit: false,
+    dosageInterval: 12,
   },
   {
     id: '13',
@@ -117,6 +129,7 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Sanofi'],
     whenToTake: 'Independente',
     canSplit: true,
+    dosageInterval: 6,
   },
 ];
 

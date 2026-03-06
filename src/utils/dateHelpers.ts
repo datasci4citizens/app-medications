@@ -4,6 +4,7 @@ export function generateDateRange(centerDate: Date, daysBefore: number, daysAfte
   for (let i = -daysBefore; i <= daysAfter; i++) {
     const date = new Date(centerDate);
     date.setDate(date.getDate() + i);
+    date.setHours(0, 0, 0, 0); // BUG 3: Normalizar para meia-noite
     dates.push(date);
   }
 

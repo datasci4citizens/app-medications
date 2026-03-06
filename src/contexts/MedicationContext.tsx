@@ -13,10 +13,11 @@ interface MedicationContextType {
   addMedication: (medication: Omit<Medication, 'id'>) => void;
   updateMedication: (id: string, medication: Partial<Medication>) => void;
   deleteMedication: (id: string) => void;
-  markAsTaken: (id: string) => void;
+  markAsTaken: (id: string) => void; 
   markAsSkipped: (id: string) => void;
+  markDoseAsTaken: (medicationId: string, occurrenceId: string) => void;
+  markDoseAsSkipped: (medicationId: string, occurrenceId: string) => void;
   getMedicationById: (id: string) => Medication | undefined;
-  getMedicationsByDate: (date: Date) => Medication[];
 }
 
 // ============================================
@@ -45,7 +46,6 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
         if (saved && saved.length > 0) {
           setMedications(saved);
         } else {
-          // Se não tem nada salvo, usa dados mock
           setMedications(mockMedication);
           medicationStorage.saveMedications(mockMedication);
         }
@@ -60,9 +60,6 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     loadMedications();
   }, []);
 
-  // ============================================
-  // SALVAR NO LOCALSTORAGE QUANDO MUDAR
-  // ============================================
   useEffect(() => {
     if (!isLoading) {
       medicationStorage.saveMedications(medications);
@@ -79,6 +76,7 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
       id: Date.now().toString(),
       taken: false,
       status: 'pending',
+      doseStatus: {},
     };
 
     setMedications((prev) => [...prev, newMedication]);
@@ -94,40 +92,41 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     setMedications((prev) => prev.filter((med) => med.id !== id));
   };
 
+  const markDoseAsTaken = (medicationId: string, occurrenceId: string) => {
+    setMedications(prev => prev.map(med => {
+      if (med.id === medicationId) {
+        return {
+          ...med,
+          doseStatus: { ...med.doseStatus, [occurrenceId]: 'taken' }
+        };
+      }
+      return med;
+    }));
+  };
+
+  const markDoseAsSkipped = (medicationId: string, occurrenceId: string) => {
+    setMedications(prev => prev.map(med => {
+      if (med.id === medicationId) {
+        return {
+          ...med,
+          doseStatus: { ...med.doseStatus, [occurrenceId]: 'skipped' }
+        };
+      }
+      return med;
+    }));
+  };
+
   const markAsTaken = (id: string) => {
-    updateMedication(id, {
-      status: 'taken',
-      taken: true,
-    });
+    updateMedication(id, { status: 'taken', taken: true });
   };
 
   const markAsSkipped = (id: string) => {
-    updateMedication(id, {
-      status: 'skipped',
-      taken: false,
-    });
+    updateMedication(id, { status: 'skipped', taken: false });
   };
 
   const getMedicationById = (id: string): Medication | undefined => {
     return medications.find((med) => med.id === id);
   };
-
-  const getMedicationsByDate = (date: Date): Medication[] => {
-    return medications.filter((med) => {
-      if (!med.scheduledDate) return true; // Mostra se não tem data
-      
-      const medDate = new Date(med.scheduledDate);
-      return (
-        medDate.getFullYear() === date.getFullYear() &&
-        medDate.getMonth() === date.getMonth() &&
-        medDate.getDate() === date.getDate()
-      );
-    });
-  };
-
-  // ============================================
-  // VALOR DO CONTEXTO
-  // ============================================
 
   const value: MedicationContextType = {
     medications,
@@ -137,8 +136,9 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     deleteMedication,
     markAsTaken,
     markAsSkipped,
+    markDoseAsTaken,
+    markDoseAsSkipped,
     getMedicationById,
-    getMedicationsByDate,
   };
 
   if (isLoading) {
