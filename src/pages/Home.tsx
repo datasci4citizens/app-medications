@@ -95,8 +95,8 @@ export function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <Header onTitleClick={() => navigate('/home')} />
+    <div className="min-h-screen bg-figmagray pb-20">
+      <Header selectedDate={selectedDate}  />
 
       <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
 

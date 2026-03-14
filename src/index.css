@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+/* tem que mudar o nome dessas cores */
+
+@theme {
+  --color-graybg: #EFEFEF;
+  --color-darkpurple: #5b2a78; 
+  --font-merriweather: "Merriweather Sans", sans-serif;
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  background-color: #EFEFEF;
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
