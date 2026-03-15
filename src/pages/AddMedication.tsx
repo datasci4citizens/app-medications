@@ -168,7 +168,7 @@ export function AddMedication() {
         </h1>
       </header>
 
-      <div className="h-[1px] bg-gray-100 w-full" />
+      <div className="h-px bg-gray-100 w-full" />
 
       <main key={step} className="flex-1 px-8 py-10 flex flex-col animate-fade-slide-up">
         
@@ -249,7 +249,7 @@ export function AddMedication() {
         )}
 
         {showSelector && (step === 0 || step === 1) && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-end justify-center">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-100 flex items-end justify-center">
             <div className="bg-white w-full max-w-md rounded-t-[40px] p-8 animate-in slide-in-from-bottom duration-300 shadow-2xl">
               <div className="flex justify-between items-center mb-8">
                 <h3 className="text-2xl font-black text-gray-900">
@@ -277,7 +277,7 @@ export function AddMedication() {
         <button
           onClick={nextStep}
           disabled={(step < 2 && (!currentData.day || !currentData.month)) || (step === 3 && !dosage)}
-          className={`w-full text-white font-black text-xl py-5 rounded-[32px] shadow-xl disabled:opacity-50 disabled:grayscale transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
+          className={`w-full text-white font-black text-xl py-5 rounded-4xl shadow-xl disabled:opacity-50 disabled:grayscale transition-all flex items-center justify-center gap-2 active:scale-[0.98] ${
             step === 3 ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-600 hover:bg-purple-700'
           }`}
         >

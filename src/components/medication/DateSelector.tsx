@@ -44,20 +44,20 @@ export function DateSelector({ selectedDate, onDateChange }: DateSelectorProps) 
               >
                 {isSelected ? (
                   <div className="w-17.5 h-29 rounded-[50px] bg-darkpurple flex flex-col items-center justify-center gap-2">
-                    <span className="text-[#FFFEFA] text-2xl font-normal">
+                    <span className="text-offwhite text-2xl font-normal">
                       {date.toLocaleDateString('pt-BR', { weekday: 'short' })}
                     </span>
-                    <div className="w-15 h-15 rounded-full bg-[#FFFEFA] flex items-center justify-center">
-                      <span className="text-[#290A3B] text-3xl font-bold">{date.getDate()}</span>
+                    <div className="w-15 h-15 rounded-full bg-offwhite flex items-center justify-center">
+                      <span className="text-deepplum text-3xl font-bold">{date.getDate()}</span>
                     </div>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <span className="text-[#0C0C0C] text-2xl font-normal">
+                    <span className="text-inkblack text-2xl font-normal">
                       {date.toLocaleDateString('pt-BR', { weekday: 'short' })}
                     </span>
-                    <div className="w-15 h-15 rounded-full bg-[#FFFEFA] shadow-md flex items-center justify-center">
-                      <span className="text-[#0C0C0C] text-3xl font-bold">{date.getDate()}</span>
+                    <div className="w-15 h-15 rounded-full bg-offwhite shadow-md flex items-center justify-center">
+                      <span className="text-inkblack text-3xl font-bold">{date.getDate()}</span>
                     </div>
                   </div>
                 )}

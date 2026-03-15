@@ -1,17 +1,39 @@
+export type ScheduleType = 'fixed' | 'interval';
+
+export type DoseStatus = 'upcoming' | 'pending' | 'late' | 'taken' | 'taken_late' | 'skipped';
+
+export interface DoseRecord {
+  status: DoseStatus;
+  takenAt?: string; // ISO timestamp
+}
+
+export type WeekDay = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0=dom, 6=sab
+
 export interface Medication {
   id: string;
+
+  // Basic Info
   name: string;
   brand?: string;
   dosage: string;
-  time: string; // Horário da primeira dose
-  scheduledDate: string; // Data de início (ISO YYYY-MM-DD)
   type: 'capsule' | 'liquid' | 'injection' | 'tablet';
-  endDate?: string; // Data de fim (ISO YYYY-MM-DD)
-  taken: boolean;
-  status?: 'pending' | 'taken' | 'skipped';
   medicationInfoId?: string;
-  dosageInterval?: number;
-  doseStatus?: Record<string, 'pending' | 'taken' | 'skipped'>; // Chave: "YYYY-MM-DD HH:mm"
+
+  // Treatment Period
+  startDate: string;
+  endDate?: string;
+
+  // Scheduling
+  scheduleType: ScheduleType;
+  weekDays: WeekDay[];  // [0,1,2,3,4,5,6] = todo dia
+
+  // Schedules (depends on scheduleType)
+  times?: string[];         // if fixed: ['08:00', '20:00']
+  startTime?: string;       // if interval: '08:00'
+  intervalHours?: number;   // if interval: 8
+
+  // DoseStatus
+  doseStatus: Record<string, DoseRecord>; // chave: 'medId-YYYY-MM-DD-HH:mm'
 }
 
 export interface MedicationInfo {
@@ -22,5 +44,4 @@ export interface MedicationInfo {
   commonBrands?: string[];
   whenToTake?: 'Antes da Refeição' | 'Após Refeição' | 'Com Refeição' | 'Independente';
   canSplit?: boolean;
-  dosageInterval?: number;
 }

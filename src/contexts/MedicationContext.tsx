@@ -13,9 +13,7 @@ interface MedicationContextType {
   addMedication: (medication: Omit<Medication, 'id'>) => void;
   updateMedication: (id: string, medication: Partial<Medication>) => void;
   deleteMedication: (id: string) => void;
-  markAsTaken: (id: string) => void; 
-  markAsSkipped: (id: string) => void;
-  markDoseAsTaken: (medicationId: string, occurrenceId: string) => void;
+  markDoseAsTaken: (medicationId: string, occurrenceId: string, wasLate: boolean) => void;
   markDoseAsSkipped: (medicationId: string, occurrenceId: string) => void;
   getMedicationById: (id: string) => Medication | undefined;
 }
@@ -42,7 +40,7 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     const loadMedications = () => {
       try {
         const saved = medicationStorage.getMedications();
-        
+
         if (saved && saved.length > 0) {
           setMedications(saved);
         } else {
@@ -74,8 +72,6 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     const newMedication: Medication = {
       ...medication,
       id: Date.now().toString(),
-      taken: false,
-      status: 'pending',
       doseStatus: {},
     };
 
@@ -92,12 +88,18 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     setMedications((prev) => prev.filter((med) => med.id !== id));
   };
 
-  const markDoseAsTaken = (medicationId: string, occurrenceId: string) => {
+  const markDoseAsTaken = (medicationId: string, occurrenceId: string, wasLate: boolean) => {
     setMedications(prev => prev.map(med => {
       if (med.id === medicationId) {
         return {
           ...med,
-          doseStatus: { ...med.doseStatus, [occurrenceId]: 'taken' }
+          doseStatus: {
+            ...med.doseStatus,
+            [occurrenceId]: { 
+              status: wasLate ? 'taken_late' : 'taken', 
+              takenAt: new Date().toISOString() 
+            }
+          }
         };
       }
       return med;
@@ -109,19 +111,14 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
       if (med.id === medicationId) {
         return {
           ...med,
-          doseStatus: { ...med.doseStatus, [occurrenceId]: 'skipped' }
+          doseStatus: {
+            ...med.doseStatus,
+            [occurrenceId]: { status: 'skipped' }
+          }
         };
       }
       return med;
     }));
-  };
-
-  const markAsTaken = (id: string) => {
-    updateMedication(id, { status: 'taken', taken: true });
-  };
-
-  const markAsSkipped = (id: string) => {
-    updateMedication(id, { status: 'skipped', taken: false });
   };
 
   const getMedicationById = (id: string): Medication | undefined => {
@@ -134,8 +131,6 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     addMedication,
     updateMedication,
     deleteMedication,
-    markAsTaken,
-    markAsSkipped,
     markDoseAsTaken,
     markDoseAsSkipped,
     getMedicationById,

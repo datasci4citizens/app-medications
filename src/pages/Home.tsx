@@ -10,11 +10,11 @@ import { calculateDosesForDay, type DailyDose } from '../utils/medicationCalcula
 
 
 export function Home() {
-  const { medications, markDoseAsTaken, markDoseAsSkipped, deleteMedication } = useMedications();
-  const [medicationToDelete, setMedicationToDelete] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { medications, markDoseAsTaken } = useMedications();
   const [isFutureModalOpen, setIsFutureModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [isEarlyModalOpen, setIsEarlyModalOpen] = useState(false);
+  const [pendingEarlyDose, setPendingEarlyDose] = useState<{ medId: string, occurrenceId: string } | null>(null);
 
   // BUG 3: Normalizar selectedDate para meia-noite ao inicializar
   const [selectedDate, setSelectedDate] = useState<Date>(() => {
@@ -30,32 +30,39 @@ export function Home() {
       const doses = calculateDosesForDay(med, selectedDate);
       allDoses.push(...doses);
     });
-    
+
     // Ordena por horário
     return allDoses.sort((a, b) => a.time.localeCompare(b.time));
   }, [medications, selectedDate]);
 
+
+
   // Divide entre pendentes e concluídos (tomados/esquecidos)
+  const upcomingDoses = useMemo(() => dailyDoses.filter(d => d.status === 'upcoming'), [dailyDoses]);
+  const lateDoses = useMemo(() => dailyDoses.filter(d => d.status === 'late'), [dailyDoses]);
   const pendingDoses = useMemo(() => dailyDoses.filter(d => d.status === 'pending'), [dailyDoses]);
-  const completedDoses = useMemo(() => dailyDoses.filter(d => d.status !== 'pending'), [dailyDoses]);
+  const takenDoses = useMemo(() => dailyDoses.filter(d => d.status === 'taken' || d.status === 'taken_late'), [dailyDoses]);
+  const skippedDoses = useMemo(() => dailyDoses.filter(d => d.status === 'skipped'), [dailyDoses]);
+
+
+  const groupedDoses = useMemo(() => {
+    const activeDoses = [...lateDoses, ...pendingDoses, ...upcomingDoses];
+
+    return activeDoses.reduce((acc, dose) => {
+      const horario = dose.time;
+
+      if (!acc[horario]) {
+        acc[horario] = [];
+      }
+      acc[horario].push(dose);
+      return acc;
+    }, {} as Record<string, typeof pendingDoses>);
+  }, [lateDoses, pendingDoses, upcomingDoses]);
 
   const isToday = useMemo(() => {
     const today = new Date();
     return selectedDate.toDateString() === today.toDateString();
   }, [selectedDate]);
-
-  // BUG 16: Encontrar o próximo medicamento pendente considerando o horário atual se for HOJE
-  const nextDose = useMemo(() => {
-    if (!isToday) return null; // Só mostra banner se for hoje
-    
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    
-    return pendingDoses.find(dose => {
-      const [h, m] = dose.time.split(':').map(Number);
-      return (h * 60 + m) >= currentTime;
-    }) || pendingDoses[0];
-  }, [pendingDoses, isToday]);
 
   const isFutureDate = useMemo(() => {
     const now = new Date();
@@ -64,93 +71,79 @@ export function Home() {
   }, [selectedDate]);
 
   // Marcar como tomado (usando ID da ocorrência)
-  const handleTake = (medId: string, occurrenceId: string) => {
+  const handleTake = (medId: string, occurrenceId: string, wasLate: boolean, isEarly: boolean) => {
     if (isFutureDate) {
       setIsFutureModalOpen(true);
       return;
     }
-    markDoseAsTaken(medId, occurrenceId);
-  };
 
-  // BUG 15: handleSkip agora também tem guard de data futura
-  const handleSkip = (medId: string, occurrenceId: string) => {
-    if (isFutureDate) {
-      setIsFutureModalOpen(true);
+    if (isEarly) {
+      setPendingEarlyDose({ medId, occurrenceId });
+      setIsEarlyModalOpen(true);
       return;
     }
-    markDoseAsSkipped(medId, occurrenceId)
+
+    markDoseAsTaken(medId, occurrenceId, wasLate);
   };
 
-  const editMedication = (id: string) => {
-    navigate(`/edit/${id}`);
-  };
 
   const handleCardClick = (id: string) => {
-    navigate(`/medication/user/${id}`);
-  };
-
-  const handleDelete = (id: string) => {
-    setMedicationToDelete(id);
-    setIsModalOpen(true);
+    navigate(`/medication/${id}`);
   };
 
   return (
     <div className="min-h-screen bg-figmagray pb-20">
-      <Header selectedDate={selectedDate}  />
+      <Header selectedDate={selectedDate} />
 
       <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
       <main className="max-w-md mx-auto px-4 py-6">
-        {/* PRÓXIMO HORÁRIO (BUG 16: Apenas hoje) */}
-        {isToday && nextDose && (
-          <div className="mb-6 animate-fade-slide-up">
-            <h2 className="text-purple-600 font-bold text-lg uppercase tracking-wide">
-              Próximo Horário: {nextDose.time}
-            </h2>
-          </div>
-        )}
 
         {/* Lista de Medicamentos Pendentes */}
         <div className="flex flex-col gap-4 mb-10">
-          {pendingDoses.map((dose) => (
-            <MedicationCard
-              key={dose.occurrenceId}
-              medication={{
-                ...dose.medication,
-                time: dose.time,
-                status: dose.status,
-                taken: dose.status === 'taken'
-              }}
-              // BUG 11: Padronizado callback sem parâmetro id desnecessário
-              onTake={() => handleTake(dose.medication.id, dose.occurrenceId)}
-              onSkip={() => handleSkip(dose.medication.id, dose.occurrenceId)}
-              onDelete={() => handleDelete(dose.medication.id)}
-              onEdit={() => editMedication(dose.medication.id)}
-              onClick={() => handleCardClick(dose.medication.id)}
-            />
-          ))}
+          {Object.entries(groupedDoses).map(([horario, doses], index) => {
+
+            const hasLate = doses.some(d => d.status === 'late');
+
+            return (
+              <div key={horario}>
+
+                {/* Label do horário */}
+                <h2 className="font-merriweather font-bold text-[26px] text-inkblack mb-3">
+                  {hasLate ? `Atrasado: ${horario}` :
+                    index === 0 && isToday ? `Próximo horário: ${horario}`
+                      : `Horário: ${horario}`}
+                </h2>
+
+                {/* Cards desse horário */}
+                <div className="flex flex-col gap-3">
+                  {doses.map((dose) => (
+                    <MedicationCard
+                      key={dose.occurrenceId}
+                      dose={dose}
+                      onTake={() => handleTake(dose.medication.id, dose.occurrenceId, dose.status === 'late', dose.status === 'upcoming')}
+                      onClick={() => handleCardClick(dose.medication.id)}
+                    />
+                  ))}
+                </div>
+
+              </div>
+            )
+          })}
         </div>
 
         {/* Seção de Tomados */}
-        {completedDoses.length > 0 && (
-          <div className="mt-8 animate-fade-slide-up">
-            <h3 className="text-gray-400 font-bold text-sm uppercase tracking-widest mb-4 px-2">
-              Tomados / Concluídos
+        {takenDoses.length > 0 && (
+          <div className="mt-8">
+            <h3 className="font-merriweather font-bold text-[26px] text-inkblack mb-3">
+              Tomados
             </h3>
-            <div className="flex flex-col gap-4 opacity-60 grayscale-[0.5]">
-              {completedDoses.map((dose) => (
+            <div className="flex flex-col gap-3">
+              {takenDoses.map((dose) => (
                 <MedicationCard
                   key={dose.occurrenceId}
-                  medication={{
-                    ...dose.medication,
-                    time: dose.time,
-                    status: dose.status,
-                    taken: dose.status === 'taken'
-                  }}
-                  onTake={() => handleTake(dose.medication.id, dose.occurrenceId)}
-                  onSkip={() => handleSkip(dose.medication.id, dose.occurrenceId)}
-                  onDelete={() => handleDelete(dose.medication.id)}
-                  onEdit={() => editMedication(dose.medication.id)}
+                  dose={dose}
+                  onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false )}
                   onClick={() => handleCardClick(dose.medication.id)}
                 />
               ))}
@@ -158,9 +151,27 @@ export function Home() {
           </div>
         )}
 
+        {/* Seção de Esquecidos */}
+        {skippedDoses.length > 0 && (
+          <div className="mt-8">
+            <h3 className="font-merriweather font-bold text-[28px] text-inkblack mb-3">
+              Esquecidos
+            </h3>
+            <div className="flex flex-col gap-3">
+              {skippedDoses.map((dose) => (
+                <MedicationCard
+                  key={dose.occurrenceId}
+                  dose={dose}
+                  onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false)}
+                  onClick={() => handleCardClick(dose.medication.id)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
         {/* Estado vazio */}
         {dailyDoses.length === 0 && (
-          <div className="text-center mt-20 animate-fade-slide-up">
+          <div className=" font-merriweather font-bold text-[28px] text-center mt-20 animate-fade-slide-up">
             <p className="text-gray-400 text-lg">Nenhum medicamento para este dia.</p>
           </div>
         )}
@@ -174,19 +185,6 @@ export function Home() {
       </button>
 
       <ConfirmModal
-        isOpen={isModalOpen}
-        title="Excluir tratamento?"
-        message="Isso removerá todas as doses futuras deste medicamento."
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={() => {
-          if (medicationToDelete) {
-            deleteMedication(medicationToDelete);
-            setIsModalOpen(false);
-          }
-        }}
-      />
-
-      <ConfirmModal
         isOpen={isFutureModalOpen}
         title="Data Futura"
         message="Você não pode interagir com um medicamento de uma data futura."
@@ -195,6 +193,25 @@ export function Home() {
         confirmText="Entendi"
         cancelText="Voltar"
         variant="info"
+      />
+      <ConfirmModal
+        isOpen={isEarlyModalOpen}
+        title="Está muito cedo!"
+        message="Ainda não está na janela de horário desse medicamento. Tem certeza que quer tomar agora?"
+        onClose={() => {
+          setIsEarlyModalOpen(false);
+          setPendingEarlyDose(null);
+        }}
+        onConfirm={() => {
+          if (pendingEarlyDose) {
+            markDoseAsTaken(pendingEarlyDose.medId, pendingEarlyDose.occurrenceId, false);
+          }
+          setIsEarlyModalOpen(false);
+          setPendingEarlyDose(null);
+        }}
+        confirmText="Sim, tomar agora"
+        cancelText="Cancelar"
+        variant="warning"
       />
     </div>
   );

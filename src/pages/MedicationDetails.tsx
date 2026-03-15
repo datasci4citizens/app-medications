@@ -62,8 +62,8 @@ export function MedicationDetails() {
       today.setHours(0, 0, 0, 0);
       const doses = calculateDosesForDay(medication, today);
       
-      // Busca a primeira pendente ou a última tomada
-      return doses.find(d => d.status === 'pending') || doses[doses.length - 1];
+      // Busca a primeira dose que pode ser interagida (pendente ou atrasada)
+      return doses.find(d => d.status === 'pending' || d.status === 'late') || doses[doses.length - 1];
    }, [medication]);
 
    const displayData = haveUser ? medication : medicationInfo;
@@ -80,7 +80,7 @@ export function MedicationDetails() {
       if (!medication) return false;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const startDate = new Date(medication.scheduledDate + 'T00:00:00');
+      const startDate = new Date(medication.startDate + 'T00:00:00');
       if (startDate > today) {
          setIsFutureModalOpen(true);
          return true;
@@ -91,7 +91,8 @@ export function MedicationDetails() {
    const handleTake = () => {
       if (checkFutureGuard()) return;
       if (medication && currentDoseInfo) {
-         markDoseAsTaken(medication.id, currentDoseInfo.occurrenceId);
+         const wasLate = currentDoseInfo.status == 'late';
+         markDoseAsTaken(medication.id, currentDoseInfo.occurrenceId, wasLate);
       }
    };
 
@@ -126,7 +127,7 @@ export function MedicationDetails() {
    const doseStatus = currentDoseInfo?.status || 'pending';
    const isTaken = doseStatus === 'taken';
    const isSkipped = doseStatus === 'skipped';
-   const isPending = doseStatus === 'pending';
+   const isInteractable = doseStatus === 'pending' || doseStatus === 'late';
 
    return (
       <div className={`max-w-md mx-auto min-h-screen bg-[#eeeef4] px-6 py-8 pb-32 ${isExiting ? 'page-exit-right' : 'page-transition-right'}`}>
@@ -173,7 +174,7 @@ export function MedicationDetails() {
             </button>
          ) : (
             <div className="flex flex-col gap-3 mb-6">
-               {isPending && (
+               {isInteractable && (
                   <div className="flex flex-col gap-3">
                      <button
                         onClick={handleTake}

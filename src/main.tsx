@@ -2,7 +2,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './index.css';
+import './styles/index.css';
 
 // Protected Routes
 import { GuestRoute, ProtectedRoute } from './utils/ProtectedRoute.tsx';
@@ -18,6 +18,7 @@ import { Home } from './pages/Home.tsx';
 import { AddMedication } from './pages/AddMedication.tsx';
 import { SearchMedication } from './pages/SearchMedication.tsx';
 import { MedicationDetails } from './pages/MedicationDetails.tsx';
+import { Profile } from './pages/Profile.tsx';
 
 
 
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')!).render(
             <Routes>
               <Route path="/" element={<GuestRoute><Login /></GuestRoute>} />
               <Route path="/home" element={<ProtectedRoute><Home />  </ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/add" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
               <Route path="/edit/:id" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
               <Route path='/search' element={<ProtectedRoute> <SearchMedication/> </ProtectedRoute>}/> 
