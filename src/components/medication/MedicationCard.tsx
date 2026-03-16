@@ -46,7 +46,9 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
           <div>
             <h3 className={`font-merriweather font-bold text-[24px] leading-tight ${textColor}`}>
               <span className="uppercase">{medication.name}</span>{' '}
-              <span className="text-purple-dose lowercase">{medication.dosage}</span>
+              <span className={`${isSkipped ? 'text-offwhite' : 'text-purple-dose'} lowercase`}>
+                {medication.dosage}
+              </span>
             </h3>
             <p className={`font-merriweather font-normal text-[20px] mt-1 ${subTextColor}`}>{typeLabel}</p>
             {medication.brand && (
