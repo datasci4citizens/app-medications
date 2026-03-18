@@ -1,9 +1,9 @@
-import './App.css';
+import './Login.css';
 import { GoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
 import { FaApple } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +14,8 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/auth/google/', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+      const response = await fetch(`${apiUrl}/auth/google/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ export function generateDateRange(centerDate: Date, daysBefore: number, daysAfte
   for (let i = -daysBefore; i <= daysAfter; i++) {
     const date = new Date(centerDate);
     date.setDate(date.getDate() + i);
+    date.setHours(0, 0, 0, 0); // BUG 3: Normalizar para meia-noite
     dates.push(date);
   }
 
@@ -27,6 +28,26 @@ export function formatDateLabel(date: Date): string {
   const month = date.toLocaleDateString('pt-BR', { month: 'short' });
 
   return `${weekday.charAt(0).toUpperCase() + weekday.slice(1)}, ${day} de ${month}`;
+}
+
+export function formatHeaderDate(date: Date): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const compareDate = new Date(date);
+  compareDate.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.floor((compareDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+  const weekday = date.toLocaleDateString('pt-BR', { weekday: 'short' });
+  const day = date.getDate();
+  const month = date.toLocaleDateString('pt-BR', { month: 'short' });
+
+  if (diffDays === 0) return `Hoje, ${day} de ${month}`;
+  if (diffDays === -1) return `Ontem, ${day} de ${month}`;
+  if (diffDays === 1) return `Amanhã, ${day} de ${month}`;
+
+  return `${weekday.charAt(0).toUpperCase() + weekday.slice(1)}, ${day} de ${month}`;
+
 }
 
 export function isSameDay(date1: Date, date2: Date): boolean {
