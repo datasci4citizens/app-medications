@@ -41,9 +41,9 @@ export function AddMedication() {
       const existing = getMedicationById(id);
       if (existing) {
         setDosage(existing.dosage);
-        setTime(existing.time);
+        setTime(existing.times?.[0] || '08:00');
         
-        const start = new Date(existing.scheduledDate + 'T00:00:00');
+        const start = new Date(existing.startDate + 'T00:00:00');
         setStartDate({
           day: String(start.getDate()).padStart(2, '0'),
           month: months[start.getMonth()],
@@ -129,17 +129,17 @@ export function AddMedication() {
     const isoStart = `${startDate.year}-${String(monthIndexStart + 1).padStart(2, '0')}-${startDate.day}`;
     const isoEnd = `${endDate.year}-${String(monthIndexEnd + 1).padStart(2, '0')}-${endDate.day}`;
 
-    const medicationData = {
+    const medicationData: any = {
       name: dbMed?.name || 'Medicamento',
       dosage: dosage || '1 dose',
-      time: time,
-      scheduledDate: isoStart,
+      times: [time],
+      startDate: isoStart,
       endDate: isoEnd,
       brand: dbMed?.commonBrands?.[0],
       type: (dbMed?.type.toLowerCase() === 'cápsula' ? 'capsule' : 'tablet') as any,
-      taken: false,
       medicationInfoId: dbMed?.id,
-      dosageInterval: dbMed?.dosageInterval || 24,
+      scheduleType: 'fixed',
+      weekDays: [0, 1, 2, 3, 4, 5, 6],
     };
 
     if (isEditing && id) {

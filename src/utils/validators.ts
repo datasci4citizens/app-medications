@@ -106,14 +106,14 @@ export function validateMedicationForm(data: Partial<Medication>): ValidationRes
   }
 
   // Horário obrigatório e válido
-  if (!validators.required(data.time)) {
+  if (!data.times || data.times.length === 0 || !validators.required(data.times[0])) {
     errors.time = 'Horário é obrigatório';
-  } else if (!validators.isValidTime(data.time!)) {
+  } else if (!validators.isValidTime(data.times[0]!)) {
     errors.time = 'Horário inválido (use formato HH:MM)';
   }
 
   // Data opcional, mas se preenchida deve ser válida
-  if (data.scheduledDate && !validators.isValidDate(data.scheduledDate)) {
+  if (data.startDate && !validators.isValidDate(data.startDate)) {
     errors.scheduledDate = 'Data inválida';
   }
 
