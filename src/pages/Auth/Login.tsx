@@ -1,14 +1,30 @@
 import './Login.css';
-import { GoogleLogin } from '@react-oauth/google';
 import { useState } from 'react';
-import { FaApple } from 'react-icons/fa';
+import { FaApple, FaGoogle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+
+import { googleLogin } from '../../services/socialAuth';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  async function signInWithGoogle() {
+    try {
+      const response = await googleLogin();
+      console.log('response completo:', JSON.stringify(response));
+      if (response) {
+        handleGoogleSuccess(response.result);
+      }
+    } catch (error) {
+      console.error('❌ Erro no googleLogin:', JSON.stringify(error));
+      alert('Erro: ' + JSON.stringify(error));
+    }
+  }
+
+  // Todo: Implement Logout
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setIsLoading(true);
@@ -21,7 +37,7 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          token: credentialResponse.credential, // ID Token (JWT)
+          token: credentialResponse.idToken, // ID Token (JWT)
         }),
       });
 
@@ -40,16 +56,18 @@ function App() {
       }
     } catch (error) {
       console.error('❌ Erro de rede:', error);
+      console.error('❌ Detalhes:', JSON.stringify(error));
       alert('Erro ao conectar com o servidor');
+
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleError = () => {
-    console.error('❌ Google Login Error');
-    alert('Erro ao fazer login com Google');
-  };
+  // const handleGoogleError = () => {
+  //   console.error('❌ Google Login Error');
+  //   alert('Erro ao fazer login com Google');
+  // };
 
   const handleGuestLogin = () => {
     const guestUser = {
@@ -71,17 +89,19 @@ function App() {
           <p className="text-gray-500 text-sm mt-2">Faça Login no LembraMed</p>
         </div>
 
-        {/* Google Login Button - Componente Oficial */}
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={handleGoogleError}
-          theme="outline"
-          size="large"
-          text="signin_with"
-          shape="rectangular"
-          width="100%"
-          ux_mode="popup"
-        />
+        {/* Botão Google  */}
+        <button
+          disabled={isLoading}
+          onClick={() => {
+            signInWithGoogle()
+          }}
+          className="flex items-center bg-white justify-center gap-3 w-full border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
+        >
+          <FaGoogle size={24} />
+          <span className="font-medium text-gray-700">
+            {isLoading ? 'Carregando...' : 'Entrar com Google'}
+          </span>
+        </button>
 
         {/* Botão Apple - Mock */}
         <button

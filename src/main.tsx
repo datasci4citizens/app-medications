@@ -1,8 +1,10 @@
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './styles/index.css';
+
+// Social Logins
+import { InitLogin } from './services/socialAuth.ts';
 
 // Protected Routes
 import { GuestRoute, ProtectedRoute } from './utils/ProtectedRoute.tsx';
@@ -23,37 +25,35 @@ import { Profile } from './pages/Profile.tsx';
 import { Navigate } from 'react-router-dom';
 
 
-
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+await InitLogin()
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={clientId}>
-      <BrowserRouter>
-        <AuthProvider>
-          <MedicationProvider>
-            <Routes>
-              <Route path="/" element={<GuestRoute><Login /></GuestRoute>} />
-              
-              <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>}>
-                <Route index element={<Navigate to="medications" replace />} />
-                <Route path="medications" element={<Medications />} />
-                <Route path="profile" element={<Profile />} />
-              </Route>
 
-              <Route path="/add" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
-              <Route path="/edit/:id" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
-              <Route path='/search' element={<ProtectedRoute> <SearchMedication/> </ProtectedRoute>}/> 
-              <Route path='/medication/user/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
-              <Route path='/medication/search/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
-              
-              {/* Redireciona /profile antigo para a nova estrutura se necessário, ou apenas remove */}
-              <Route path="/profile" element={<Navigate to="/home/profile" replace />} />
-            </Routes>
-          </MedicationProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <MedicationProvider>
+          <Routes>
+            <Route path="/" element={<GuestRoute><Login /></GuestRoute>} />
+
+            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>}>
+              <Route index element={<Navigate to="medications" replace />} />
+              <Route path="medications" element={<Medications />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
+
+            <Route path="/add" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
+            <Route path="/edit/:id" element={<ProtectedRoute><AddMedication /></ProtectedRoute>} />
+            <Route path='/search' element={<ProtectedRoute> <SearchMedication /> </ProtectedRoute>} />
+            <Route path='/medication/user/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
+            <Route path='/medication/search/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
+
+            {/* Redireciona /profile antigo para a nova estrutura se necessário, ou apenas remove */}
+            <Route path="/profile" element={<Navigate to="/home/profile" replace />} />
+          </Routes>
+        </MedicationProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </StrictMode>,
 );

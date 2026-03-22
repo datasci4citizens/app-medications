@@ -26,6 +26,36 @@ To create the production build:
 ```bash
 npm run build
 ```
+
+## Native Development (Android)
+
+To run the app on an Android device or emulator, follow these steps:
+
+1.  **Build the web project:**
+    ```bash
+    npm run build
+    ```
+
+2.  **Sync with Capacitor:**
+    ```bash
+    npx cap sync
+    ```
+
+3.  **Run on Android:**
+    ```bash
+    npx cap run android
+    ```
+
+Alternatively, to open the project in Android Studio:
+```bash
+npx cap open android
+```
+
+> **Note:** This project requires **Java 21 JDK**. Ensure your `JAVA_HOME` environment variable is set correctly or export it before running:
+> ```bash
+> export JAVA_HOME=/path/to/your/java-21-jdk
+> ```
+
 ### This project uses Biome to ensure code standardization and error checking.
 
 <details> <summary><strong>Click to see Formatting/Fix commands</strong></summary>
@@ -38,3 +68,5 @@ To <strong>automatically fix</strong> formatting and organize imports:
 ```bash
 npm run check:write
 ```
+
+</details>
