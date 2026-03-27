@@ -1,4 +1,10 @@
 import { SocialLogin } from '@capgo/capacitor-social-login';
+import type { User } from '../../types';
+
+interface BackendAuthResponse {
+  user: User;
+  token: string;
+}
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -29,16 +35,18 @@ async function fetchGoogleToken() {
 export async function authenticateWithGoogle() {
   try {
     const response = await fetchGoogleToken();
-    if (response) {
-      return handleGoogleSuccess(response.result);
+    const result = response.result;
+    if (!('idToken' in result) || !result.idToken) {
+      throw new Error('Token do Google não recebido');
     }
+    return handleGoogleSuccess({ idToken: result.idToken });
   } catch (error) {
     console.error('❌ Erro no googleLogin:', JSON.stringify(error));
     throw error;
   }
 }
 
-const handleGoogleSuccess = async (credentialResponse: any) => {
+const handleGoogleSuccess = async (credentialResponse: { idToken: string }) => {
   try {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
     const response = await fetch(`${apiUrl}/auth/google/`, {
@@ -51,13 +59,13 @@ const handleGoogleSuccess = async (credentialResponse: any) => {
       }),
     });
 
-    const data = await response.json();
+    const data: BackendAuthResponse = await response.json();
 
     if (response.ok) {
       return data;
     } else {
       console.error('❌ Erro do backend:', data);
-      throw new Error(data.error || 'Erro desconhecido no login');
+      throw new Error((data as { error?: string }).error || 'Erro desconhecido no login');
     }
   } catch (error) {
     console.error('❌ Erro de rede:', error);

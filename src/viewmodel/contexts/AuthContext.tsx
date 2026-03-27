@@ -3,23 +3,8 @@ import { LoadingPage } from '../../view/pages/LoadingPageAuth';
 import { authStorage } from '../../model/repositories/AuthRepository';
 import { authenticateWithGoogle } from '../../model/services/socialAuth';
 
-
-interface User {
-   id: string;
-   name: string;
-   email: string;
-}
-
-interface AuthContextType {
-   user: User | null;
-   token: string | null;
-   isAuthenticated: boolean;
-   isLoading: boolean;
-   login: (userData: User, authToken: string) => void;
-   loginWithGoogle: () => Promise<void>;
-   logout: () => void;
-}
-
+import type { User, AuthContextType } from '../../types'
+import { medicationStorage } from '../../model/repositories/MedicationRepository';
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType); //alternativa mais segura é usar createContext<AuthContextType | undefined>(undefined) e depois tratar com useContext para garantir que o provider esteja presente.
 
@@ -65,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       setToken(null);
       authStorage.clearAuth();
-      localStorage.removeItem('my_medications');
+      medicationStorage.clear();
    };
 
    const value: AuthContextType = {
@@ -78,9 +63,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
    };
 
-   if (isLoading) {
-      return <LoadingPage message="Carregando..." />;
-   }
+   // if (isLoading) {
+   //    return <LoadingPage message="Carregando..." />;
+   // }
 
    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 
