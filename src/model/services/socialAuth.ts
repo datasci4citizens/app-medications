@@ -1,0 +1,66 @@
+import { SocialLogin } from '@capgo/capacitor-social-login';
+
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+export async function InitLogin() {
+  await SocialLogin.initialize({
+    google: {
+      webClientId: clientId,
+      // iOSServerClientId: 'your-google-server-client-id',
+      mode: 'online',
+    }
+  });
+}
+
+
+async function fetchGoogleToken() {
+  const response = await SocialLogin.login({
+    provider: 'google',
+    options: {
+      forceRefreshToken: true
+    }
+  })
+
+  return response
+}
+
+
+
+export async function authenticateWithGoogle() {
+  try {
+    const response = await fetchGoogleToken();
+    if (response) {
+      return handleGoogleSuccess(response.result);
+    }
+  } catch (error) {
+    console.error('❌ Erro no googleLogin:', JSON.stringify(error));
+    throw error;
+  }
+}
+
+const handleGoogleSuccess = async (credentialResponse: any) => {
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const response = await fetch(`${apiUrl}/auth/google/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: credentialResponse.idToken,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return data;
+    } else {
+      console.error('❌ Erro do backend:', data);
+      throw new Error(data.error || 'Erro desconhecido no login');
+    }
+  } catch (error) {
+    console.error('❌ Erro de rede:', error);
+    throw error;
+  }
+};

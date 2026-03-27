@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import "./theme.css";
+body {
+  background-color: #EFEFEF;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Animação de entrada da direita */
+@keyframes slideInFromRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* Animação de saída para a direita */
+@keyframes slideOutToRight {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+/* Animação suave subindo com fade */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Animação do card de seleção subindo de baixo (bottom sheet) */
+@keyframes slideUpCard {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.page-transition-right {
+  animation: slideInFromRight 0.3s ease-out forwards;
+}
+.page-exit-right {
+  animation: slideOutToRight 0.3s ease-in forwards;
+}
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.5s ease-out forwards;
+}
+.animate-slide-up-card {
+  animation: slideUpCard 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
