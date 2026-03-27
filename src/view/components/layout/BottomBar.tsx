@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import CapsuleIcon from '../../assets/icons/svgs/capsule.svg?react'
-import ProfileIcon from '../../assets/icons/svgs/profile.svg?react'
+import CapsuleIcon from '../../../assets/icons/svgs/capsule.svg?react'
+import ProfileIcon from '../../../assets/icons/svgs/profile.svg?react'
 import { FiPlus } from 'react-icons/fi'
 
 

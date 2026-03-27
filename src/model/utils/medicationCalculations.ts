@@ -1,4 +1,4 @@
-import type { Medication, WeekDay, DoseStatus } from '../types';
+import type { Medication, WeekDay, DoseStatus } from '../../types';
 
 export interface DailyDose {
   medication: Medication;

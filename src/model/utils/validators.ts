@@ -1,5 +1,5 @@
 
-import type { Medication } from '../types';
+import type { Medication } from '../../types';
 
 // ============================================
 // VALIDATORS - Funções de Validação

@@ -45,3 +45,22 @@ export interface MedicationInfo {
   whenToTake?: 'Antes da Refeição' | 'Após Refeição' | 'Com Refeição' | 'Independente';
   canSplit?: boolean;
 }
+
+// AuthContext Types
+
+export interface User {
+   id: string;
+   name: string;
+   email: string;
+}
+
+export interface AuthContextType {
+   user: User | null;
+   token: string | null;
+   isAuthenticated: boolean;
+   isLoading: boolean;
+   login: (userData: User, authToken: string) => void;
+   loginWithGoogle: () => Promise<void>;
+   logout: () => void;
+}
+

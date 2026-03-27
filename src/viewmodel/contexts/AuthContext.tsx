@@ -1,23 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { LoadingPage } from '../pages/LoadingPageAuth';
+// Todo: implement LoadingPage in app 
+// import { LoadingPage } from '../../view/pages/LoadingPageAuth';
+import { authStorage } from '../../model/repositories/AuthRepository';
+import { authenticateWithGoogle } from '../../model/services/socialAuth';
 
-
-interface User {
-   id: string;
-   name: string;
-   email: string;
-   // Teste, tem que adicionar outros tipos depois
-}
-
-interface AuthContextType {
-   user: User | null; // null = deslogado
-   token: string | null;
-   isAuthenticated: boolean;
-   isLoading: boolean;
-   login: (userData: User, authToken: string) => void;
-   logout: () => void; // Ajustar o logout depois que implementamos sistema com backend 
-}
-
+import type { User, AuthContextType } from '../../types'
+import { medicationStorage } from '../../model/repositories/MedicationRepository';
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType); //alternativa mais segura é usar createContext<AuthContextType | undefined>(undefined) e depois tratar com useContext para garantir que o provider esteja presente.
 
@@ -26,66 +14,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    const [token, setToken] = useState<string | null>(null);
    const [isLoading, setIsLoading] = useState<boolean>(true); // Mudar isso no futuro para uma abordagem mais segura
 
-   // Verificar se esta logado
    useEffect(() => {
-      // Tem que mudar depois que não usar mais o LocalStorage, usar Cookies (mais seguro)
       const checkAuth = () => {
          try {
-
-            const savedToken = localStorage.getItem('auth_token');
-            const savedUser = localStorage.getItem('user');
+            const savedToken = authStorage.getToken();
+            const savedUser = authStorage.getUser() as User | null;
 
             if (savedToken && savedUser) {
                setToken(savedToken);
-               setUser(JSON.parse(savedUser))
+               setUser(savedUser);
             }
          } catch (error) {
             console.error('Erro ao verificar autenticação:', error);
-            // Se der erro, limpa tudo
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user');
+            authStorage.clearAuth();
          } finally {
             setIsLoading(false);
          }
       };
 
       checkAuth();
-   }, []) // [] => executa só quando o componente monta
+   }, []);
 
-
-
-
-   // Implementaçõs do Sistema de Login extramamente simplificados até o backend cuidar disso
    const login = (userData: User, authToken: string) => {
       setUser(userData);
       setToken(authToken);
+      authStorage.saveToken(authToken);
+      authStorage.saveUser(userData);
+   };
 
-      // Lembrar de Arrumar isso quando houver um backend (não é seguro o uso de LocalStorage)
-      localStorage.setItem('auth_token', authToken);
-      localStorage.setItem('user', JSON.stringify(userData));
-   }
+   const loginWithGoogle = async () => {
+      const data = await authenticateWithGoogle();
+      login(data.user, data.token);
+   };
 
    const logout = () => {
       setUser(null);
       setToken(null);
-
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('my_medications'); // Se não criar outro usuario ele mantem os mesmos medicamentos
+      authStorage.clearAuth();
+      medicationStorage.clear();
    };
 
    const value: AuthContextType = {
       user,
       token,
-      isAuthenticated: !!user, // !! converte para boolean (null = false, objeto = true)
+      isAuthenticated: !!user,
       isLoading,
       login,
+      loginWithGoogle,
       logout,
    };
 
-   if (isLoading) {
-      return <LoadingPage message="Carregando..." />;
-   }
+   // if (isLoading) {
+   //    return <LoadingPage message="Carregando..." />;
+   // }
 
    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 

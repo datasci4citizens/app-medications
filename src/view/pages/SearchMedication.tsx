@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { searchMedication } from "../data/mockMedicationsDatabase";
+import { searchMedication } from "../../model/utils/medicationUtils";
 import { useNavigate } from "react-router-dom";
-import type { MedicationInfo } from "../types";
+import type { MedicationInfo } from "../../types";
 import { FiChevronRight, FiX, FiSearch } from "react-icons/fi";
 
 

@@ -1,4 +1,4 @@
-import type { MedicationInfo } from "../types";
+import type { MedicationInfo } from "../../types";
 
 export const medicationsDatabase: MedicationInfo[] = [
   {
@@ -93,16 +93,3 @@ export const medicationsDatabase: MedicationInfo[] = [
   },
 ];
 
-export function searchMedication(query: string): MedicationInfo[] {
-  if (!query || query.trim().length == 0) {
-    return [];
-  }
-
-  const searchTerm = query.toLowerCase().trim();
-
-  return medicationsDatabase.filter((med) => {
-    const nameMatch = med.name.toLowerCase().includes(searchTerm);
-    const ingredientMatch = med.activeIngredient.toLowerCase().includes(searchTerm);
-    return nameMatch || ingredientMatch;
-  });
-}

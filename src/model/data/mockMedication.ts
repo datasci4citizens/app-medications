@@ -1,4 +1,4 @@
-import type { Medication } from '../types';
+import type { Medication } from "../../types";
 
 export const mockMedication: Medication[] = [
   {

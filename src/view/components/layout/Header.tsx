@@ -1,5 +1,5 @@
 
-import { formatHeaderDate } from "../../utils/dateHelpers";
+import { formatHeaderDate } from "../../../model/utils/dateHelpers"
 
 interface HeaderProps {
   selectedDate: Date;

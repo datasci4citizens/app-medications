@@ -1,14 +1,14 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom"
 import { useEffect, useState, useMemo } from "react";
-import { useMedications } from "../hooks/useMedications";
-import { medicationsDatabase } from "../data/mockMedicationsDatabase";
-import { getBrandColor } from "../utils/brandColorHelper";
-import type { Medication, MedicationInfo } from "../types";
+import { useMedications } from "../../viewmodel/hooks/useMedications";
+import { medicationsDatabase } from "../../model/data/mockMedicationsDatabase";
+import { getBrandColor } from "../../model/utils/brandColorHelper";
+import type { Medication, MedicationInfo } from "../../types";
 import { FiArrowLeft, FiCheck, FiAlertCircle, FiEdit, FiTrash2, FiLayers, FiClock, FiScissors, FiActivity } from "react-icons/fi";
 
-import { BOX_IMAGE, MEDICATION_TYPE_IMAGES } from "../constants";
+import { BOX_IMAGE, MEDICATION_TYPE_IMAGES } from "../../constants";
 import { ConfirmModal } from "../components/common/Modal";
-import { calculateDosesForDay } from "../utils/medicationCalculations";
+import { calculateDosesForDay } from "../../model/utils/medicationCalculations";
 
 
 

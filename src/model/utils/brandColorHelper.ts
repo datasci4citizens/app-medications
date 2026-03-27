@@ -1,4 +1,4 @@
-import { BRAND_COLORS } from '../constants';
+import { BRAND_COLORS } from '../../constants';
 
 /**
  * Converte nome da marca para cor hexadecimal

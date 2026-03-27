@@ -1,7 +1,7 @@
 import { FiChevronRight } from 'react-icons/fi';
-import type { DailyDose } from '../../utils/medicationCalculations';
-import { getBrandColor } from '../../utils/brandColorHelper';
-import { MEDICATION_TYPE_LABELS } from '../../constants';
+import type { DailyDose } from '../../../model/utils/medicationCalculations';
+import { getBrandColor } from '../../../model/utils/brandColorHelper';
+import { MEDICATION_TYPE_LABELS } from '../../../constants';
 
 interface MedicationCardProps {
   dose: DailyDose;
