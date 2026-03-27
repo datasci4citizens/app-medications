@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { generateDateRange, isSameDay } from '../../utils/dateHelpers';
+import { generateDateRange, isSameDay } from '../../../model/utils/dateHelpers';
 
 interface DateSelectorProps {
   selectedDate: Date;

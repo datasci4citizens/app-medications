@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { LoadingPage } from '../../view/pages/LoadingPageAuth';
+// Todo: implement LoadingPage in app 
+// import { LoadingPage } from '../../view/pages/LoadingPageAuth';
 import { authStorage } from '../../model/repositories/AuthRepository';
 import { authenticateWithGoogle } from '../../model/services/socialAuth';
 

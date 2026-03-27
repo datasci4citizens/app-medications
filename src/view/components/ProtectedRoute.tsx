@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../../viewmodel/contexts/AuthContext'
 import { LoadingPage } from '../pages/LoadingPageAuth';
 
 interface ProtectedRouteProps {

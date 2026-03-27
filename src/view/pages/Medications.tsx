@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { DateSelector } from '../components/medication/DateSelector.tsx';
 import { Header } from '../components/layout/Header';
 import { MedicationCard } from '../components/medication/MedicationCard';
-import { useMedications } from '../hooks/useMedications.ts';
+import { useMedications } from '../../viewmodel/hooks/useMedications.ts';
 import { ConfirmModal } from '../components/common/Modal.tsx';
-import { calculateDosesForDay, type DailyDose } from '../utils/medicationCalculations';
+import { calculateDosesForDay, type DailyDose } from '../../model/utils/medicationCalculations';
 
 
 export function Medications() {
