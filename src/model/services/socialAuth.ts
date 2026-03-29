@@ -54,8 +54,8 @@ export async function authenticateWithGoogle() {
 const handleGoogleSuccess = async (credentialResponse: { idToken: string }) => {
   console.log(credentialResponse.idToken)
   try {
-    const apiUrl = 'http://127.0.0.1:8000';
-    const response = await fetch(`${apiUrl}/auth/google/`, {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    const response = await fetch(`${apiUrl}'/api-auth'/auth/google/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
