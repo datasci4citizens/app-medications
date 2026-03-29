@@ -1,4 +1,5 @@
 import { SocialLogin } from '@capgo/capacitor-social-login';
+import { Capacitor } from '@capacitor/core';
 import type { User } from '../../types';
 
 interface BackendAuthResponse {
@@ -6,7 +7,11 @@ interface BackendAuthResponse {
   token: string;
 }
 
-const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const clientId = Capacitor.isNativePlatform()
+  ? import.meta.env.VITE_GOOGLE_CLIENT_ID
+  : import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID;
+
+console.log(Capacitor.isNativePlatform())
 
 export async function InitLogin() {
   await SocialLogin.initialize({
@@ -47,8 +52,9 @@ export async function authenticateWithGoogle() {
 }
 
 const handleGoogleSuccess = async (credentialResponse: { idToken: string }) => {
+  console.log(credentialResponse.idToken)
   try {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+    const apiUrl = 'http://127.0.0.1:8000';
     const response = await fetch(`${apiUrl}/auth/google/`, {
       method: 'POST',
       headers: {
