@@ -73,6 +73,8 @@ export function NumberDisplay({
  *   <NumberInput value={dose} onChange={setDose} label="comprimidos" example="0" />
  *   <NumberInput value={3} onChange={setDose} isReadOnly={true} />
  */
+
+
 // TODO: CORRIGIR BUG DE ESPAÇAMENTO
 export function NumberInput({
    value,
