@@ -5,6 +5,8 @@
    --color-deepplum: #290A3B;
    --color-offwhite: #FFFEFA;
    --color-inkblack: #0C0C0C;
+   --color-yellow-alert: #ffc249;
+   --color-ghost-gray: #BCBCBC;
    --color-green-take: #24BD76;
    --color-green-taken: #3A7D5E;
    --color-lilac: #CEC7DD;
@@ -14,6 +16,7 @@
    --color-lightpurple: #DED8F1;
    --color-bg-taken: #C4BBCA;
    --color-bg-skipped: #250935;
+   --color-ghostcolor: #585858;
    --color-card-border: rgba(133, 133, 133, 0.5);
 
    /* Fontes */
