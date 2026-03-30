@@ -1,16 +1,31 @@
 // import { useState, useEffect } from 'react';
+import { useState } from "react";
 // import { FiArrowLeft, FiChevronRight, FiCheck, FiClock, FiFileText } from 'react-icons/fi';
 // import { useNavigate, useLocation, useParams } from 'react-router-dom';
 // import { useMedications } from '../hooks/useMedications';
 // import { medicationsDatabase } from '../data/mockMedicationsDatabase';
 // import { ConfirmModal } from '../components/common/Modal';
 
+import { AccordionSection } from "../components/common/AccordionSection";
+import { NumberBox } from "../components/common/NumberBox";
+
+import { WeekDaySelector } from "../components/common/WeekDaySelector";
+
+import {  NumberDisplay, NumberInput, TextInput } from "../components/common/InputBar";
+
+
 export function AddMedication() {
+  const [meuValor, setMeuValor] = useState<number | null>(null)
+  const [diasSelecionados, setDiasSelecionados] = useState<number[]>([])
+   const [quantity, setQuantity] = useState<number | "">(2);
+   const [text, setText] = useState();
+
+
   // const navigate = useNavigate();
   // const location = useLocation();
   // const { id } = useParams(); // BUG 7: Pegar ID para edição
   // const { addMedication, updateMedication, getMedicationById } = useMedications();
-  
+
   // const isEditing = Boolean(id);
 
   // // Estados do Formulário
@@ -19,7 +34,7 @@ export function AddMedication() {
   // const [endDate, setEndDate] = useState({ day: '', month: '', year: '2026' });
   // const [time, setTime] = useState('08:00');
   // const [dosage, setDosage] = useState(''); // BUG 8: Estado para dosagem
-  
+
   // // Estados Auxiliares
   // const [showSelector, setShowSelector] = useState(false);
   // const [selectorType, setSelectorType] = useState<'day' | 'month' | 'year'>('day');
@@ -42,7 +57,7 @@ export function AddMedication() {
   //     if (existing) {
   //       setDosage(existing.dosage);
   //       setTime(existing.times?.[0] || '08:00');
-        
+
   //       const start = new Date(existing.startDate + 'T00:00:00');
   //       setStartDate({
   //         day: String(start.getDate()).padStart(2, '0'),
@@ -138,7 +153,7 @@ export function AddMedication() {
   //     brand: dbMed?.commonBrands?.[0],
   //     type: (dbMed?.type.toLowerCase() === 'cápsula' ? 'capsule' : 'tablet') as any,
   //     medicationInfoId: dbMed?.id,
-  //     scheduleType: 'fixed',
+  //     scheduleType: 'fixed',f} o
   //     weekDays: [0, 1, 2, 3, 4, 5, 6],
   //   };
 
@@ -156,10 +171,48 @@ export function AddMedication() {
 
   return (
     <>
+
+      <div className="p-6">
+        <AccordionSection label="Instruções" hasToggle={true} >
+          <WeekDaySelector values={[2,3]} isReadOnly={true} onChange={setDiasSelecionados}/>
+        </AccordionSection>
+        <AccordionSection label="Instruções" hasToggle={true} >
+          {/* <NumberBox value={meuValor} onChange={setMeuValor}isReadOnly={false}/>
+          <NumberBox value={5} isReadOnly={true}/>
+          <NumberBar value={2} label="comprimidos" isReadOnly={true} />
+          <NumberBar  isReadOnly={false} example="Ex: Dosage"/> */}
+
+
+ <div >
+
+         {/* 👁️ Display */}
+         <NumberDisplay value={2} label="comprimidos" />
+
+         {/* 🔢 Input numérico */}
+         <NumberInput
+            value={quantity}
+            onChange={setQuantity}
+            label="comprimidos"
+            example="0"
+         />
+
+         {/* 🔤 Input texto */}
+         <TextInput
+            value={text}
+            onChange={setText}
+            example="DOsatge"
+         />
+
+
+
+      </div>
+        </AccordionSection>
+      
+      </div>
     </>
     // <div className="min-h-screen bg-white flex flex-col">
     //   <header className="px-6 py-6 flex items-center gap-4">
-    //     <button
+    //     <buttont
     //       onClick={() => step > 0 ? setStep(step - 1) : navigate(-1)}
     //       className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all"
     //     >
@@ -173,7 +226,7 @@ export function AddMedication() {
     //   <div className="h-px bg-gray-100 w-full" />
 
     //   <main key={step} className="flex-1 px-8 py-10 flex flex-col animate-fade-slide-up">
-        
+
     //     {(step === 0 || step === 1) && (
     //       <div className="space-y-12 flex-1 flex flex-col justify-center">
     //         <h2 className="text-3xl font-bold text-gray-800 leading-tight text-center">

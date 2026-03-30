@@ -1,3 +1,18 @@
+/**
+ * NumberBox
+ *
+ * A compact numeric input displayed as a small square box.
+ * Accepts only valid numbers and clears to null when empty.
+ *
+ * Props:
+ *   - value: current number value (null renders an empty box)
+ *   - onChange: called with the new number, or null if cleared
+ *   - isReadOnly: when true, disables editing and text selection
+ *
+ * Usage:
+ *   <NumberBox value={3} onChange={setDose} isReadOnly={false} />
+ *   <NumberBox value={5} isReadOnly={true} />
+ */
 interface NumberBoxProps {
   value?: number | null;
   onChange?: (value: number | null) => void;
