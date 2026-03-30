@@ -9,7 +9,7 @@ interface InfoTileProps {
 export function InfoTile({ title, value, accentColor }: InfoTileProps) {
 
    return (
-      <div className="w-[170px] h-[84px] bg-offwhite rounded-[10px] border-b-4 flex justify-between font-merriweather border-darkpurple px-3 ">
+      <div className="w-42.5 h-21 bg-offwhite rounded-[10px] border-b-4 flex justify-between font-merriweather border-darkpurple px-3 ">
 
          <div className="py-3">
             <h1 className="text-[#6d6d6d] text-[20px]">
