@@ -1,6 +1,21 @@
 
 
 
+/**
+ * WeekDaySelector
+ *
+ * A row of buttons representing the days of the week (Sun–Sat, index 0–6).
+ * Selected days are highlighted with a border. Supports read-only mode.
+ *
+ * Props:
+ *   - values: array of selected day indexes (0 = Sunday, 6 = Saturday)
+ *   - isReadOnly: when true, disables all toggles
+ *   - onChange: called with the updated array whenever a day is toggled
+ *
+ * Usage:
+ *   <WeekDaySelector values={[1, 3, 5]} isReadOnly={false} onChange={setDays} />
+ *   <WeekDaySelector values={[2, 3]} isReadOnly={true} onChange={setDays} />
+ */
 interface WeekDaySelectorProps {
    values: number[];
    isReadOnly: boolean;
