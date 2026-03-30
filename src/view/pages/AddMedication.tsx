@@ -11,11 +11,14 @@ import { NumberBox } from "../components/common/NumberBox";
 
 import { WeekDaySelector } from "../components/common/WeekDaySelector";
 
+import {  NumberDisplay, NumberInput, TextInput } from "../components/common/InputBar";
+
 
 export function AddMedication() {
   const [meuValor, setMeuValor] = useState<number | null>(null)
   const [diasSelecionados, setDiasSelecionados] = useState<number[]>([])
-
+   const [quantity, setQuantity] = useState<number | "">(2);
+   const [text, setText] = useState();
 
 
   // const navigate = useNavigate();
@@ -174,9 +177,35 @@ export function AddMedication() {
           <WeekDaySelector values={[2,3]} isReadOnly={true} onChange={setDiasSelecionados}/>
         </AccordionSection>
         <AccordionSection label="Instruções" hasToggle={true} >
-          <NumberBox value={meuValor} onChange={setMeuValor}isReadOnly={false}/>
+          {/* <NumberBox value={meuValor} onChange={setMeuValor}isReadOnly={false}/>
           <NumberBox value={5} isReadOnly={true}/>
+          <NumberBar value={2} label="comprimidos" isReadOnly={true} />
+          <NumberBar  isReadOnly={false} example="Ex: Dosage"/> */}
 
+
+ <div >
+
+         {/* 👁️ Display */}
+         <NumberDisplay value={2} label="comprimidos" />
+
+         {/* 🔢 Input numérico */}
+         <NumberInput
+            value={quantity}
+            onChange={setQuantity}
+            label="comprimidos"
+            example="0"
+         />
+
+         {/* 🔤 Input texto */}
+         <TextInput
+            value={text}
+            onChange={setText}
+            example="DOsatge"
+         />
+
+
+
+      </div>
         </AccordionSection>
       
       </div>
