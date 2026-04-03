@@ -28,7 +28,10 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
   return (
     <div
       onClick={onClick}
-      className={`relative w-full h-45 rounded-[30px] border border-[rgba(133,133,133,0.5)] flex overflow-hidden cursor-pointer ${bgColor}`}
+      className={`relative w-full h-45 rounded-[30px] border border-[rgba(133,133,133,0.5)] flex overflow-hidden cursor-pointer 
+        transition-all ease-in-out 
+        [&:not(:has(button:active)):active]:scale-90 
+        ${bgColor}`}
       style={{ boxShadow: '0 4px 3px rgba(0,0,0,0.25)' }}
     >
       {/* Barra lateral da marca */}
@@ -57,7 +60,10 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
           </div>
 
           {/* Botão centralizado em relação ao texto */}
-          <div className="flex justify-center mt-3">
+          <div className="flex justify-center mt-3 
+          
+          transition-all ease-in-out
+          active:scale-110 active:brightness-110">
             {(isPending || isUpcoming) && (
               <button
                 onClick={e => { e.stopPropagation(); onTake(); }}
