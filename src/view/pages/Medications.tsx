@@ -86,8 +86,10 @@ export function Medications() {
   };
 
 
-  const handleCardClick = (id: string) => {
-    navigate(`/medication/${id}`);
+  const handleCardClick = (id: string, occurrenceId: string ) => {
+    navigate(`/medication/user/${id}`, { state: {
+      occurrenceId: occurrenceId
+    }});
   };
 
   return (
@@ -121,7 +123,7 @@ export function Medications() {
                       key={dose.occurrenceId}
                       dose={dose}
                       onTake={() => handleTake(dose.medication.id, dose.occurrenceId, dose.status === 'late', dose.status === 'upcoming')}
-                      onClick={() => handleCardClick(dose.medication.id)}
+                      onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId)}
                     />
                   ))}
                 </div>
@@ -143,7 +145,7 @@ export function Medications() {
                   key={dose.occurrenceId}
                   dose={dose}
                   onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false )}
-                  onClick={() => handleCardClick(dose.medication.id)}
+                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId)}
                 />
               ))}
             </div>
@@ -162,7 +164,7 @@ export function Medications() {
                   key={dose.occurrenceId}
                   dose={dose}
                   onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false)}
-                  onClick={() => handleCardClick(dose.medication.id)}
+                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId)}
                 />
               ))}
             </div>
