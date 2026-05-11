@@ -86,9 +86,10 @@ export function Medications() {
   };
 
 
-  const handleCardClick = (id: string, occurrenceId: string ) => {
+  const handleCardClick = (id: string, occurrenceId: string, wasLate: boolean ) => {
     navigate(`/medication/user/${id}`, { state: {
-      occurrenceId: occurrenceId
+      occurrenceId: occurrenceId,
+      wasLate: wasLate
     }});
   };
 
@@ -123,7 +124,7 @@ export function Medications() {
                       key={dose.occurrenceId}
                       dose={dose}
                       onTake={() => handleTake(dose.medication.id, dose.occurrenceId, dose.status === 'late', dose.status === 'upcoming')}
-                      onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId)}
+                      onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId, dose.status === 'late')}
                     />
                   ))}
                 </div>
@@ -145,7 +146,7 @@ export function Medications() {
                   key={dose.occurrenceId}
                   dose={dose}
                   onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false )}
-                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId)}
+                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId, false)}
                 />
               ))}
             </div>
@@ -164,7 +165,7 @@ export function Medications() {
                   key={dose.occurrenceId}
                   dose={dose}
                   onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false)}
-                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId)}
+                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId, false)}
                 />
               ))}
             </div>

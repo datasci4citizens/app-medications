@@ -24,7 +24,7 @@ export function AccordionSection({
 
    return (
       <div className='font-merriweather '>
-         <div className='flex  font-inkblack justify-between bg-lightpurple rounded-[10px] text-2xl px-3 h-12 tracking-[-0.288px] items-center'>  {label}
+         <div className='flex  font-inkblack justify-between bg-lightpurple rounded-[10px] text-[20px] px-3 h-12 tracking-[-0.288px] items-center'>  {label}
             {hasToggle &&
                <button
                   aria-label={`${isOpen ? 'Recolher' : 'Expandir'} ${label}`}

@@ -15,6 +15,7 @@ export function useMedicationDetails() {
    const { id } = useParams();
 
    const occurrenceId = state && typeof state.occurrenceId == 'string' ? state.occurrenceId : null;
+   const wasLate = state && typeof state.wasLate == 'boolean' ? state.wasLate : false;
 
 
    const medication = mode === 'user' ? context.getMedicationById(String(id)) : null;
@@ -36,10 +37,10 @@ export function useMedicationDetails() {
       navigate(`/add`, { state: { medicationInfoId: drugInfo?.id } });
    }
 
-   // TODO: waslate is wrong
    const handleTake = () => {
       if (!medication || !occurrenceId) return
-      context.markDoseAsTaken(medication.id, occurrenceId, false);
+      context.markDoseAsTaken(medication.id, occurrenceId, wasLate);
+      navigate(-1);
    }
 
    return {

@@ -3,7 +3,7 @@ import { useAuth } from "../../viewmodel/contexts/AuthContext";
 
 export function Profile() {
 
-  const { logout, user } = useAuth();
+  const { logout } = useAuth();
 
 
   return (

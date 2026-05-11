@@ -9,6 +9,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Boehringer Ingelheim', 'Sanofi'],
     whenToTake: 'Independente',
     canSplit: false,
+    instructions: 'Tomar via oral, com água. Pode ser tomado a qualquer hora do dia.',
+    sideEffects: 'Boca seca, taquicardia, retenção urinária.',
+    contraindications: 'Glaucoma, hipertrofia prostática, miastenia gravis.',
   },
   {
     id: '2',
@@ -18,6 +21,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Novalgina', 'Medley', 'EMS'],
     whenToTake: 'Independente',
     canSplit: false,
+    instructions: 'Tomar via oral com água. Dose máxima de 4 vezes ao dia.',
+    sideEffects: 'Reações alérgicas, queda de pressão, agranulocitose (raro).',
+    contraindications: 'Alergia à dipirona, insuficiência renal ou hepática grave.',
   },
   {
     id: '3',
@@ -27,6 +33,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Tylenol', 'EMS', 'Medley', 'Aché'],
     whenToTake: 'Após Refeição',
     canSplit: true,
+    instructions: 'Tomar após refeição. Intervalo mínimo de 4 horas entre doses.',
+    sideEffects: 'Em doses normais raramente causa efeitos. Superdose pode causar dano hepático.',
+    contraindications: 'Doença hepática grave, uso conjunto com álcool.',
   },
   {
     id: '4',
@@ -36,6 +45,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Eurofarma', 'EMS', 'Medley'],
     whenToTake: 'Com Refeição',
     canSplit: false,
+    instructions: 'Tomar com refeição para reduzir irritação gástrica. Completar o ciclo mesmo com melhora.',
+    sideEffects: 'Diarreia, náusea, erupção cutânea, candidíase.',
+    contraindications: 'Alergia à penicilina ou cefalosporinas.',
   },
   {
     id: '5',
@@ -45,6 +57,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Aradois', 'Neo Química', 'EMS', 'Medley'],
     whenToTake: 'Independente',
     canSplit: true,
+    instructions: 'Tomar no mesmo horário todos os dias. Não interromper sem orientação médica.',
+    sideEffects: 'Tontura, hipotensão, aumento de potássio, tosse (menos comum que outros anti-hipertensivos).',
+    contraindications: 'Gravidez, hiperpotassemia, uso combinado com aliskiren em diabéticos.',
   },
   {
     id: '6',
@@ -54,6 +69,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Losec', 'Prati-Donaduzzi', 'Medley', 'EMS'],
     whenToTake: 'Antes da Refeição',
     canSplit: false,
+    instructions: 'Tomar 30 minutos antes da refeição principal. Engolir inteiro, não mastigar.',
+    sideEffects: 'Dor de cabeça, diarreia, náusea, dor abdominal.',
+    contraindications: 'Uso concomitante com nelfinavir. Cautela com uso prolongado (risco de deficiência de magnésio).',
   },
   {
     id: '7',
@@ -63,6 +81,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Luftal', 'Cimed', 'Medley'],
     whenToTake: 'Após Refeição',
     canSplit: false,
+    instructions: 'Tomar após refeições e ao deitar. Agitar bem antes de usar.',
+    sideEffects: 'Raramente causa efeitos adversos.',
+    contraindications: 'Sem contraindicações conhecidas em doses normais.',
   },
   {
     id: '8',
@@ -72,6 +93,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Advil', 'Alivium', 'Aché', 'Medley'],
     whenToTake: 'Com Refeição',
     canSplit: true,
+    instructions: 'Tomar com alimento ou leite para proteger o estômago. Usar a menor dose eficaz.',
+    sideEffects: 'Irritação gástrica, náusea, dor de cabeça, retenção de líquidos.',
+    contraindications: 'Úlcera péptica, insuficiência renal, último trimestre de gravidez, alergia a AINEs.',
   },
   {
     id: '9',
@@ -81,6 +105,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Novo Nordisk', 'Eli Lilly', 'Biobrás'],
     whenToTake: 'Independente',
     canSplit: false,
+    instructions: 'Aplicar via subcutânea. Girar os locais de aplicação. Manter refrigerada entre 2–8°C.',
+    sideEffects: 'Hipoglicemia, reações no local de aplicação, lipodistrofia.',
+    contraindications: 'Hipoglicemia ativa. Ajustar dose em insuficiência renal ou hepática.',
   },
   {
     id: '10',
@@ -90,6 +117,9 @@ export const medicationsDatabase: MedicationInfo[] = [
     commonBrands: ['Cimed', 'Addera D3', 'EMS'],
     whenToTake: 'Com Refeição',
     canSplit: false,
+    instructions: 'Tomar com refeição que contenha gordura para melhor absorção.',
+    sideEffects: 'Em doses normais sem efeitos. Superdose pode causar hipercalcemia.',
+    contraindications: 'Hipercalcemia, hipervitaminose D, sarcoidose.',
   },
 ];
 
