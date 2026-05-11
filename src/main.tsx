@@ -22,6 +22,7 @@ import { AddMedication } from './view/pages/AddMedication.tsx';
 import { SearchMedication } from './view/pages/SearchMedication.tsx';
 import { MedicationDetails } from './view/pages/MedicationDetails.tsx';
 import { Profile } from './view/pages/Profile.tsx';
+import { SplashScreen } from './view/pages/SplashScreen.tsx';
 import { Navigate } from 'react-router-dom';
 
 
@@ -39,6 +40,7 @@ createRoot(document.getElementById('root')!).render(
 
     <BrowserRouter>
       <AuthProvider>
+        <SplashScreen />
         <MedicationProvider>
           <Routes>
             <Route path="/" element={<GuestRoute><Login /></GuestRoute>} />
