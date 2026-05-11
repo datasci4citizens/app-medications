@@ -12,25 +12,25 @@ interface MedicationCardProps {
 export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
   const { medication, status } = dose;
 
-  const isTaken = status === 'taken';
+  const isTaken = status === 'taken' || status === 'taken_late';
   const isSkipped = status === 'skipped';
   const isLate = status === 'late';
   const isPending = status === 'pending';
-
   const isUpcoming = status === 'upcoming';
 
   const bgColor = isSkipped ? 'bg-bg-skipped' : isTaken ? 'bg-bg-taken' : 'bg-offwhite';
   const textColor = isSkipped ? 'text-offwhite' : 'text-inkblack';
   const subTextColor = isSkipped ? 'text-gray-300' : 'text-gray-600';
+  const dosageColor = isSkipped ? 'text-offwhite' : 'text-purple-dose';
 
   const typeLabel = MEDICATION_TYPE_LABELS[medication.type] || 'Dose';
 
   return (
     <div
       onClick={onClick}
-      className={`relative w-full h-45 rounded-[30px] border border-[rgba(133,133,133,0.5)] flex overflow-hidden cursor-pointer 
-        transition-all ease-in-out 
-        [&:not(:has(button:active)):active]:scale-90 
+      className={`relative w-full rounded-[30px] border border-[rgba(133,133,133,0.5)] flex overflow-hidden cursor-pointer
+        transition-all ease-in-out
+        [&:not(:has(button:active)):active]:scale-95
         ${bgColor}`}
       style={{ boxShadow: '0 4px 3px rgba(0,0,0,0.25)' }}
     >
@@ -43,32 +43,30 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
       {/* Conteúdo */}
       <div className="flex flex-1 items-center py-4 px-5">
 
-        {/* Lado Esquerdo: Info + Botão */}
-        <div className="flex flex-col flex-1">
+        {/* Lado Esquerdo: Info + Footer */}
+        <div className="flex flex-col flex-1 gap-3">
           {/* Info */}
           <div>
-            <h3 className={`font-merriweather font-bold text-[24px] leading-tight ${textColor}`}>
+            <h3 className={`font-merriweather font-bold text-[22px] leading-tight ${textColor}`}>
               <span className="uppercase">{medication.name}</span>{' '}
-              <span className={`${isSkipped ? 'text-offwhite' : 'text-purple-dose'} lowercase`}>
+              <span className={`${dosageColor} lowercase`}>
                 {medication.dosage}
               </span>
             </h3>
-            <p className={`font-merriweather font-normal text-[20px] mt-1 ${subTextColor}`}>{typeLabel}</p>
+            <p className={`font-merriweather font-normal text-[18px] mt-1 ${subTextColor}`}>{typeLabel}</p>
             {medication.brand && (
-              <p className={`text-sm ${subTextColor}`}>Marca: {medication.brand}</p>
+              <p className={`font-merriweather text-[16px] ${subTextColor}`}>Marca: {medication.brand}</p>
             )}
           </div>
 
-          {/* Botão centralizado em relação ao texto */}
-          <div className="flex justify-center mt-3 
-          
-          transition-all ease-in-out
-          active:scale-110 active:brightness-110">
+          {/* Footer: botão ou label de status */}
+          <div className="flex justify-center
+            transition-all ease-in-out
+            active:scale-110 active:brightness-110">
             {(isPending || isUpcoming) && (
               <button
                 onClick={e => { e.stopPropagation(); onTake(); }}
-                className="bg-green-take text-offwhite font-merriweather font-semibold text-[28px] rounded-4xl"
-                style={{ width: '175px', height: '57px' }}
+                className="bg-green-take text-offwhite font-merriweather font-semibold text-[24px] rounded-4xl px-8 py-2"
               >
                 Tomar
               </button>
@@ -77,35 +75,28 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
             {isLate && (
               <button
                 onClick={e => { e.stopPropagation(); onTake(); }}
-                className="bg-amber-500 text-offwhite font-merriweather font-semibold text-[28px] rounded-4xl"
-                style={{ width: '175px', height: '57px' }}
+                className="bg-yellow-alert text-inkblack font-merriweather font-semibold text-[24px] rounded-4xl px-6 py-2"
               >
-                Tomar
+                Tomar com atraso
               </button>
             )}
+
             {isTaken && (
-              <button
-                disabled
-                className="bg-green-taken text-offwhite font-merriweather font-semibold text-[28px] rounded-full"
-                style={{ width: '175px', height: '57px' }}
-              >
-                Tomei
-              </button>
+              <span className="font-merriweather font-bold text-[24px] text-green-taken">
+                Tomei ✓
+              </span>
             )}
+
             {isSkipped && (
-              <button
-                disabled
-                className="bg-red-skip text-offwhite font-merriweather font-semibold text-[28px] rounded-full"
-                style={{ width: '175px', height: '57px' }}
-              >
-                Esqueci
-              </button>
+              <span className="font-merriweather font-bold text-[24px] text-red-skip">
+                Esquecido!
+              </span>
             )}
           </div>
         </div>
 
         {/* Seta centralizada verticalmente à direita */}
-        <FiChevronRight size={32} className="text-darkpurple shrink-0 ml-2" />
+        <FiChevronRight size={32} className={`shrink-0 ml-2 ${isSkipped ? 'text-offwhite' : 'text-darkpurple'}`} />
 
       </div>
     </div>

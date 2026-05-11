@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DateSelector } from '../components/medication/DateSelector.tsx';
 import { Header } from '../components/layout/Header';
@@ -22,6 +22,13 @@ export function Medications() {
     return d;
   });
 
+  // Tick a cada minuto para recalcular status das doses (pending → late → skipped)
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Calcula todas as doses (ocorrências) para o dia selecionado
   const dailyDoses = useMemo(() => {
     const allDoses: DailyDose[] = [];
@@ -32,7 +39,8 @@ export function Medications() {
 
     // Ordena por horário
     return allDoses.sort((a, b) => a.time.localeCompare(b.time));
-  }, [medications, selectedDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [medications, selectedDate, now]);
 
 
 

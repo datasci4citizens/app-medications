@@ -13,8 +13,10 @@ interface MedicationContextType {
   addMedication: (medication: Omit<Medication, 'id'>) => void;
   updateMedication: (id: string, medication: Partial<Medication>) => void;
   deleteMedication: (id: string) => void;
-  markDoseAsTaken: (medicationId: string, occurrenceId: string, wasLate: boolean) => void;
+  markDoseAsTaken: (medicationId: string, occurrenceId: string, wasLate: boolean, takenAt?: string) => void;
   markDoseAsSkipped: (medicationId: string, occurrenceId: string) => void;
+  clearDoseStatus: (medicationId: string, occurrenceId: string) => void;
+  updateDoseTakenAt: (medicationId: string, occurrenceId: string, takenAt: string) => void;
   getMedicationById: (id: string) => Medication | undefined;
 }
 
@@ -88,17 +90,34 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     setMedications((prev) => prev.filter((med) => med.id !== id));
   };
 
-  const markDoseAsTaken = (medicationId: string, occurrenceId: string, wasLate: boolean) => {
+  const markDoseAsTaken = (medicationId: string, occurrenceId: string, wasLate: boolean, takenAt?: string) => {
     setMedications(prev => prev.map(med => {
       if (med.id === medicationId) {
         return {
           ...med,
           doseStatus: {
             ...med.doseStatus,
-            [occurrenceId]: { 
-              status: wasLate ? 'taken_late' : 'taken', 
-              takenAt: new Date().toISOString() 
+            [occurrenceId]: {
+              status: wasLate ? 'taken_late' : 'taken',
+              takenAt: takenAt ?? new Date().toISOString()
             }
+          }
+        };
+      }
+      return med;
+    }));
+  };
+
+  const updateDoseTakenAt = (medicationId: string, occurrenceId: string, takenAt: string) => {
+    setMedications(prev => prev.map(med => {
+      if (med.id === medicationId) {
+        const existing = med.doseStatus[occurrenceId];
+        if (!existing) return med;
+        return {
+          ...med,
+          doseStatus: {
+            ...med.doseStatus,
+            [occurrenceId]: { ...existing, takenAt }
           }
         };
       }
@@ -113,9 +132,19 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
           ...med,
           doseStatus: {
             ...med.doseStatus,
-            [occurrenceId]: { status: 'skipped' }
+            [occurrenceId]: { status: 'skipped', takenAt: new Date().toISOString() }
           }
         };
+      }
+      return med;
+    }));
+  };
+
+  const clearDoseStatus = (medicationId: string, occurrenceId: string) => {
+    setMedications(prev => prev.map(med => {
+      if (med.id === medicationId) {
+        const { [occurrenceId]: _removed, ...rest } = med.doseStatus;
+        return { ...med, doseStatus: rest };
       }
       return med;
     }));
@@ -133,6 +162,8 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     deleteMedication,
     markDoseAsTaken,
     markDoseAsSkipped,
+    clearDoseStatus,
+    updateDoseTakenAt,
     getMedicationById,
   };
 

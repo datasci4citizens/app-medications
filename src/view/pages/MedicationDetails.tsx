@@ -4,7 +4,6 @@ import { useState } from "react";
 import { NavBottom } from "../components/layout/NavBottom";
 
 import { InfoTile } from "../components/common/InfoTile";
-import { ActionButton } from "../components/common/ActionButton";
 import { WeekDaySelector } from "../components/common/WeekDaySelector";
 import { NumberBox } from "../components/common/NumberBox";
 import { AccordionSection } from "../components/common/AccordionSection";
@@ -12,17 +11,48 @@ import { ToggleSwitch } from "../components/common/ToggleSwitch";
 import { NumberInput } from "../components/common/InputBar";
 
 import { useMedicationDetails } from "../../viewmodel/hooks/useMedicationDetails";
-import type { MedicationInfo, Medication } from '../../types/index'
+import { DoseActionPanel } from "../components/medication/DoseActionPanel";
+import type { MedicationInfo, Medication, DoseRecord, DoseStatus } from '../../types/index'
 
 
 
 export function MedicationDetails() {
 
 
-   const { mode, medication, drugInfo, occurrenceId, handleBack, handleEdit, handleAdd, handleTake } = useMedicationDetails();
+   const {
+      mode,
+      medication,
+      drugInfo,
+      occurrenceId,
+      doseRecord,
+      effectiveStatus,
+      handleBack,
+      handleEdit,
+      handleAdd,
+      handleTake,
+      handleTakeNow,
+      handleTakeAtTime,
+      handleUpdateTakenAt,
+      handleClear,
+   } = useMedicationDetails();
 
    return (<div>
-      {mode === 'search' ? <SearchView drugInfo={drugInfo} handleAdd={handleAdd} handleBack={handleBack} /> : <UserView drugInfo={drugInfo} handleBack={handleBack} handleEdit={handleEdit} handleTake={handleTake} medication={medication} occurrenceId={occurrenceId} />}
+      {mode === 'search'
+         ? <SearchView drugInfo={drugInfo} handleAdd={handleAdd} handleBack={handleBack} />
+         : <UserView
+              drugInfo={drugInfo}
+              handleBack={handleBack}
+              handleEdit={handleEdit}
+              medication={medication}
+              occurrenceId={occurrenceId}
+              doseRecord={doseRecord}
+              effectiveStatus={effectiveStatus}
+              onTake={handleTake}
+              onTakeNow={handleTakeNow}
+              onTakeAtTime={handleTakeAtTime}
+              onUpdateTakenAt={handleUpdateTakenAt}
+              onClear={handleClear}
+           />}
    </div>);
 
 }
@@ -100,7 +130,20 @@ function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationI
 
 // USER SCREEN
 
-function UserView({ medication, drugInfo, occurrenceId, handleBack, handleEdit, handleTake }: { medication: Medication | undefined, drugInfo: MedicationInfo | undefined, occurrenceId: string | null, handleBack: () => void, handleEdit: () => void, handleTake: () => void }) {
+function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveStatus, handleBack, handleEdit, onTake, onTakeNow, onTakeAtTime, onUpdateTakenAt, onClear }: {
+   medication: Medication | undefined,
+   drugInfo: MedicationInfo | undefined,
+   occurrenceId: string | null,
+   doseRecord: DoseRecord | undefined,
+   effectiveStatus: DoseStatus | null,
+   handleBack: () => void,
+   handleEdit: () => void,
+   onTake: () => void,
+   onTakeNow: () => void,
+   onTakeAtTime: (time: string) => void,
+   onUpdateTakenAt: (time: string) => void,
+   onClear: () => void,
+}) {
    const [remember, setRemember] = useState<boolean>(false);
    const [stock, setStock] = useState<number>(0);
    const [reminderThreshold, setReminderThreshold] = useState<number>(0);
@@ -127,10 +170,17 @@ function UserView({ medication, drugInfo, occurrenceId, handleBack, handleEdit, 
             <InfoTile title="Tem no SUS?" subtitle="Sim" />
          </div>
 
-         <div>
-            {occurrenceId &&
-               <ActionButton label="Tomar" onClick={() => handleTake()} variant="success" />}
-         </div>
+         {occurrenceId && (
+            <DoseActionPanel
+               effectiveStatus={effectiveStatus}
+               doseRecord={doseRecord}
+               onTake={onTake}
+               onTakeNow={onTakeNow}
+               onTakeAtTime={onTakeAtTime}
+               onUpdateTakenAt={onUpdateTakenAt}
+               onClear={onClear}
+            />
+         )}
 
          <div className="flex flex-col gap-4 font-merriweather  text-2xl">
             <h1 className="font-bold ">Frequência do uso:</h1>

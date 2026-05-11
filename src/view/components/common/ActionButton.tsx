@@ -2,7 +2,7 @@
 interface ActionButtonProps {
    label: string;
    onClick: () => void;
-   variant: "success" | "warning" | "disabled" | "ghost" | "add"
+   variant: "success" | "warning" | "danger" | "disabled" | "ghost" | "add"
 }
 
 
@@ -10,6 +10,7 @@ export function ActionButton({ label, onClick, variant }: ActionButtonProps) {
    const variantColor = {
       success: "bg-green-take text-offwhite",
       warning: "bg-yellow-alert text-inkblack",
+      danger: "bg-red-skip text-offwhite",
       disabled: "bg-ghost-gray text-",
       ghost: "border-2 border-ghostcolor text-ghostcolor",
       add: "bg-blue-add text-offwhite"
