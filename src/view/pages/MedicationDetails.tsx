@@ -70,7 +70,7 @@ function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationI
       </div>
 
       {/* InfoCards TileCard*/}
-      <div className="bg-lightpurple  mx-auto rounded-2xl grid grid-cols-2 gap-2 px-3.5 py-2.5">
+      <div className="bg-lightpurple w-full mx-auto rounded-2xl grid grid-cols-2 gap-2 px-3.5 py-2.5">
 
          <InfoTile title="Princípio ativo:" subtitle={`${drugInfo?.activeIngredient}`} />
          <InfoTile title="Forma:" subtitle={`${drugInfo?.type}`} />
@@ -162,7 +162,7 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
 
 
          {/* InfoCards TileCard*/}
-         <div className="bg-lightpurple  mx-auto rounded-2xl grid grid-cols-2 gap-2 px-3.5 py-2.5">
+         <div className="bg-lightpurple w-full mx-auto rounded-2xl grid grid-cols-2 gap-2 px-3.5 py-2.5">
 
             <InfoTile title="Dosage:" subtitle={`${medication?.dosage}`} />
             <InfoTile title="Forma:" subtitle={`${medication?.type}`} />

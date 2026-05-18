@@ -51,7 +51,7 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
     >
       {/* Barra lateral da marca */}
       <div
-        className="w-5.25 shrink-0"
+        className="brand-strip w-5.25 shrink-0"
         style={{ backgroundColor: getBrandColor(medication.brand) }}
       />
 
@@ -74,14 +74,13 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
             )}
           </div>
 
-          {/* Footer: botão ou label de status — animado a cada troca de status */}
-          <div key={status} className="flex justify-center animate-fade-slide-up
-            transition-all ease-in-out
-            active:scale-110 active:brightness-110">
+          {/* Footer: botão ou label de status */}
+          <div key={status} className="animate-fade-slide-up">
             {(isPending || isUpcoming) && (
               <button
                 onClick={e => { e.stopPropagation(); onTake(); }}
-                className="bg-green-take text-offwhite font-merriweather font-semibold text-[24px] rounded-4xl px-8 py-2"
+                className="btn-shine w-full h-[60px] rounded-full bg-green-take text-offwhite font-merriweather font-black text-[22px] tracking-[0.02em] transition-transform active:scale-[0.97]"
+                style={{ animation: isPending ? 'pulseHalo 2.4s ease-in-out infinite' : 'none' }}
               >
                 Tomar
               </button>
@@ -90,16 +89,17 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
             {isLate && (
               <button
                 onClick={e => { e.stopPropagation(); onTake(); }}
-                className="bg-yellow-alert text-inkblack font-merriweather font-semibold text-[24px] rounded-4xl px-6 py-2"
+                className="btn-shine w-full h-[60px] rounded-full bg-yellow-alert text-deepplum font-merriweather font-black text-[22px] tracking-[0.02em] transition-transform active:scale-[0.97]"
+                style={{ animation: 'pulseHaloAmber 2.2s ease-in-out infinite' }}
               >
-                Tomar com atraso
+                Tomar agora
               </button>
             )}
 
             {isTaken && (
-              <span className="font-merriweather font-bold text-[24px] text-green-taken">
-                Tomei ✓
-              </span>
+              <div className="w-full h-[56px] rounded-full bg-bg-taken flex items-center justify-center gap-2">
+                <span className="font-merriweather font-bold text-[20px] text-green-taken">Tomado ✓</span>
+              </div>
             )}
 
             {isSkipped && (

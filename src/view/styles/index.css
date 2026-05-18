@@ -89,6 +89,30 @@ body {
   animation: pulseSuccess 0.6s ease-out;
 }
 
+/* Pulse halo verde (botão Tomar) */
+@keyframes pulseHalo {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(36,189,118,0.50), 0 10px 24px rgba(36,189,118,0.30); }
+  50%       { box-shadow: 0 0 0 16px rgba(36,189,118,0), 0 10px 24px rgba(36,189,118,0.30); }
+}
+/* Pulse halo âmbar (botão Tomar com atraso) */
+@keyframes pulseHaloAmber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,194,73,0.55), 0 10px 24px rgba(255,194,73,0.35); }
+  50%       { box-shadow: 0 0 0 16px rgba(255,194,73,0), 0 10px 24px rgba(255,194,73,0.35); }
+}
+
+/* Barra lateral colorida dos cards com brilho */
+.brand-strip {
+  position: relative;
+  overflow: hidden;
+}
+.brand-strip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.18));
+  pointer-events: none;
+}
+
 /* Sheen (brilho deslizante em botões) */
 @keyframes sheen {
   0%   { transform: translateX(-160%) skewX(-18deg); }
