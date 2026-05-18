@@ -19,12 +19,10 @@ export function useMedicationDetails() {
    const occurrenceId = state && typeof state.occurrenceId == 'string' ? state.occurrenceId : null;
 
 
-   const medication = mode === 'user' ? context.getMedicationById(String(id)) : null;
+   const safeId = id ?? '';
+   const medication = mode === 'user' ? context.getMedicationById(safeId) : null;
 
-   // TODO: add a error screen?
-   if (!id) return
-
-   const drugInfo = medicationsDatabase.find((item) => item.id === (mode === 'user' ? medication?.medicationInfoId : id));
+   const drugInfo = medicationsDatabase.find((item) => item.id === (mode === 'user' ? medication?.medicationInfoId : safeId));
 
    const doseRecord = medication && occurrenceId ? medication.doseStatus[occurrenceId] : undefined;
 
@@ -58,7 +56,7 @@ export function useMedicationDetails() {
    }
 
    const handleEdit = () => {
-      navigate(`/edit/${id}`);
+      navigate(`/edit/${safeId}`);
    }
    const handleAdd = () => {
       navigate(`/add`, { state: { medicationInfoId: drugInfo?.id } });
