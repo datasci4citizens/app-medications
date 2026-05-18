@@ -43,9 +43,9 @@ const THEMES: Record<ModalVariant, ThemeConfig> = {
     iconName: 'warning',
   },
   info: {
-    iconBg: '#fff', iconBorder: 'rgba(91,42,120,0.22)', iconColor: 'var(--color-darkpurple)',
-    haloBg: 'rgba(91,42,120,0.20)', washTop: 'rgba(91,42,120,0.10)',
-    confirmBg: 'var(--color-darkpurple)', confirmColor: '#fff', confirmShadow: 'rgba(91,42,120,0.40)',
+    iconBg: '#fff', iconBorder: 'rgba(37,99,235,0.25)', iconColor: '#2563eb',
+    haloBg: 'rgba(37,99,235,0.18)', washTop: 'rgba(37,99,235,0.08)',
+    confirmBg: '#2563eb', confirmColor: '#fff', confirmShadow: 'rgba(37,99,235,0.35)',
     iconName: 'info',
   },
   success: {
