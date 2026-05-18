@@ -45,8 +45,8 @@ export function ConfirmModal({
   const currentTheme = theme[variant];
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-4xl shadow-xl p-8 w-full max-w-sm flex flex-col items-center text-center">
+    <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center p-4 animate-fade-in">
+      <div className="bg-white rounded-4xl shadow-xl p-8 w-full max-w-sm flex flex-col items-center text-center animate-scale-in">
         
         {/* Círculo do Ícone */}
         <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${currentTheme.iconBg}`}>

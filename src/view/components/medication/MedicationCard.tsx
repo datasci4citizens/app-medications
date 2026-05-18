@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 import type { DailyDose } from '../../../model/utils/medicationCalculations';
 import { getBrandColor } from '../../../model/utils/brandColorHelper';
@@ -11,6 +12,20 @@ interface MedicationCardProps {
 
 export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
   const { medication, status } = dose;
+  const prevStatusRef = useRef(status);
+  const [pulse, setPulse] = useState(false);
+
+  useEffect(() => {
+    const wasNotTaken = prevStatusRef.current !== 'taken' && prevStatusRef.current !== 'taken_late';
+    const isNowTaken = status === 'taken' || status === 'taken_late';
+    if (wasNotTaken && isNowTaken) {
+      setPulse(true);
+      const t = setTimeout(() => setPulse(false), 700);
+      prevStatusRef.current = status;
+      return () => clearTimeout(t);
+    }
+    prevStatusRef.current = status;
+  }, [status]);
 
   const isTaken = status === 'taken' || status === 'taken_late';
   const isSkipped = status === 'skipped';
@@ -28,11 +43,11 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
   return (
     <div
       onClick={onClick}
-      className={`relative w-full rounded-[30px] border border-[rgba(133,133,133,0.5)] flex overflow-hidden cursor-pointer
-        transition-all ease-in-out
+      className={`stagger-item animate-fade-slide-up relative w-full rounded-[30px] border border-[rgba(133,133,133,0.5)] flex overflow-hidden cursor-pointer
         [&:not(:has(button:active)):active]:scale-95
-        ${bgColor}`}
-      style={{ boxShadow: '0 4px 3px rgba(0,0,0,0.25)' }}
+        ${bgColor}
+        ${pulse ? 'animate-pulse-success' : ''}`}
+      style={{ boxShadow: '0 4px 3px rgba(0,0,0,0.25)', transition: 'background-color 500ms ease-out, transform 200ms ease-out' }}
     >
       {/* Barra lateral da marca */}
       <div
@@ -59,8 +74,8 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
             )}
           </div>
 
-          {/* Footer: botão ou label de status */}
-          <div className="flex justify-center
+          {/* Footer: botão ou label de status — animado a cada troca de status */}
+          <div key={status} className="flex justify-center animate-fade-slide-up
             transition-all ease-in-out
             active:scale-110 active:brightness-110">
             {(isPending || isUpcoming) && (

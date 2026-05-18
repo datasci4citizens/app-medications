@@ -43,7 +43,7 @@ export function MedicationDetails() {
               drugInfo={drugInfo}
               handleBack={handleBack}
               handleEdit={handleEdit}
-              medication={medication}
+              medication={medication ?? undefined}
               occurrenceId={occurrenceId}
               doseRecord={doseRecord}
               effectiveStatus={effectiveStatus}
@@ -59,7 +59,7 @@ export function MedicationDetails() {
 
 
 function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationInfo | undefined, handleBack: () => void, handleAdd: () => void }) {
-   return (<div className="p-4 flex gap-4 self-stretch flex-col pb-48">
+   return (<div className="p-4 flex gap-4 self-stretch flex-col pb-48 animate-slide-in-right">
       <NavBottom OnClick={() => handleBack()} type='back' size={55} />
       <div className="font-merriweather text-[44px] font-bold text-darkpurple text-center border-b-2">
          {/* Medicine Name */}
@@ -149,7 +149,7 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
    const [reminderThreshold, setReminderThreshold] = useState<number>(0);
 
    return (
-      <div className="p-4 flex gap-4 self-stretch flex-col pb-48">
+      <div className="p-4 flex gap-4 self-stretch flex-col pb-48 animate-slide-in-right">
 
          <NavBottom OnClick={() => handleBack()} type='back' size={55} />
          <div className="font-merriweather text-[44px] font-bold text-darkpurple text-center border-b-2">
