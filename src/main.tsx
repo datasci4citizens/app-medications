@@ -24,6 +24,7 @@ import { MedicationDetails } from './view/pages/MedicationDetails.tsx';
 import { Profile } from './view/pages/Profile.tsx';
 import { SplashScreen } from './view/pages/SplashScreen.tsx';
 import { Navigate } from 'react-router-dom';
+import { Register } from './view/pages/Auth/Register.tsx';
 
 
 try {
@@ -56,6 +57,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path='/search' element={<ProtectedRoute> <SearchMedication /> </ProtectedRoute>} />
             <Route path='/medication/user/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
             <Route path='/medication/search/:id' element={<ProtectedRoute> <MedicationDetails /></ProtectedRoute>} />
+
+            <Route path='/register' element={<GuestRoute><Register /></GuestRoute>} />
 
             {/* Redireciona /profile antigo  */}
             <Route path="/profile" element={<Navigate to="/home/profile" replace />} />

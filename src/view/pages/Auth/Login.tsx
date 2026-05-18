@@ -138,7 +138,8 @@ function Login() {
         <p className="font-inter text-sm text-gray-500 mb-1">
           Primeira vez no LembraMed?
         </p>
-        <button className="font-merriweather font-extrabold text-[17px] text-darkpurple underline underline-offset-4">
+        <button onClick={() => navigate('/register')} 
+        className="font-merriweather font-extrabold text-[17px] text-darkpurple underline underline-offset-4">
           Criar uma conta
         </button>
           <p className="font-inter text-[11px] text-gray-400 leading-relaxed px-4 mt-4">
