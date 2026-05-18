@@ -8,6 +8,8 @@ interface StepLayoutProps {
    onNext: () => void;
    isValid: boolean;
    nextLabel?: string;
+   stepKey?: string;
+   direction?: 'forward' | 'back';
 }
 
 export function StepLayout({
@@ -18,19 +20,23 @@ export function StepLayout({
    onNext,
    isValid,
    nextLabel = 'Próximo',
+   stepKey,
+   direction = 'forward',
 }: StepLayoutProps) {
+   const animationClass = direction === 'forward' ? 'animate-slide-in-right' : 'animate-slide-in-left';
+
    return (
-      <div className="min-h-screen bg-graybg flex flex-col">
+      <div className="min-h-screen bg-graybg flex flex-col overflow-hidden">
          <div className="p-4 flex flex-col gap-4">
             <div className="flex items-center gap-3">
                <NavBottom OnClick={onBack} type="back" size={55} />
                <h1 className="font-merriweather text-2xl font-bold text-darkpurple">{title}</h1>
             </div>
             <div className="border-b border-darkpurple" />
-            <h2 className="font-merriweather text-2xl font-bold text-inkblack">{question}</h2>
          </div>
 
-         <div className="flex-1 px-4 pb-32 overflow-y-auto">
+         <div key={stepKey} className={`flex-1 px-4 pb-32 overflow-y-auto ${animationClass}`}>
+            <h2 className="font-merriweather text-2xl font-bold text-inkblack mb-4">{question}</h2>
             {children}
          </div>
 

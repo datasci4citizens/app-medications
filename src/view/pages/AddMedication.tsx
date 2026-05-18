@@ -15,6 +15,7 @@ export function AddMedication() {
       drugInfo,
       isEditing,
       isValid,
+      direction,
       updateField,
       handleNext,
       handleBack,
@@ -31,6 +32,8 @@ export function AddMedication() {
                onBack={handleBack}
                onNext={handleNext}
                isValid={isValid}
+               stepKey={step}
+               direction={direction}
             >
                <BrandStep
                   value={formData.brand}
@@ -48,6 +51,8 @@ export function AddMedication() {
                onBack={handleBack}
                onNext={handleNext}
                isValid={isValid}
+               stepKey={step}
+               direction={direction}
             >
                <DosageStep
                   value={formData.dosage}
@@ -65,6 +70,8 @@ export function AddMedication() {
                onBack={handleBack}
                onNext={handleNext}
                isValid={isValid}
+               stepKey={step}
+               direction={direction}
             >
                <WeekDaysStep
                   value={formData.weekDays}
@@ -81,6 +88,8 @@ export function AddMedication() {
                onBack={handleBack}
                onNext={handleNext}
                isValid={isValid}
+               stepKey={step}
+               direction={direction}
             >
                <ScheduleStep
                   scheduleType={formData.scheduleType}
@@ -103,6 +112,8 @@ export function AddMedication() {
                onBack={handleBack}
                onNext={handleNext}
                isValid={isValid}
+               stepKey={step}
+               direction={direction}
             >
                <PeriodStep
                   startDate={formData.startDate}
@@ -121,6 +132,8 @@ export function AddMedication() {
                onBack={handleBack}
                onNext={handleNext}
                isValid={isValid}
+               stepKey={step}
+               direction={direction}
             >
                <StockStep
                   currentStock={formData.currentStock}

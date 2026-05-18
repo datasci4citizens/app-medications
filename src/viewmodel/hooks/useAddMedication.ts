@@ -67,6 +67,7 @@ export function useAddMedication() {
    );
 
    const [stepIndex, setStepIndex] = useState(0);
+   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
    const [formData, setFormData] = useState<AddMedicationFormData>(() => {
       if (editingMedication) {
          return {
@@ -124,6 +125,7 @@ export function useAddMedication() {
          handleSave();
          return;
       }
+      setDirection('forward');
       setStepIndex(i => i + 1);
    };
 
@@ -132,6 +134,7 @@ export function useAddMedication() {
          navigate(-1);
          return;
       }
+      setDirection('back');
       setStepIndex(i => i - 1);
    };
 
@@ -169,6 +172,7 @@ export function useAddMedication() {
       totalSteps,
       isFirstStep,
       isLastStep,
+      direction,
       formData,
       drugInfo,
       isEditing,
