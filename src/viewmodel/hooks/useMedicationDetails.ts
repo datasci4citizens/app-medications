@@ -101,6 +101,11 @@ export function useMedicationDetails() {
       context.clearDoseStatus(medication.id, occurrenceId);
    }
 
+   const handleDelete = () => {
+      context.deleteMedication(safeId);
+      navigate(-1);
+   }
+
    return {
       mode,
       medication,
@@ -111,6 +116,7 @@ export function useMedicationDetails() {
       handleBack,
       handleEdit,
       handleAdd,
+      handleDelete,
       handleTake,
       handleTakeNow,
       handleTakeAtTime,

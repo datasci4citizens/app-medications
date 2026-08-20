@@ -5,10 +5,10 @@ import { NavBottom } from "../components/layout/NavBottom";
 
 import { InfoTile } from "../components/common/InfoTile";
 import { WeekDaySelector } from "../components/common/WeekDaySelector";
-import { NumberBox } from "../components/common/NumberBox";
 import { AccordionSection } from "../components/common/AccordionSection";
 import { ToggleSwitch } from "../components/common/ToggleSwitch";
 import { NumberInput } from "../components/common/InputBar";
+import { ConfirmModal } from "../components/common/Modal";
 
 import { useMedicationDetails } from "../../viewmodel/hooks/useMedicationDetails";
 import { DoseActionPanel } from "../components/medication/DoseActionPanel";
@@ -29,6 +29,7 @@ export function MedicationDetails() {
       handleBack,
       handleEdit,
       handleAdd,
+      handleDelete,
       handleTake,
       handleTakeNow,
       handleTakeAtTime,
@@ -43,6 +44,7 @@ export function MedicationDetails() {
               drugInfo={drugInfo}
               handleBack={handleBack}
               handleEdit={handleEdit}
+              handleDelete={handleDelete}
               medication={medication ?? undefined}
               occurrenceId={occurrenceId}
               doseRecord={doseRecord}
@@ -130,7 +132,7 @@ function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationI
 
 // USER SCREEN
 
-function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveStatus, handleBack, handleEdit, onTake, onTakeNow, onTakeAtTime, onUpdateTakenAt, onClear }: {
+function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveStatus, handleBack, handleEdit, handleDelete, onTake, onTakeNow, onTakeAtTime, onUpdateTakenAt, onClear }: {
    medication: Medication | undefined,
    drugInfo: MedicationInfo | undefined,
    occurrenceId: string | null,
@@ -138,6 +140,7 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
    effectiveStatus: DoseStatus | null,
    handleBack: () => void,
    handleEdit: () => void,
+   handleDelete: () => void,
    onTake: () => void,
    onTakeNow: () => void,
    onTakeAtTime: (time: string) => void,
@@ -147,6 +150,7 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
    const [remember, setRemember] = useState<boolean>(false);
    const [stock, setStock] = useState<number>(0);
    const [reminderThreshold, setReminderThreshold] = useState<number>(0);
+   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
    return (
       <div className="p-4 flex gap-4 self-stretch flex-col pb-48 animate-slide-in-right">
@@ -185,16 +189,15 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
          <div className="flex flex-col gap-4 font-merriweather  text-2xl">
             <h1 className="font-bold ">Frequência do uso:</h1>
             <WeekDaySelector isReadOnly={true} values={medication?.weekDays ?? []} />
-            <div className="mx-auto flex gap-2 items-center">
-               {medication?.times?.map(med => {
-                  const time = med.split(":");
-                  return (
-                     <div key={med}>
-                        <NumberBox isReadOnly={true} value={Number(time[0])} /> h :
-                        <NumberBox isReadOnly={true} value={Number(time[1])} /> min
-                     </div>
-                  )
-               })}
+            <div className="flex flex-wrap gap-2 justify-center">
+               {medication?.times?.map(time => (
+                  <span
+                     key={time}
+                     className="px-4 py-2 rounded-full bg-lightpurple text-darkpurple font-merriweather font-bold text-xl"
+                  >
+                     {time}
+                  </span>
+               ))}
             </div>
          </div>
 
@@ -238,22 +241,48 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
             </AccordionSection>
          </div>
 
-         {/* Edit Button */}
-         <button
-            onClick={handleEdit}
-            className="
-               bg-graybg
-               fixed bottom-0 left-0 right-0
-               mx-auto w-[calc(100%-2rem)] max-w-md mb-4
-               font-merriweather font-bold text-darkpurple text-2xl text-center
-               border-[3px] border-darkpurple rounded-[0.625rem]
-               py-2
-               transition-colors duration-300
-               active:bg-darkpurple active:text-offwhite
-            "
-         >
-            Editar
-         </button>
+         {/* Buttons */}
+         <div className="fixed bottom-0 left-0 right-0 mx-auto w-[calc(100%-2rem)] max-w-md mb-4 flex gap-3">
+            <button
+               onClick={() => setDeleteModalOpen(true)}
+               className="
+                  flex-1
+                  bg-graybg
+                  font-merriweather font-bold text-red-500 text-2xl text-center
+                  border-[3px] border-red-400 rounded-[0.625rem]
+                  py-2
+                  transition-colors duration-300
+                  active:bg-red-500 active:text-offwhite
+               "
+            >
+               Excluir
+            </button>
+            <button
+               onClick={handleEdit}
+               className="
+                  flex-[2]
+                  bg-graybg
+                  font-merriweather font-bold text-darkpurple text-2xl text-center
+                  border-[3px] border-darkpurple rounded-[0.625rem]
+                  py-2
+                  transition-colors duration-300
+                  active:bg-darkpurple active:text-offwhite
+               "
+            >
+               Editar
+            </button>
+         </div>
+
+         <ConfirmModal
+            isOpen={deleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={handleDelete}
+            title="Excluir medicamento?"
+            message={`"${medication?.name}" será removido permanentemente do seu tratamento.`}
+            confirmText="Excluir"
+            cancelText="Cancelar"
+            variant="danger"
+         />
 
       </div>
    );
