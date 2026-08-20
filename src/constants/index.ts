@@ -47,6 +47,14 @@ export const MEDICATION_TYPE_LABELS: Record<string, string> = {
   [MEDICATION_TYPES.LIQUID]: 'Líquido',
 };
 
+// Rótulos curtos para o card — linguagem simples, sem jargão de bula
+export const MEAL_LABELS: Record<string, string> = {
+  'Antes da Refeição': 'Antes de comer',
+  'Após Refeição': 'Depois de comer',
+  'Com Refeição': 'Com comida',
+  'Independente': 'Livre',
+};
+
 // ============================================
 // STATUS DE MEDICAMENTO
 // ============================================

@@ -100,6 +100,15 @@ body {
   50%       { box-shadow: 0 0 0 16px rgba(255,194,73,0), 0 10px 24px rgba(255,194,73,0.35); }
 }
 
+/* Chacoalhada sutil — chip de dose atrasada */
+@keyframes shakeGentle {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-4px); }
+  40%      { transform: translateX(4px); }
+  60%      { transform: translateX(-3px); }
+  80%      { transform: translateX(3px); }
+}
+
 /* Barra lateral colorida dos cards com brilho */
 .brand-strip {
   position: relative;

@@ -27,6 +27,9 @@ interface ConfirmModalProps {
   destructive?: boolean;
   icon?: React.ReactNode;
   dark?: boolean;
+  /** Toque no fundo fecha o modal. Desligue quando `onClose` tiver efeito colateral
+   *  (ex.: "Desfazer"), para que a escolha exija um toque no botão. */
+  dismissOnBackdrop?: boolean;
 }
 
 const THEMES: Record<ModalVariant, ThemeConfig> = {
@@ -126,6 +129,7 @@ export function ConfirmModal({
   destructive,
   icon,
   dark = false,
+  dismissOnBackdrop = true,
 }: ConfirmModalProps) {
   const [closing, setClosing] = useState(false);
 
@@ -149,7 +153,7 @@ export function ConfirmModal({
 
   return (
     <div
-      onClick={handleClose}
+      onClick={dismissOnBackdrop ? handleClose : undefined}
       style={{
         position: 'fixed', inset: 0,
         background: closing ? 'rgba(12,6,20,0)' : 'rgba(12,6,20,0.55)',

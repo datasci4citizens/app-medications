@@ -53,3 +53,29 @@ export function formatHeaderDate(date: Date): string {
 export function isSameDay(date1: Date, date2: Date): boolean {
   return date1.toDateString() === date2.toDateString();
 }
+
+/**
+ * Distância até um horário futuro, em linguagem curta: "1h 12min", "12min".
+ * Retorna null se o alvo já passou.
+ */
+export function formatTimeUntil(target: Date, now: Date): string | null {
+  const diffMin = Math.round((target.getTime() - now.getTime()) / 60000);
+  if (diffMin <= 0) return null;
+
+  const hours = Math.floor(diffMin / 60);
+  const minutes = diffMin % 60;
+
+  if (hours === 0) return `${minutes}min`;
+  if (minutes === 0) return `${hours}h`;
+  return `${hours}h ${minutes}min`;
+}
+
+/**
+ * Constrói a data de uma ocorrência a partir do dia selecionado e do horário "HH:MM".
+ */
+export function buildDoseDate(day: Date, time: string): Date {
+  const [h, m] = time.split(':').map(Number);
+  const d = new Date(day);
+  d.setHours(h, m, 0, 0);
+  return d;
+}

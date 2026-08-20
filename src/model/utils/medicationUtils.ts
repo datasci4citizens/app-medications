@@ -29,3 +29,8 @@ export function searchMedication(query: string, type: string = 'all'): Medicatio
 export function getPopularMedications(): MedicationInfo[] {
   return medicationsDatabase.filter((med) => POPULAR_IDS.includes(med.id));
 }
+
+export function getMedicationInfoById(id: string | undefined): MedicationInfo | undefined {
+  if (!id) return undefined;
+  return medicationsDatabase.find((med) => med.id === id);
+}
