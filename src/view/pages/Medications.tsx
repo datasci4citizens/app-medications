@@ -1,15 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DateSelector } from '../components/medication/DateSelector.tsx';
 import { Header } from '../components/layout/Header';
 import { MedicationCard } from '../components/medication/MedicationCard';
 import { useMedications } from '../../viewmodel/hooks/useMedications.ts';
 import { ConfirmModal } from '../components/common/Modal.tsx';
+import { Toast } from '../components/common/Toast.tsx';
 import { calculateDosesForDay, type DailyDose } from '../../model/utils/medicationCalculations';
 
 
 export function Medications() {
-  const { medications, markDoseAsTaken } = useMedications();
+  const { medications, markDoseAsTaken, clearDoseStatus } = useMedications();
+  const [toast, setToast] = useState<{ name: string; medId: string; occurrenceId: string } | null>(null);
+  const dismissToast = useCallback(() => setToast(null), []);
   const [isFutureModalOpen, setIsFutureModalOpen] = useState(false);
   const navigate = useNavigate();
   const [isEarlyModalOpen, setIsEarlyModalOpen] = useState(false);
@@ -77,6 +80,11 @@ export function Medications() {
     return selectedDate > now;
   }, [selectedDate]);
 
+  const showTakenToast = (medId: string, occurrenceId: string) => {
+    const med = medications.find(m => m.id === medId);
+    setToast({ name: med?.name ?? '', medId, occurrenceId });
+  };
+
   // Marcar como tomado (usando ID da ocorrência)
   const handleTake = (medId: string, occurrenceId: string, wasLate: boolean, isEarly: boolean) => {
     if (isFutureDate) {
@@ -91,6 +99,7 @@ export function Medications() {
     }
 
     markDoseAsTaken(medId, occurrenceId, wasLate);
+    showTakenToast(medId, occurrenceId);
   };
 
 
@@ -208,6 +217,7 @@ export function Medications() {
         onConfirm={() => {
           if (pendingEarlyDose) {
             markDoseAsTaken(pendingEarlyDose.medId, pendingEarlyDose.occurrenceId, false);
+            showTakenToast(pendingEarlyDose.medId, pendingEarlyDose.occurrenceId);
           }
           setIsEarlyModalOpen(false);
           setPendingEarlyDose(null);
@@ -216,6 +226,15 @@ export function Medications() {
         cancelText="Cancelar"
         variant="warning"
       />
+
+      {toast && (
+        <Toast
+          key={toast.occurrenceId}
+          name={toast.name}
+          onUndo={() => clearDoseStatus(toast.medId, toast.occurrenceId)}
+          onDismiss={dismissToast}
+        />
+      )}
     </div>
   );
 }
