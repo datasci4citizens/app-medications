@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { FiChevronRight } from 'react-icons/fi';
+import { FiChevronRight, FiClock, FiMinusCircle } from 'react-icons/fi';
 import type { DailyDose } from '../../../model/utils/medicationCalculations';
 import { getBrandColor } from '../../../model/utils/brandColorHelper';
-import { MEDICATION_TYPE_LABELS } from '../../../constants';
+import { getMedicationInfoById } from '../../../model/utils/medicationUtils';
+import { MEAL_LABELS, MEDICATION_TYPE_LABELS } from '../../../constants';
 
 interface MedicationCardProps {
   dose: DailyDose;
   onTake: () => void;
+  onSkip: () => void;
   onClick: () => void;
 }
 
-export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
+export function MedicationCard({ dose, onTake, onSkip, onClick }: MedicationCardProps) {
   const { medication, status } = dose;
   const prevStatusRef = useRef(status);
   const [pulse, setPulse] = useState(false);
@@ -40,6 +42,13 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
 
   const typeLabel = MEDICATION_TYPE_LABELS[medication.type] || 'Dose';
 
+  const drugInfo = getMedicationInfoById(medication.medicationInfoId);
+  const mealLabel = drugInfo?.whenToTake ? MEAL_LABELS[drugInfo.whenToTake] : undefined;
+
+  const timeChipColor = isLate
+    ? 'bg-[rgba(211,34,49,0.10)] text-red-skip'
+    : 'bg-[rgba(91,42,120,0.08)] text-darkpurple';
+
   return (
     <div
       onClick={onClick}
@@ -61,39 +70,63 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
         {/* Lado Esquerdo: Info + Footer */}
         <div className="flex flex-col flex-1 gap-3">
           {/* Info */}
-          <div>
-            <h3 className={`font-merriweather font-bold text-[22px] leading-tight ${textColor}`}>
-              <span className="uppercase">{medication.name}</span>{' '}
-              <span className={`${dosageColor} lowercase`}>
-                {medication.dosage}
-              </span>
-            </h3>
-            <p className={`font-merriweather font-normal text-[18px] mt-1 ${subTextColor}`}>{typeLabel}</p>
-            {medication.brand && (
-              <p className={`font-merriweather text-[16px] ${subTextColor}`}>Marca: {medication.brand}</p>
-            )}
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <h3 className={`font-merriweather font-bold text-[22px] leading-tight ${textColor}`}>
+                <span className="uppercase">{medication.name}</span>{' '}
+                <span className={`${dosageColor} lowercase`}>
+                  {medication.dosage}
+                </span>
+              </h3>
+              <p className={`font-merriweather font-normal text-[18px] mt-1 flex items-center gap-1.5 flex-wrap ${subTextColor}`}>
+                <span>{typeLabel}</span>
+                {mealLabel && (
+                  <>
+                    <span className="opacity-50">·</span>
+                    <span>{mealLabel}</span>
+                  </>
+                )}
+              </p>
+              {medication.brand && (
+                <p className={`font-merriweather text-[16px] ${subTextColor}`}>Marca: {medication.brand}</p>
+              )}
+            </div>
+
+            {/* Chip de horário */}
+            <span
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full font-inter font-bold text-[15px] ${isSkipped ? 'bg-white/15 text-offwhite' : timeChipColor}`}
+            >
+              <FiClock size={16} />
+              {dose.time}
+            </span>
           </div>
 
           {/* Footer: botão ou label de status */}
           <div key={status} className="animate-fade-slide-up">
-            {(isPending || isUpcoming) && (
-              <button
-                onClick={e => { e.stopPropagation(); onTake(); }}
-                className="btn-shine w-full h-[60px] rounded-full bg-green-take text-offwhite font-merriweather font-black text-[22px] tracking-[0.02em] transition-transform active:scale-[0.97]"
-                style={{ animation: isPending ? 'pulseHalo 2.4s ease-in-out infinite' : 'none' }}
-              >
-                Tomar
-              </button>
-            )}
+            {(isPending || isUpcoming || isLate) && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={e => { e.stopPropagation(); onTake(); }}
+                  aria-label={`Marcar ${medication.name} ${medication.dosage} como ${isLate ? 'tomado agora' : 'tomado'}`}
+                  className={`btn-shine flex-1 h-[60px] rounded-full font-merriweather font-black text-[22px] tracking-[0.02em] transition-transform active:scale-[0.97] ${isLate ? 'bg-yellow-alert text-deepplum' : 'bg-green-take text-offwhite'}`}
+                  style={{
+                    animation: isLate
+                      ? 'pulseHaloAmber 2.2s ease-in-out infinite'
+                      : isPending ? 'pulseHalo 2.4s ease-in-out infinite' : 'none',
+                  }}
+                >
+                  {isLate ? 'Tomar agora' : 'Tomar'}
+                </button>
 
-            {isLate && (
-              <button
-                onClick={e => { e.stopPropagation(); onTake(); }}
-                className="btn-shine w-full h-[60px] rounded-full bg-yellow-alert text-deepplum font-merriweather font-black text-[22px] tracking-[0.02em] transition-transform active:scale-[0.97]"
-                style={{ animation: 'pulseHaloAmber 2.2s ease-in-out infinite' }}
-              >
-                Tomar agora
-              </button>
+                <button
+                  onClick={e => { e.stopPropagation(); onSkip(); }}
+                  aria-label={`Marcar ${medication.name} como esquecida`}
+                  title="Marcar como esquecida"
+                  className="shrink-0 w-[60px] h-[60px] rounded-full border-2 border-black/10 text-gray-500 flex items-center justify-center transition-colors duration-150 active:border-red-skip active:text-red-skip"
+                >
+                  <FiMinusCircle size={24} />
+                </button>
+              </div>
             )}
 
             {isTaken && (

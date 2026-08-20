@@ -1,22 +1,32 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FiCheck, FiChevronRight } from 'react-icons/fi';
 import { DateSelector } from '../components/medication/DateSelector.tsx';
 import { Header } from '../components/layout/Header';
 import { MedicationCard } from '../components/medication/MedicationCard';
+import { DoneRow } from '../components/medication/DoneRow.tsx';
 import { useMedications } from '../../viewmodel/hooks/useMedications.ts';
 import { ConfirmModal } from '../components/common/Modal.tsx';
-import { Toast } from '../components/common/Toast.tsx';
 import { calculateDosesForDay, type DailyDose } from '../../model/utils/medicationCalculations';
+import { buildDoseDate, formatTimeUntil } from '../../model/utils/dateHelpers.ts';
 
+interface DoseConfirm {
+  kind: 'taken' | 'skipped';
+  name: string;
+  dosage: string;
+  time: string;
+  medId: string;
+  occurrenceId: string;
+}
 
 export function Medications() {
-  const { medications, markDoseAsTaken, clearDoseStatus } = useMedications();
-  const [toast, setToast] = useState<{ name: string; medId: string; occurrenceId: string } | null>(null);
-  const dismissToast = useCallback(() => setToast(null), []);
+  const { medications, markDoseAsTaken, markDoseAsSkipped, clearDoseStatus } = useMedications();
+  const [doseConfirm, setDoseConfirm] = useState<DoseConfirm | null>(null);
+  const [showDone, setShowDone] = useState(false);
   const [isFutureModalOpen, setIsFutureModalOpen] = useState(false);
   const navigate = useNavigate();
   const [isEarlyModalOpen, setIsEarlyModalOpen] = useState(false);
-  const [pendingEarlyDose, setPendingEarlyDose] = useState<{ medId: string, occurrenceId: string } | null>(null);
+  const [pendingEarlyDose, setPendingEarlyDose] = useState<{ medId: string, occurrenceId: string, time: string } | null>(null);
 
   // BUG 3: Normalizar selectedDate para meia-noite ao inicializar
   const [selectedDate, setSelectedDate] = useState<Date>(() => {
@@ -80,26 +90,52 @@ export function Medications() {
     return selectedDate > now;
   }, [selectedDate]);
 
-  const showTakenToast = (medId: string, occurrenceId: string) => {
+  // Doses já resolvidas no dia — tomadas e esquecidas juntas, em ordem de horário
+  const doneDoses = useMemo(
+    () => [...takenDoses, ...skippedDoses].sort((a, b) => a.time.localeCompare(b.time)),
+    [takenDoses, skippedDoses]
+  );
+
+  // Próxima dose em aberto e quanto falta para ela
+  const nextDose = useMemo(() => lateDoses[0] ?? pendingDoses[0] ?? upcomingDoses[0], [lateDoses, pendingDoses, upcomingDoses]);
+
+  const countdownLabel = useMemo(() => {
+    if (!nextDose || !isToday) return null;
+    if (nextDose.status === 'late') return 'tome agora';
+    return formatTimeUntil(buildDoseDate(selectedDate, nextDose.time), now);
+  }, [nextDose, isToday, selectedDate, now]);
+
+  const showDoseConfirm = (kind: DoseConfirm['kind'], medId: string, occurrenceId: string, time: string) => {
     const med = medications.find(m => m.id === medId);
-    setToast({ name: med?.name ?? '', medId, occurrenceId });
+    setDoseConfirm({ kind, name: med?.name ?? '', dosage: med?.dosage ?? '', time, medId, occurrenceId });
   };
 
   // Marcar como tomado (usando ID da ocorrência)
-  const handleTake = (medId: string, occurrenceId: string, wasLate: boolean, isEarly: boolean) => {
+  const handleTake = (medId: string, occurrenceId: string, time: string, wasLate: boolean, isEarly: boolean) => {
     if (isFutureDate) {
       setIsFutureModalOpen(true);
       return;
     }
 
     if (isEarly) {
-      setPendingEarlyDose({ medId, occurrenceId });
+      setPendingEarlyDose({ medId, occurrenceId, time });
       setIsEarlyModalOpen(true);
       return;
     }
 
     markDoseAsTaken(medId, occurrenceId, wasLate);
-    showTakenToast(medId, occurrenceId);
+    showDoseConfirm('taken', medId, occurrenceId, time);
+  };
+
+  // Marcar como esquecida
+  const handleSkip = (medId: string, occurrenceId: string, time: string) => {
+    if (isFutureDate) {
+      setIsFutureModalOpen(true);
+      return;
+    }
+
+    markDoseAsSkipped(medId, occurrenceId);
+    showDoseConfirm('skipped', medId, occurrenceId, time);
   };
 
 
@@ -112,7 +148,7 @@ export function Medications() {
 
   return (
     <div className="min-h-screen bg-figmagray pb-20">
-      <Header selectedDate={selectedDate} />
+      <Header selectedDate={selectedDate} doses={dailyDoses} />
 
       <DateSelector selectedDate={selectedDate} onDateChange={setSelectedDate} />
 
@@ -127,12 +163,23 @@ export function Medications() {
             return (
               <div key={horario}>
 
-                {/* Label do horário */}
-                <h2 className="font-merriweather font-bold text-[26px] text-inkblack mb-3">
-                  {hasLate ? `Atrasado: ${horario}` :
-                    index === 0 && isToday ? `Próximo horário: ${horario}`
-                      : `Horário: ${horario}`}
-                </h2>
+                {/* Label do horário + quanto falta */}
+                <div className="flex justify-between items-baseline gap-3 mb-3">
+                  <h2 className="font-merriweather font-bold text-[26px] text-inkblack">
+                    {hasLate ? `Atrasado: ${horario}` :
+                      index === 0 && isToday ? `Próximo horário: ${horario}`
+                        : `Horário: ${horario}`}
+                  </h2>
+
+                  {index === 0 && countdownLabel && (
+                    <span
+                      className={`shrink-0 font-inter font-bold text-[15px] px-3 py-1.5 rounded-full ${hasLate ? 'bg-[rgba(211,34,49,0.10)] text-red-skip' : 'bg-[rgba(146,84,173,0.10)] text-purple-dose'}`}
+                      style={{ animation: hasLate ? 'shakeGentle 2.4s ease-in-out infinite' : 'none' }}
+                    >
+                      {hasLate ? countdownLabel : `em ${countdownLabel}`}
+                    </span>
+                  )}
+                </div>
 
                 {/* Cards desse horário */}
                 <div className="flex flex-col gap-3">
@@ -140,7 +187,8 @@ export function Medications() {
                     <MedicationCard
                       key={dose.occurrenceId}
                       dose={dose}
-                      onTake={() => handleTake(dose.medication.id, dose.occurrenceId, dose.status === 'late', dose.status === 'upcoming')}
+                      onTake={() => handleTake(dose.medication.id, dose.occurrenceId, dose.time, dose.status === 'late', dose.status === 'upcoming')}
+                      onSkip={() => handleSkip(dose.medication.id, dose.occurrenceId, dose.time)}
                       onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId, dose.status === 'late')}
                     />
                   ))}
@@ -151,41 +199,38 @@ export function Medications() {
           })}
         </div>
 
-        {/* Seção de Tomados */}
-        {takenDoses.length > 0 && (
+        {/* Doses já resolvidas — recolhidas por padrão, para o foco ficar no que falta */}
+        {doneDoses.length > 0 && (
           <div className="mt-8">
-            <h3 className="font-merriweather font-bold text-[26px] text-inkblack mb-3">
-              Tomados
-            </h3>
-            <div className="flex flex-col gap-3">
-              {takenDoses.map((dose) => (
-                <MedicationCard
-                  key={dose.occurrenceId}
-                  dose={dose}
-                  onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false )}
-                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId, false)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+            <button
+              onClick={() => setShowDone(s => !s)}
+              aria-expanded={showDone}
+              className="w-full flex items-center gap-2.5 py-3 px-3.5 rounded-[18px] bg-white/55 border border-black/5 font-merriweather font-bold text-[18px] text-gray-600"
+            >
+              <span className="inline-flex w-6.5 h-6.5 rounded-full bg-green-take items-center justify-center text-white shrink-0">
+                <FiCheck size={14} strokeWidth={3} />
+              </span>
+              <span className="flex-1 text-left">Registradas hoje · {doneDoses.length}</span>
+              <span
+                className="text-gray-400 transition-transform duration-200"
+                style={{ transform: showDone ? 'rotate(90deg)' : 'rotate(0deg)' }}
+              >
+                <FiChevronRight size={18} />
+              </span>
+            </button>
 
-        {/* Seção de Esquecidos */}
-        {skippedDoses.length > 0 && (
-          <div className="mt-8">
-            <h3 className="font-merriweather font-bold text-[28px] text-inkblack mb-3">
-              Esquecidos
-            </h3>
-            <div className="flex flex-col gap-3">
-              {skippedDoses.map((dose) => (
-                <MedicationCard
-                  key={dose.occurrenceId}
-                  dose={dose}
-                  onTake={() => handleTake(dose.medication.id, dose.occurrenceId, false, false)}
-                  onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId, false)}
-                />
-              ))}
-            </div>
+            {showDone && (
+              <div className="flex flex-col gap-2 mt-2.5 animate-fade-slide-up">
+                {doneDoses.map((dose, i) => (
+                  <DoneRow
+                    key={dose.occurrenceId}
+                    dose={dose}
+                    delay={i * 40}
+                    onClick={() => handleCardClick(dose.medication.id, dose.occurrenceId, false)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
         {/* Estado vazio */}
@@ -217,7 +262,7 @@ export function Medications() {
         onConfirm={() => {
           if (pendingEarlyDose) {
             markDoseAsTaken(pendingEarlyDose.medId, pendingEarlyDose.occurrenceId, false);
-            showTakenToast(pendingEarlyDose.medId, pendingEarlyDose.occurrenceId);
+            showDoseConfirm('taken', pendingEarlyDose.medId, pendingEarlyDose.occurrenceId, pendingEarlyDose.time);
           }
           setIsEarlyModalOpen(false);
           setPendingEarlyDose(null);
@@ -227,14 +272,21 @@ export function Medications() {
         variant="warning"
       />
 
-      {toast && (
-        <Toast
-          key={toast.occurrenceId}
-          name={toast.name}
-          onUndo={() => clearDoseStatus(toast.medId, toast.occurrenceId)}
-          onDismiss={dismissToast}
-        />
-      )}
+      {/* Confirmação da dose registrada, com desfazer */}
+      <ConfirmModal
+        isOpen={!!doseConfirm}
+        title={doseConfirm?.kind === 'skipped' ? 'Marcada como esquecida' : 'Dose registrada!'}
+        message={doseConfirm ? `${doseConfirm.name} ${doseConfirm.dosage} · ${doseConfirm.time}` : ''}
+        variant={doseConfirm?.kind === 'skipped' ? 'danger' : 'success'}
+        confirmText="Ok"
+        cancelText="Desfazer"
+        dismissOnBackdrop={false}
+        onConfirm={() => setDoseConfirm(null)}
+        onClose={() => {
+          if (doseConfirm) clearDoseStatus(doseConfirm.medId, doseConfirm.occurrenceId);
+          setDoseConfirm(null);
+        }}
+      />
     </div>
   );
 }
