@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useAddMedication } from "../../viewmodel/hooks/useAddMedication";
 import { StepLayout } from "../components/addMedication/StepLayout";
+import { ConfirmModal } from "../components/common/Modal";
 import { BrandStep } from "../components/addMedication/steps/BrandStep";
 import { DosageStep } from "../components/addMedication/steps/DosageStep";
 import { WeekDaysStep } from "../components/addMedication/steps/WeekDaysStep";
@@ -14,6 +16,7 @@ export function AddMedication() {
       formData,
       drugInfo,
       isEditing,
+      isFirstStep,
       isValid,
       direction,
       updateField,
@@ -21,15 +24,26 @@ export function AddMedication() {
       handleBack,
    } = useAddMedication();
 
+   const [discardModalOpen, setDiscardModalOpen] = useState(false);
+
+   const onBackClick = () => {
+      if (isEditing && isFirstStep) {
+         setDiscardModalOpen(true);
+      } else {
+         handleBack();
+      }
+   };
+
    const title = isEditing ? 'Editar medicamento' : 'Adicionar medicamento';
 
    switch (step) {
       case 'brand':
          return (
+            <>
             <StepLayout
                title={title}
                question="Qual a marca?"
-               onBack={handleBack}
+               onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                stepKey={step}
@@ -41,6 +55,17 @@ export function AddMedication() {
                   onChange={(brand) => updateField('brand', brand)}
                />
             </StepLayout>
+            <ConfirmModal
+               isOpen={discardModalOpen}
+               onClose={() => setDiscardModalOpen(false)}
+               onConfirm={handleBack}
+               title="Descartar alterações?"
+               message="As alterações feitas nesse medicamento não serão salvas."
+               confirmText="Descartar"
+               cancelText="Continuar editando"
+               variant="question"
+            />
+            </>
          );
 
       case 'dosage':
@@ -48,7 +73,7 @@ export function AddMedication() {
             <StepLayout
                title={title}
                question="Qual a dosagem?"
-               onBack={handleBack}
+               onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                stepKey={step}
@@ -67,7 +92,7 @@ export function AddMedication() {
             <StepLayout
                title={title}
                question="Em quais dias?"
-               onBack={handleBack}
+               onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                stepKey={step}
@@ -85,7 +110,7 @@ export function AddMedication() {
             <StepLayout
                title={title}
                question="Em quais horários?"
-               onBack={handleBack}
+               onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                stepKey={step}
@@ -109,7 +134,7 @@ export function AddMedication() {
             <StepLayout
                title={title}
                question="Por quanto tempo?"
-               onBack={handleBack}
+               onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                stepKey={step}
@@ -129,7 +154,7 @@ export function AddMedication() {
             <StepLayout
                title={title}
                question="Quantas unidades você tem?"
-               onBack={handleBack}
+               onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                stepKey={step}
@@ -151,7 +176,7 @@ export function AddMedication() {
             <StepLayout
                title={title}
                question="Revisar"
-               onBack={handleBack}
+               onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                nextLabel={isEditing ? 'Salvar' : 'Adicionar'}
