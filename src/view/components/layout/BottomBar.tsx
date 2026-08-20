@@ -11,54 +11,37 @@ export function BottomBar() {
    const isMedications = location.pathname.includes('/home/medications')
 
    return (
-      <div className="fixed bottom-6 left-0 right-0 px-6 flex items-center justify-between">
+      <div className="fixed bottom-5 left-0 right-0 px-5 flex items-center gap-3">
 
          {/* Segmented Control */}
-         <div
-            className="relative flex items-center bg-offwhite overflow-hidden"
-            style={{
-               width: '280px',
-               height: '86px',
-               borderRadius: '48px'
-            }}
-         >
+         <div className="relative flex items-center bg-offwhite overflow-hidden flex-1 h-[86px] rounded-[48px] shadow-[0_4px_16px_rgba(0,0,0,0.10)]">
 
             {/* Sliding indicator */}
             <div
-               className="absolute top-0 left-0 bg-darkpurple transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]"
+               className="absolute top-0 left-0 h-full bg-darkpurple transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)]"
                style={{
-                  width: '153px',
-                  height: '86px',
+                  width: '50%',
                   borderRadius: '48px',
-                  transform: isMedications
-                     ? 'translateX(0px)'
-                     : 'translateX(127px)'
+                  transform: isMedications ? 'translateX(0%)' : 'translateX(100%)',
                }}
             />
 
             {/* Medicamentos */}
             <button
                onClick={() => navigate('/home/medications')}
-               className={`relative z-10 flex flex-col items-center justify-center w-[140px] h-[86px] transition-colors
-          ${isMedications ? 'text-offwhite' : 'text-inkblack'}`}
+               className={`relative z-10 flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors duration-200 ${isMedications ? 'text-offwhite' : 'text-ghost-gray'}`}
             >
-               <CapsuleIcon className="w-8 " />
-               <span className="font-bold text-[16px]">
-                  Medicamentos
-               </span>
+               <CapsuleIcon className="w-9 h-9" />
+               <span className="font-inter font-semibold text-[11px]">Medicamentos</span>
             </button>
 
             {/* Perfil */}
             <button
                onClick={() => navigate('/home/profile')}
-               className={`relative z-10 flex flex-col items-center justify-center w-[140px] h-[86px] transition-colors
-          ${!isMedications ? 'text-offwhite' : 'text-inkblack'}`}
+               className={`relative z-10 flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors duration-200 ${!isMedications ? 'text-offwhite' : 'text-ghost-gray'}`}
             >
-               {/* <FiUser size={24} /> */}
-               <ProfileIcon className="w-6 h-6" />
-               <span className="font-bold text-[16px]">
-                  Perfil
-               </span>
+               <ProfileIcon className="w-9 h-9" />
+               <span className="font-inter font-semibold text-[11px]">Perfil</span>
             </button>
 
          </div>
@@ -66,14 +49,10 @@ export function BottomBar() {
          {/* Plus button */}
          <button
             onClick={() => navigate('/search')}
-            className="bg-darkpurple text-offwhite flex items-center justify-center"
-            style={{
-               width: '86px',
-               height: '86px',
-               borderRadius: '50%'
-            }}
+            className="bg-darkpurple text-offwhite flex items-center justify-center rounded-full shadow-[0_10px_24px_rgba(91,42,120,0.45)] flex-shrink-0 transition-transform active:scale-90"
+            style={{ width: '86px', height: '86px' }}
          >
-            <FiPlus size={32} />
+            <FiPlus size={36} />
          </button>
 
       </div>

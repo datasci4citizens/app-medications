@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+  @keyframes sheen {
+    0%   { transform: translateX(-160%) skewX(-18deg); }
+    100% { transform: translateX(280%)  skewX(-18deg); }
+  }
+
+  .btn-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-shine::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+    animation: sheen 3.4s ease-in-out infinite;
+    animation-delay: 1.2s;
+    pointer-events: none;
+  }

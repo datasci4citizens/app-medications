@@ -10,6 +10,15 @@ export function DateSelector({ selectedDate, onDateChange }: DateSelectorProps) 
   const scrollRef = useRef<HTMLDivElement>(null);
   const dateOptions = generateDateRange(new Date(), 30, 30);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const normalizedSelected = new Date(selectedDate);
+  normalizedSelected.setHours(0, 0, 0, 0);
+  const diffDays = Math.round(
+    (normalizedSelected.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const showBackToToday = Math.abs(diffDays) > 3;
+
   useEffect(() => {
     if (scrollRef.current) {
       const activeItem = scrollRef.current.querySelector('[data-active="true"]');
@@ -22,6 +31,12 @@ export function DateSelector({ selectedDate, onDateChange }: DateSelectorProps) 
       }
     }
   }, [selectedDate]);
+
+  const handleBackToToday = () => {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    onDateChange(t);
+  };
 
 
   return (
@@ -65,6 +80,17 @@ export function DateSelector({ selectedDate, onDateChange }: DateSelectorProps) 
             );
           })}
         </div>
+
+        {showBackToToday && (
+          <div className="flex justify-center mt-2 animate-fade-slide-up">
+            <button
+              onClick={handleBackToToday}
+              className="bg-lightpurple text-darkpurple font-merriweather font-bold text-xl px-6 py-2 rounded-full active:scale-95 transition-transform"
+            >
+              Voltar para Hoje
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

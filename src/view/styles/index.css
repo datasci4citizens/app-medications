@@ -14,14 +14,20 @@ body {
 
 /* Animação de entrada da direita */
 @keyframes slideInFromRight {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
 }
 
 /* Animação de saída para a direita */
 @keyframes slideOutToRight {
-  from { transform: translateX(0); }
-  to   { transform: translateX(100%); }
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(100%); opacity: 0; }
+}
+
+/* Animação de entrada da esquerda (wizard voltando) */
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
 }
 
 /* Animação suave subindo com fade */
@@ -36,11 +42,36 @@ body {
   to   { transform: translateY(0);    opacity: 1; }
 }
 
+/* Fade in simples (backdrop de modal) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Scale-in com fade (conteúdo de modal) */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Pulse verde pra confirmar marcação positiva (tomei) */
+@keyframes pulseSuccess {
+  0%   { box-shadow: 0 0 0 0 rgba(36, 189, 118, 0.6); }
+  70%  { box-shadow: 0 0 0 16px rgba(36, 189, 118, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(36, 189, 118, 0); }
+}
+
 .page-transition-right {
   animation: slideInFromRight 0.3s ease-out forwards;
 }
 .page-exit-right {
   animation: slideOutToRight 0.3s ease-in forwards;
+}
+.animate-slide-in-right {
+  animation: slideInFromRight 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+.animate-slide-in-left {
+  animation: slideInFromLeft 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
 }
 .animate-fade-slide-up {
   animation: fadeSlideUp 0.5s ease-out forwards;
@@ -48,3 +79,90 @@ body {
 .animate-slide-up-card {
   animation: slideUpCard 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards;
 }
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+.animate-scale-in {
+  animation: scaleIn 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+.animate-pulse-success {
+  animation: pulseSuccess 0.6s ease-out;
+}
+
+/* Pulse halo verde (botão Tomar) */
+@keyframes pulseHalo {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(36,189,118,0.50), 0 10px 24px rgba(36,189,118,0.30); }
+  50%       { box-shadow: 0 0 0 16px rgba(36,189,118,0), 0 10px 24px rgba(36,189,118,0.30); }
+}
+/* Pulse halo âmbar (botão Tomar com atraso) */
+@keyframes pulseHaloAmber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,194,73,0.55), 0 10px 24px rgba(255,194,73,0.35); }
+  50%       { box-shadow: 0 0 0 16px rgba(255,194,73,0), 0 10px 24px rgba(255,194,73,0.35); }
+}
+
+/* Barra lateral colorida dos cards com brilho */
+.brand-strip {
+  position: relative;
+  overflow: hidden;
+}
+.brand-strip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(0,0,0,0.18));
+  pointer-events: none;
+}
+
+/* Sheen (brilho deslizante em botões) */
+@keyframes sheen {
+  0%   { transform: translateX(-160%) skewX(-18deg); }
+  100% { transform: translateX(280%)  skewX(-18deg); }
+}
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: sheen 3.4s ease-in-out infinite;
+  animation-delay: 1.2s;
+  pointer-events: none;
+}
+
+/* Modal */
+@keyframes modalSheetIn {
+  from { opacity: 0; transform: translateY(60px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes modalSheetOut {
+  from { opacity: 1; transform: translateY(0)    scale(1); }
+  to   { opacity: 0; transform: translateY(40px) scale(0.96); }
+}
+@keyframes modalHalo {
+  0%, 100% { transform: scale(1);    opacity: 0.7; }
+  50%       { transform: scale(1.14); opacity: 0.35; }
+}
+@keyframes modalIconPop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  60%  { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes modalDraw {
+  from { stroke-dashoffset: 140; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* Stagger delay para listas (cada item aparece sequencialmente) */
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 60ms; }
+.stagger-item:nth-child(3) { animation-delay: 120ms; }
+.stagger-item:nth-child(4) { animation-delay: 180ms; }
+.stagger-item:nth-child(5) { animation-delay: 240ms; }
+.stagger-item:nth-child(6) { animation-delay: 300ms; }
+.stagger-item:nth-child(7) { animation-delay: 360ms; }
+.stagger-item:nth-child(8) { animation-delay: 420ms; }
+.stagger-item:nth-child(n+9) { animation-delay: 480ms; }

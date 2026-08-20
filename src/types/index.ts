@@ -7,7 +7,7 @@ export interface DoseRecord {
   takenAt?: string; // ISO timestamp
 }
 
-export type WeekDay = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0=dom, 6=sab
+export type WeekDay = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0=dom, 6=sab (convenção JS Date.getDay)
 
 export interface Medication {
   id: string;
@@ -34,6 +34,11 @@ export interface Medication {
 
   // DoseStatus
   doseStatus: Record<string, DoseRecord>; // chave: 'medId-YYYY-MM-DD-HH:mm'
+
+  // Stock (optional)
+  currentStock?: number;
+  stockReminderEnabled?: boolean;
+  stockReminderThreshold?: number;
 }
 
 export interface MedicationInfo {
@@ -44,6 +49,9 @@ export interface MedicationInfo {
   commonBrands?: string[];
   whenToTake?: 'Antes da Refeição' | 'Após Refeição' | 'Com Refeição' | 'Independente';
   canSplit?: boolean;
+  instructions?: string;
+  sideEffects?: string;
+  contraindications?: string;
 }
 
 // AuthContext Types

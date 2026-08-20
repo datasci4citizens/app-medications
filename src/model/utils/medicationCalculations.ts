@@ -15,7 +15,7 @@ export interface DailyDose {
  * - Do horário até 1h depois: late
  * - Mais de 1h depois: skipped (calculado on-the-fly)
  */
-function getAutomaticStatus(doseDate: Date, now: Date): DoseStatus {
+export function getAutomaticStatus(doseDate: Date, now: Date): DoseStatus {
   const diffMs = now.getTime() - doseDate.getTime();
   const oneHourMs = 3600000;
 
@@ -133,4 +133,21 @@ export function calculateDosesForDay(medication: Medication, selectedDate: Date)
 
   // Retornar doses ordenadas por horário
   return doses.sort((a, b) => a.time.localeCompare(b.time));
+}
+
+/**
+ * Extrai data e horário do occurrenceId.
+ * Formato: `${medId}-${YYYY-MM-DD}-${HH:MM}`
+ */
+export function parseOccurrenceId(occurrenceId: string): { date: string; time: string } | null {
+  const parts = occurrenceId.split('-');
+  if (parts.length < 5) return null;
+  const time = parts[parts.length - 1];
+  const day = parts[parts.length - 2];
+  const month = parts[parts.length - 3];
+  const year = parts[parts.length - 4];
+  if (!/^\d{4}$/.test(year) || !/^\d{2}$/.test(month) || !/^\d{2}$/.test(day) || !/^\d{2}:\d{2}$/.test(time)) {
+    return null;
+  }
+  return { date: `${year}-${month}-${day}`, time };
 }

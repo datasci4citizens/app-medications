@@ -14,9 +14,10 @@
    --color-red-skip: #D32231;
    --color-purple-dose: #9254AD;
    --color-lightpurple: #DED8F1;
-   --color-bg-taken: #C4BBCA;
+--color-bg-taken: #C4BBCA; 
    --color-bg-skipped: #250935;
    --color-ghostcolor: #585858;
+   --color-blue-add: #5920F6;
    --color-card-border: rgba(133, 133, 133, 0.5);
 
    /* Fontes */
