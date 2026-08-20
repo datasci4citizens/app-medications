@@ -40,16 +40,6 @@ function Login() {
     }, 2000);
   };
 
-  const handleGuestLogin = () => {
-    const guestUser = {
-      id: 'guest',
-      name: 'Visitante',
-      email: 'guest@local.com',
-    };
-    login(guestUser, 'guest-token');
-    navigate('/home');
-  };
-
   return (
     <div className="min-h-screen bg-[#f6f2fb] relative overflow-hidden pb-10 flex flex-col">
 
