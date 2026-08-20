@@ -98,14 +98,14 @@ export function MedicationCard({ dose, onTake, onClick }: MedicationCardProps) {
 
             {isTaken && (
               <div className="w-full h-[56px] rounded-full bg-bg-taken flex items-center justify-center gap-2">
-                <span className="font-merriweather font-bold text-[20px] text-green-taken">Tomado ✓</span>
+                <span className="font-merriweather font-bold text-[24px] text-green-taken">Tomado ✓</span>
               </div>
             )}
 
             {isSkipped && (
-              <span className="font-merriweather font-bold text-[24px] text-red-skip">
-                Esquecido!
-              </span>
+              <div className="w-full h-[56px] flex items-center justify-center">
+                <span className="font-merriweather font-bold text-[24px] text-red-skip">Esquecido!</span>
+              </div>
             )}
           </div>
         </div>
