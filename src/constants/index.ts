@@ -110,6 +110,7 @@ export const STORAGE_KEYS = {
   USER: 'user',
   MEDICATIONS: 'my_medications',
   PREFERENCES: 'user_preferences',
+  ACCESSIBILITY: 'accessibility_settings',
 } as const;
 
 

@@ -1,12 +1,20 @@
 import { useState } from "react";
 import { useAuth } from "../../viewmodel/contexts/AuthContext";
 import { useMedications } from "../../viewmodel/hooks/useMedications";
+import { useAccessibility, type TextSize } from "../../viewmodel/hooks/useAccessibility";
 import { medicationStorage } from "../../model/repositories/MedicationRepository";
 import { ConfirmModal } from "../components/common/Modal";
+
+const TEXT_SIZE_OPTIONS: { id: TextSize; label: string; preview: number }[] = [
+  { id: 'normal', label: 'Normal', preview: 20 },
+  { id: 'grande', label: 'Grande', preview: 27 },
+  { id: 'enorme', label: 'Enorme', preview: 34 },
+];
 
 export function Profile() {
   const { user, logout } = useAuth();
   const { medications } = useMedications();
+  const { textSize, setTextSize } = useAccessibility();
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
 
@@ -44,8 +52,44 @@ export function Profile() {
 
       <main className="max-w-md mx-auto px-4 py-6 flex flex-col gap-4">
 
-        {/* Estatísticas */}
+        {/* Acessibilidade */}
         <section className="flex flex-col gap-3">
+          <h2 className="font-merriweather font-bold text-xl text-darkpurple">
+            Acessibilidade
+          </h2>
+          <div className="bg-offwhite rounded-2xl px-5 py-4 shadow-sm border border-card-border flex flex-col gap-3">
+            <span className="font-merriweather text-lg text-inkblack">
+              Tamanho do texto
+            </span>
+            <div className="flex gap-2.5">
+              {TEXT_SIZE_OPTIONS.map(option => {
+                const isActive = textSize === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => setTextSize(option.id)}
+                    aria-pressed={isActive}
+                    className={`flex-1 h-[90px] rounded-[20px] flex flex-col items-center justify-center gap-1 font-merriweather transition-colors duration-200
+                      ${isActive
+                        ? 'border-[3px] border-darkpurple bg-lightpurple/40'
+                        : 'border-2 border-card-border bg-graybg'}`}
+                  >
+                    <span className="font-bold leading-none text-inkblack" style={{ fontSize: option.preview }}>A</span>
+                    <span className={`text-sm font-semibold ${isActive ? 'text-darkpurple' : 'text-ghostcolor'}`}>
+                      {option.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="font-merriweather text-sm text-ghostcolor">
+              Vale para o app inteiro. A tela muda assim que você escolher.
+            </p>
+          </div>
+        </section>
+
+        {/* Estatísticas */}
+        <section className="flex flex-col gap-3 mt-4">
           <h2 className="font-merriweather font-bold text-xl text-darkpurple">
             Estatísticas
           </h2>

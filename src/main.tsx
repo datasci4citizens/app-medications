@@ -6,6 +6,9 @@ import './view/styles/index.css';
 // Social Logins
 import { InitLogin } from './model/services/socialAuth.ts';
 
+// Preferências de acessibilidade
+import { initAccessibility } from './viewmodel/hooks/useAccessibility.ts';
+
 // Protected Routes
 import { GuestRoute, ProtectedRoute } from './view/components/ProtectedRoute.tsx';
 
@@ -33,6 +36,8 @@ try {
 } catch (e) {
   console.warn("Error: InitLogin not works: ", e)
 }
+
+initAccessibility()
 
 
 
