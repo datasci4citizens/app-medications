@@ -18,6 +18,7 @@ export const TEXT_SCALE: Record<TextSize, number> = {
  * mudança na fonte raiz. O zoom no body é o que multiplica qualquer unidade.
  */
 function applyTextSize(size: TextSize) {
+   if (!document.body) return;
    document.body.style.zoom = String(TEXT_SCALE[size]);
 }
 

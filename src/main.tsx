@@ -30,12 +30,11 @@ import { Navigate } from 'react-router-dom';
 import { Register } from './view/pages/Auth/Register.tsx';
 
 
-try {
-
-  await InitLogin()
-} catch (e) {
+// Sem await: se o SDK do Google demorar ou nunca responder, a interface
+// ainda monta. Nada da tela depende dessa inicialização terminar.
+InitLogin().catch((e) => {
   console.warn("Error: InitLogin not works: ", e)
-}
+})
 
 initAccessibility()
 
