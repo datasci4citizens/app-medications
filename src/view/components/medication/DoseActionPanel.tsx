@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { ActionButton } from "../common/ActionButton";
-import { NumberBox } from "../common/NumberBox";
+import { FiCheck } from "react-icons/fi";
 import type { DoseRecord, DoseStatus } from "../../../types";
 
 interface DoseActionPanelProps {
@@ -10,6 +9,7 @@ interface DoseActionPanelProps {
    onTakeNow: () => void;
    onTakeAtTime: (time: string) => void;
    onUpdateTakenAt: (time: string) => void;
+   onSkip: () => void;
    onClear: () => void;
 }
 
@@ -20,6 +20,85 @@ function formatTakenTime(iso: string): string {
    return `${h}:${m}`;
 }
 
+/** Faixa de estado: o resultado da dose, alto e sem ação embutida. */
+function StatusBar({ tone, children }: { tone: 'taken' | 'skipped'; children: React.ReactNode }) {
+   return (
+      <div
+         className={`h-16 rounded-full flex items-center justify-center gap-2.5 text-white
+            font-merriweather font-extrabold text-[22px] animate-scale-in
+            ${tone === 'taken'
+               ? 'bg-green-taken shadow-[0_10px_24px_rgba(36,189,118,0.30)]'
+               : 'bg-red-skip shadow-[0_10px_24px_rgba(211,34,49,0.30)]'}`}
+      >
+         {children}
+      </div>
+   );
+}
+
+/** Ação principal da dose: o alvo mais fácil de acertar da tela. */
+function PrimaryAction({ label, tone, onClick }: { label: string; tone: 'green' | 'amber'; onClick: () => void }) {
+   return (
+      <button
+         onClick={onClick}
+         className={`btn-shine h-16 rounded-full flex items-center justify-center gap-2.5
+            font-merriweather font-extrabold text-[22px] tracking-[0.02em]
+            transition-transform active:scale-95
+            ${tone === 'amber' ? 'bg-yellow-alert text-deepplum' : 'bg-green-take text-white'}`}
+         style={{ animation: tone === 'amber' ? 'pulseHaloAmber 2.2s ease-in-out infinite' : 'pulseHalo 2.4s ease-in-out infinite' }}
+      >
+         <FiCheck size={24} strokeWidth={3} /> {label}
+      </button>
+   );
+}
+
+/** Ação secundária, sem peso visual para não competir com a principal. */
+function TextAction({ label, onClick, tone = 'purple' }: { label: string; onClick: () => void; tone?: 'purple' | 'red' }) {
+   return (
+      <button
+         onClick={onClick}
+         className={`h-13 rounded-full font-merriweather font-bold text-[17px] transition-colors
+            ${tone === 'red'
+               ? 'border-2 border-red-skip text-red-skip active:bg-red-skip active:text-white'
+               : 'text-darkpurple underline underline-offset-4 active:opacity-60'}`}
+      >
+         {label}
+      </button>
+   );
+}
+
+function TimeEditor({ value, onChange, onCancel, onConfirm }: {
+   value: string;
+   onChange: (v: string) => void;
+   onCancel: () => void;
+   onConfirm: () => void;
+}) {
+   return (
+      <div className="flex flex-col gap-3">
+         <input
+            type="time"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full bg-transparent border-none outline-none text-center
+               font-merriweather font-black text-[56px] text-darkpurple"
+         />
+         <div className="flex gap-2.5">
+            <button
+               onClick={onCancel}
+               className="flex-1 h-13 rounded-full border-2 border-ghost-gray text-ghostcolor font-merriweather font-bold text-[17px] active:opacity-70"
+            >
+               Cancelar
+            </button>
+            <button
+               onClick={onConfirm}
+               className="flex-1 h-13 rounded-full bg-darkpurple text-offwhite font-merriweather font-bold text-[17px] active:scale-95 transition-transform"
+            >
+               Confirmar
+            </button>
+         </div>
+      </div>
+   );
+}
+
 export function DoseActionPanel({
    effectiveStatus,
    doseRecord,
@@ -27,6 +106,7 @@ export function DoseActionPanel({
    onTakeNow,
    onTakeAtTime,
    onUpdateTakenAt,
+   onSkip,
    onClear,
 }: DoseActionPanelProps) {
    const [timeEditorOpen, setTimeEditorOpen] = useState(false);
@@ -37,150 +117,87 @@ export function DoseActionPanel({
    const isTaken = doseRecord?.status === 'taken' || doseRecord?.status === 'taken_late';
    const isSkipped = effectiveStatus === 'skipped';
 
-   const handleConfirmTime = (mode: 'take' | 'update') => {
+   const confirmTime = (mode: 'take' | 'update') => {
       if (mode === 'take') onTakeAtTime(pendingTime);
       else onUpdateTakenAt(pendingTime);
       setTimeEditorOpen(false);
    };
 
-   // Estado: TOMADO
+   // TOMADO
    if (isTaken && doseRecord?.takenAt) {
       const taken = formatTakenTime(doseRecord.takenAt);
-      const [h, m] = taken.split(':');
 
       return (
-         <div className="flex flex-col gap-3 items-center">
-            <h2 className="font-merriweather text-2xl font-bold text-green-taken">
-               Tomei ✓
-            </h2>
-
-            <div className="flex items-center gap-2 font-merriweather text-xl">
-               <span>Tomei às</span>
-               <NumberBox isReadOnly={true} value={Number(h)} />
-               <span>h :</span>
-               <NumberBox isReadOnly={true} value={Number(m)} />
-               <span>min</span>
-            </div>
+         <div className="flex flex-col gap-3">
+            <StatusBar tone="taken">
+               <FiCheck size={26} strokeWidth={3} /> Tomado às {taken}
+            </StatusBar>
 
             {timeEditorOpen ? (
-               <div className="flex flex-col gap-2 w-full">
-                  <input
-                     type="time"
-                     value={pendingTime}
-                     onChange={(e) => setPendingTime(e.target.value)}
-                     className="w-full h-12 px-3 rounded-[10px] bg-lilac text-inkblack text-2xl border-b-4 border-darkpurple font-merriweather outline-none"
-                  />
-                  <div className="flex gap-2">
-                     <button
-                        onClick={() => setTimeEditorOpen(false)}
-                        className="flex-1 py-2 rounded-full border-2 border-ghostcolor text-ghostcolor font-merriweather"
-                     >
-                        Cancelar
-                     </button>
-                     <button
-                        onClick={() => handleConfirmTime('update')}
-                        className="flex-1 py-2 rounded-full bg-darkpurple text-offwhite font-merriweather"
-                     >
-                        Confirmar
-                     </button>
-                  </div>
-               </div>
+               <TimeEditor
+                  value={pendingTime}
+                  onChange={setPendingTime}
+                  onCancel={() => setTimeEditorOpen(false)}
+                  onConfirm={() => confirmTime('update')}
+               />
             ) : (
-               <div className="flex flex-col gap-2 w-full">
-                  <button
-                     onClick={onClear}
-                     className="w-full py-2 rounded-full border-2 border-ghostcolor text-ghostcolor font-merriweather text-xl active:opacity-70"
-                  >
-                     Desfazer ↩
-                  </button>
-                  <button
-                     onClick={() => {
-                        setPendingTime(taken);
-                        setTimeEditorOpen(true);
-                     }}
-                     className="w-full py-2 rounded-full bg-ghost-gray text-inkblack font-merriweather text-xl active:opacity-70"
-                  >
-                     Alterar horário que tomei
-                  </button>
+               <div className="flex flex-col gap-1">
+                  <TextAction label="Desfazer" onClick={onClear} />
+                  <TextAction
+                     label="Alterar o horário"
+                     onClick={() => { setPendingTime(taken); setTimeEditorOpen(true); }}
+                  />
                </div>
             )}
          </div>
       );
    }
 
-   // Estado: ESQUECIDO (skipped automático ou manual)
+   // ESQUECIDO
    if (isSkipped) {
       return (
-         <div className="flex flex-col gap-3 items-center">
-            <h2 className="font-merriweather text-2xl font-bold text-red-skip">
-               Esquecido!
-            </h2>
+         <div className="flex flex-col gap-3">
+            <StatusBar tone="skipped">Dose esquecida</StatusBar>
 
             {timeEditorOpen ? (
-               <div className="flex flex-col gap-2 w-full">
-                  <input
-                     type="time"
-                     value={pendingTime}
-                     onChange={(e) => setPendingTime(e.target.value)}
-                     className="w-full h-12 px-3 rounded-[10px] bg-lilac text-inkblack text-2xl border-b-4 border-darkpurple font-merriweather outline-none"
-                  />
-                  <div className="flex gap-2">
-                     <button
-                        onClick={() => setTimeEditorOpen(false)}
-                        className="flex-1 py-2 rounded-full border-2 border-ghostcolor text-ghostcolor font-merriweather"
-                     >
-                        Cancelar
-                     </button>
-                     <button
-                        onClick={() => handleConfirmTime('take')}
-                        className="flex-1 py-2 rounded-full bg-darkpurple text-offwhite font-merriweather"
-                     >
-                        Confirmar
-                     </button>
-                  </div>
-               </div>
+               <TimeEditor
+                  value={pendingTime}
+                  onChange={setPendingTime}
+                  onCancel={() => setTimeEditorOpen(false)}
+                  onConfirm={() => confirmTime('take')}
+               />
             ) : (
-               <div className="flex flex-col gap-2 w-full">
-                  <ActionButton label="Tomar agora" onClick={onTakeNow} variant="success" />
-                  <button
-                     onClick={() => setTimeEditorOpen(true)}
-                     className="w-full py-2 rounded-full bg-ghost-gray text-inkblack font-merriweather text-xl active:opacity-70"
-                  >
-                     Registrar horário que tomei
-                  </button>
-                  {doseRecord && (
-                     <button
-                        onClick={onClear}
-                        className="w-full py-2 rounded-full border-2 border-ghostcolor text-ghostcolor font-merriweather text-xl active:opacity-70 mt-2"
-                     >
-                        Desfazer ↩
-                     </button>
-                  )}
+               <div className="flex flex-col gap-2.5">
+                  <PrimaryAction label="Tomar agora" tone="green" onClick={onTakeNow} />
+                  <TextAction label="Tomei em outro horário" onClick={() => setTimeEditorOpen(true)} />
+                  {doseRecord && <TextAction label="Desfazer" onClick={onClear} />}
                </div>
             )}
          </div>
       );
    }
 
-   // Estado: ATRASADO
-   if (effectiveStatus === 'late') {
+   // ATRASADO e NA HORA compartilham o par: tomar, ou assumir que não tomou
+   if (effectiveStatus === 'late' || effectiveStatus === 'pending') {
+      const isLate = effectiveStatus === 'late';
       return (
-         <ActionButton label="Tomar com atraso" onClick={onTake} variant="warning" />
+         <div className="flex flex-col gap-2.5">
+            <PrimaryAction
+               label={isLate ? 'Tomar agora' : 'Tomar'}
+               tone={isLate ? 'amber' : 'green'}
+               onClick={onTake}
+            />
+            <TextAction label="Não tomei / Esqueci" tone="red" onClick={onSkip} />
+         </div>
       );
    }
 
-   // Estado: PRÓXIMO DE TOMAR
-   if (effectiveStatus === 'pending') {
-      return (
-         <ActionButton label="Tomar" onClick={onTake} variant="success" />
-      );
-   }
-
-   // Estado: AINDA NÃO É HORA (upcoming)
+   // AINDA NÃO É HORA
    if (effectiveStatus === 'upcoming') {
       return (
-         <div className="text-center font-merriweather text-base text-ghostcolor py-2">
-            Ainda não é horário desta dose.
+         <div className="h-16 rounded-full bg-ghostwhite flex items-center justify-center
+            font-merriweather font-bold text-[18px] text-ghostcolor">
+            Ainda não é hora desta dose
          </div>
       );
    }

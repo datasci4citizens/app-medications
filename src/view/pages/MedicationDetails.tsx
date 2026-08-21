@@ -43,6 +43,7 @@ export function MedicationDetails() {
       handleTakeNow,
       handleTakeAtTime,
       handleUpdateTakenAt,
+      handleSkip,
       handleClear,
    } = useMedicationDetails();
 
@@ -63,6 +64,7 @@ export function MedicationDetails() {
               onTakeNow={handleTakeNow}
               onTakeAtTime={handleTakeAtTime}
               onUpdateTakenAt={handleUpdateTakenAt}
+              onSkip={handleSkip}
               onClear={handleClear}
            />}
    </div>);
@@ -191,7 +193,7 @@ function SearchView({ handleBack, handleAdd }: { handleBack: () => void, handleA
 
 // USER SCREEN
 
-function UserView({ medication, drugInfo, catalogMedication, occurrenceId, doseRecord, effectiveStatus, handleBack, handleEdit, handleDelete, onTake, onTakeNow, onTakeAtTime, onUpdateTakenAt, onClear }: {
+function UserView({ medication, drugInfo, catalogMedication, occurrenceId, doseRecord, effectiveStatus, handleBack, handleEdit, handleDelete, onTake, onTakeNow, onTakeAtTime, onUpdateTakenAt, onSkip, onClear }: {
    medication: Medication | undefined,
    drugInfo: MedicationInfo | undefined,
    catalogMedication: CatalogMedication | null,
@@ -205,6 +207,7 @@ function UserView({ medication, drugInfo, catalogMedication, occurrenceId, doseR
    onTakeNow: () => void,
    onTakeAtTime: (time: string) => void,
    onUpdateTakenAt: (time: string) => void,
+   onSkip: () => void,
    onClear: () => void,
 }) {
    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -286,6 +289,7 @@ function UserView({ medication, drugInfo, catalogMedication, occurrenceId, doseR
                   onTakeNow={onTakeNow}
                   onTakeAtTime={onTakeAtTime}
                   onUpdateTakenAt={onUpdateTakenAt}
+                  onSkip={onSkip}
                   onClear={onClear}
                />
             )}
