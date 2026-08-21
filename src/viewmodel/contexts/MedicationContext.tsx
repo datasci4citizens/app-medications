@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
 import type { Medication } from '../../types';
 import { medicationStorage } from '../../model/repositories/MedicationRepository'
-import { takeRepository, toTakePayload } from '../../model/repositories/TakeRepository';
+import { fromTakeResponse, takeRepository, toTakePayload } from '../../model/repositories/TakeRepository';
 
 // ============================================
 // TIPOS
@@ -39,14 +39,31 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
   // CARREGAR MEDICAMENTOS DO LOCALSTORAGE
   // ============================================
   useEffect(() => {
-    const loadMedications = () => {
+    const loadMedications = async () => {
+      // Quem entra pela primeira vez começa sem nada: o app pede que a
+      // pessoa cadastre o primeiro medicamento em vez de inventar dados.
+      let local: Medication[] = [];
       try {
-        // Quem entra pela primeira vez começa sem nada: o app pede que a
-        // pessoa cadastre o primeiro medicamento em vez de inventar dados.
-        setMedications(medicationStorage.getMedications() ?? []);
+        local = medicationStorage.getMedications() ?? [];
       } catch (error) {
         console.error('Erro ao carregar medicamentos:', error);
-        setMedications([]);
+      }
+      setMedications(local);
+
+      // O que veio do servidor é somado, não substitui: o registro local tem
+      // dosagem, marca e histórico de doses, que o servidor ainda não guarda.
+      try {
+        const page = await takeRepository.list();
+        const known = new Set(local.map(med => med.remoteId).filter(id => id !== undefined));
+        const remoteOnly = page.results
+          .filter(take => !known.has(take.taken_id))
+          .map(fromTakeResponse);
+
+        if (remoteOnly.length > 0) {
+          setMedications([...local, ...remoteOnly]);
+        }
+      } catch (error) {
+        console.warn('Não foi possível carregar os tratamentos do servidor:', error);
       } finally {
         setIsLoading(false);
       }
@@ -98,9 +115,35 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
   };
 
   const updateMedication = (id: string, updates: Partial<Medication>) => {
+    const current = medications.find((med) => med.id === id);
+
     setMedications((prev) =>
       prev.map((med) => (med.id === id ? { ...med, ...updates } : med))
     );
+
+    if (current) syncUpdatedMedication({ ...current, ...updates });
+  };
+
+  /**
+   * Reflete a edição no servidor. Um medicamento que nunca chegou lá — porque
+   * a rede falhou no cadastro — é criado agora, em vez de atualizado.
+   */
+  const syncUpdatedMedication = async (medication: Medication) => {
+    const payload = toTakePayload(medication);
+    if (!payload) return;
+
+    try {
+      if (medication.remoteId === undefined) {
+        const { taken_id } = await takeRepository.create(payload);
+        setMedications((prev) =>
+          prev.map((med) => (med.id === medication.id ? { ...med, remoteId: taken_id } : med))
+        );
+      } else {
+        await takeRepository.update(medication.remoteId, payload);
+      }
+    } catch (error) {
+      console.warn('Não foi possível atualizar o medicamento no servidor:', error);
+    }
   };
 
   const deleteMedication = (id: string) => {

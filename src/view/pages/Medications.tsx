@@ -20,7 +20,7 @@ interface DoseConfirm {
 }
 
 export function Medications() {
-  const { medications, markDoseAsTaken, markDoseAsSkipped, clearDoseStatus } = useMedications();
+  const { medications, isLoading, markDoseAsTaken, markDoseAsSkipped, clearDoseStatus } = useMedications();
   const [doseConfirm, setDoseConfirm] = useState<DoseConfirm | null>(null);
   const [showDone, setShowDone] = useState(false);
   const [isFutureModalOpen, setIsFutureModalOpen] = useState(false);
@@ -233,9 +233,23 @@ export function Medications() {
             )}
           </div>
         )}
+        {/* Enquanto os tratamentos do servidor não chegam, não dá para dizer
+            que a pessoa não tem nada: seria um convite falso a começar. */}
+        {isLoading && dailyDoses.length === 0 && (
+          <div className="flex flex-col gap-3 mt-4">
+            {[0, 1, 2].map(i => (
+              <div
+                key={i}
+                className="w-full h-[150px] rounded-[30px] bg-offwhite/70 border border-card-border animate-pulse"
+                style={{ animationDelay: `${i * 120}ms` }}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Estado vazio: distingue "ainda não cadastrou nada" de
             "cadastrou, mas nada cai neste dia" — a ação certa é diferente */}
-        {dailyDoses.length === 0 && (
+        {!isLoading && dailyDoses.length === 0 && (
           medications.length === 0 ? (
             <div className="flex flex-col items-center text-center mt-16 px-4 animate-fade-slide-up">
               <div className="w-24 h-24 rounded-full bg-lightpurple flex items-center justify-center text-darkpurple mb-6">

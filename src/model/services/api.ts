@@ -54,6 +54,10 @@ export function apiPost<T>(path: string, body: unknown): Promise<T> {
    return request<T>(path, { method: 'POST', body: JSON.stringify(body) });
 }
 
+export function apiPatch<T>(path: string, body: unknown): Promise<T> {
+   return request<T>(path, { method: 'PATCH', body: JSON.stringify(body) });
+}
+
 export function apiDelete(path: string): Promise<unknown> {
    return request(path, { method: 'DELETE' }).catch((err) => {
       // DELETE devolve 204 sem corpo; o parse do JSON falha e não é erro.
