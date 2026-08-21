@@ -33,7 +33,7 @@ export function WeekDaySelector({ values, isReadOnly, onChange }: WeekDaySelecto
    }
 
    return (
-      <div className="flex justify-between gap-1.5 select-none">
+      <div className="flex gap-1.5 select-none">
          {DAYS.map((day, index) => {
             const isSelected = values.includes(index);
             return (
@@ -43,11 +43,11 @@ export function WeekDaySelector({ values, isReadOnly, onChange }: WeekDaySelecto
                   disabled={isReadOnly}
                   aria-label={DAY_NAMES[index]}
                   aria-pressed={isSelected}
-                  className={`flex-1 max-w-12 aspect-square rounded-full flex items-center justify-center
-                     font-merriweather font-bold text-[20px] transition-colors duration-200
+                  className={`flex-1 h-15 rounded-[18px] flex items-center justify-center
+                     font-merriweather font-extrabold text-[20px] transition-all duration-200
                      ${isSelected
-                        ? 'bg-darkpurple text-offwhite shadow-[0_4px_12px_rgba(91,42,120,0.30)]'
-                        : 'bg-offwhite text-ghost-gray border border-card-border'}`}
+                        ? 'bg-darkpurple text-offwhite -translate-y-0.5 shadow-[0_6px_14px_rgba(91,42,120,0.30)]'
+                        : 'bg-ghostwhite text-darkpurple'}`}
                >
                   {day}
                </button>

@@ -46,6 +46,18 @@ export function activeIngredients(med: CatalogMedication): string[] {
       .filter(i => i && !seen.has(i.toLowerCase()) && seen.add(i.toLowerCase()));
 }
 
+/**
+ * Fabricante, limpo para exibição.
+ *
+ * A base da ANVISA às vezes traz o CNPJ colado no nome da empresa
+ * ("57507378000365 - EMS S/A"), que não interessa a quem está cadastrando.
+ */
+export function manufacturer(med: CatalogMedication): string | undefined {
+   const raw = med.company?.trim();
+   if (!raw) return undefined;
+   return raw.replace(/^\d[\d.\/-]*\s*-\s*/, '').trim() || undefined;
+}
+
 export const catalogRepository = {
    search: (query: string, page = 1, signal?: AbortSignal) => {
       const params = new URLSearchParams({ page: String(page) });
@@ -70,7 +82,9 @@ export function toMedicationInfo(med: CatalogMedication): MedicationInfo {
       name: displayName(med),
       activeIngredient: activeIngredients(med).join(', '),
       type: (med.formato as MedicationInfo['type']) ?? 'Comprimido',
-      commonBrands: med.brand ? [med.brand] : undefined,
+      // O fabricante é `company`. O campo `brand` da ANVISA guarda o nome
+      // comercial do produto, então sugeri-lo aqui repetia o próprio remédio.
+      commonBrands: [manufacturer(med)].filter((b): b is string => Boolean(b)),
       instructions: leaflet?.como_usar_medicamento?.trim() || undefined,
       sideEffects: leaflet?.efeitos_colaterais?.trim() || undefined,
       contraindications: leaflet?.quando_nao_usar?.trim() || undefined,

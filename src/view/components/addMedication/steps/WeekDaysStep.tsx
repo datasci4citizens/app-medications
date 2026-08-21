@@ -29,11 +29,11 @@ export function WeekDaysStep({ value, onChange }: WeekDaysStepProps) {
                <button
                   key={preset.label}
                   onClick={() => onChange(preset.days)}
-                  className={`
-                     px-4 py-2 rounded-full font-merriweather text-base
-                     border-2 border-darkpurple
-                     ${isPresetActive(preset.days) ? 'bg-darkpurple text-offwhite' : 'bg-transparent text-darkpurple'}
-                  `}
+                  className={`px-4 py-3 rounded-full font-inter font-bold text-[15px]
+                     transition-colors duration-150 active:scale-95
+                     ${isPresetActive(preset.days)
+                        ? 'bg-darkpurple text-offwhite'
+                        : 'bg-ghostwhite text-darkpurple'}`}
                >
                   {preset.label}
                </button>

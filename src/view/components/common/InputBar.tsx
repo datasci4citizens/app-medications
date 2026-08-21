@@ -9,9 +9,14 @@ type BaseProps = {
 /* =========================
    🧱 BASE
 ========================= */
-function BaseContainer({ children }: { children: React.ReactNode }) {
+function BaseContainer({ children, filled }: { children: React.ReactNode; filled?: boolean }) {
    return (
-      <div className="w-full h-12 flex rounded-[10px] bg-lilac text-ghostwhite px-2 text-2xl border-b-4 border-darkpurple">
+      <div
+         className={`w-full flex items-center gap-2 rounded-[20px] bg-ghostwhite px-5 py-4
+            font-merriweather font-bold text-[22px] text-inkblack
+            border-2 transition-colors duration-200
+            ${filled ? 'border-darkpurple' : 'border-transparent'}`}
+      >
          {children}
       </div>
    );
@@ -43,8 +48,8 @@ export function NumberDisplay({
    label?: string;
 }) {
    return (
-      <BaseContainer>
-         <span className="my-auto text-left">
+      <BaseContainer filled>
+         <span className="text-left">
             {value} {label}
          </span>
       </BaseContainer>
@@ -105,11 +110,11 @@ export function NumberInput({
    const dynamicWidth = `${currentText.length + 0.5  - 0.1 }ch`;
 
    return (
-      <BaseContainer>
+      <BaseContainer filled={value !== ""}>
          <input
             className={`
-               outline-none 
-               placeholder:text-ghostwhite
+               outline-none
+               placeholder:text-ghost-gray
                bg-transparent
                /* Centraliza o texto e remove o w-full para ele respeitar o style */
                
@@ -126,7 +131,7 @@ export function NumberInput({
          />
 
          {/* whitespace-nowrap garante que o label não quebre de linha se o número for gigante */}
-         {label && <span className="my-auto  whitespace-nowrap">{label}</span>}
+         {label && <span className="whitespace-nowrap text-ghostcolor font-normal text-[18px]">{label}</span>}
       </BaseContainer>
    );
 }
@@ -162,11 +167,11 @@ export function TextInput({
    const [isFocused, setIsFocused] = useState(false);
 
    return (
-      <BaseContainer>
+      <BaseContainer filled={value.length > 0}>
          <input
             className={`
-               outline-none 
-               placeholder:text-ghostwhite
+               outline-none bg-transparent
+               placeholder:text-ghost-gray placeholder:font-normal
                ${isReadOnly ? "select-none pointer-events-none w-5 text-center" : "w-full"}
             `}
             inputMode="text"

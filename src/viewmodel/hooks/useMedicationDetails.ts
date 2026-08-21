@@ -115,6 +115,7 @@ export function useMedicationDetails() {
       mode,
       medication,
       drugInfo,
+      catalogMedication,
       occurrenceId,
       doseRecord,
       effectiveStatus,

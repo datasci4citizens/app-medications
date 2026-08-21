@@ -6,12 +6,12 @@ import { FiAlertCircle, FiArrowLeft, FiClock, FiEdit2, FiPlus, FiTrash2 } from "
 
 import { InfoTile } from "../components/common/InfoTile";
 import { WeekDaySelector } from "../components/common/WeekDaySelector";
-import { AccordionSection } from "../components/common/AccordionSection";
+import { LeafletSections } from "../components/medication/LeafletSections";
 import { ConfirmModal } from "../components/common/Modal";
 
 import { useMedicationDetails } from "../../viewmodel/hooks/useMedicationDetails";
 import { useCatalogMedication } from "../../viewmodel/hooks/useCatalogMedication";
-import { activeIngredients, displayName } from "../../model/repositories/CatalogRepository";
+import { activeIngredients, displayName, type CatalogMedication } from "../../model/repositories/CatalogRepository";
 import { DoseActionPanel } from "../components/medication/DoseActionPanel";
 import { MedicationTypeMedallion } from "../components/medication/MedicationTypeMedallion";
 import { calculateAdherence, parseOccurrenceId } from "../../model/utils/medicationCalculations";
@@ -31,6 +31,7 @@ export function MedicationDetails() {
       mode,
       medication,
       drugInfo,
+      catalogMedication,
       occurrenceId,
       doseRecord,
       effectiveStatus,
@@ -50,6 +51,7 @@ export function MedicationDetails() {
          ? <SearchView handleAdd={handleAdd} handleBack={handleBack} />
          : <UserView
               drugInfo={drugInfo}
+              catalogMedication={catalogMedication}
               handleBack={handleBack}
               handleEdit={handleEdit}
               handleDelete={handleDelete}
@@ -110,20 +112,6 @@ function SearchView({ handleBack, handleAdd }: { handleBack: () => void, handleA
 
    const title = displayName(medication);
    const ingredients = activeIngredients(medication);
-   const leaflet = medication.leaflet;
-
-   // Só entram as seções com texto: a ANVISA deixa várias em branco.
-   const sections: { label: string; text: string }[] = leaflet ? [
-      { label: 'Para que serve',        text: leaflet.indicacoes_para_uso },
-      { label: 'Como usar',             text: leaflet.como_usar_medicamento },
-      { label: 'Se esquecer uma dose',  text: leaflet.esqueceu_medicamento },
-      { label: 'Quando não usar',       text: leaflet.quando_nao_usar },
-      { label: 'Efeitos colaterais',    text: leaflet.efeitos_colaterais },
-      { label: 'Se tomar demais',       text: leaflet.quantidade_a_mais },
-      { label: 'Como funciona',         text: leaflet.funcionamento_medicamento },
-      { label: 'Antes de usar',         text: leaflet.conhecimento_previo_necessario },
-      { label: 'Como guardar',          text: leaflet.como_guardar_medicamento },
-   ].filter(sec => sec.text?.trim()) : [];
 
    return (
       <div className="min-h-screen bg-graybg pb-32 animate-slide-in-right">
@@ -180,20 +168,10 @@ function SearchView({ handleBack, handleAdd }: { handleBack: () => void, handleA
             )}
 
             {/* Bula da ANVISA */}
-            {sections.length > 0 ? (
-               <section className="flex flex-col gap-2.5">
-                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Bula</h2>
-                  {sections.map(sec => (
-                     <AccordionSection key={sec.label} label={sec.label} hasToggle={true}>
-                        <p className="whitespace-pre-line">{sec.text.trim()}</p>
-                     </AccordionSection>
-                  ))}
-               </section>
-            ) : (
-               <p className="font-inter text-[15px] text-ghostcolor text-center py-4">
-                  Este medicamento ainda não tem bula cadastrada.
-               </p>
-            )}
+            <section className="flex flex-col gap-3">
+               <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Bula</h2>
+               <LeafletSections leaflet={medication.leaflet} />
+            </section>
 
          </div>
 
@@ -213,9 +191,10 @@ function SearchView({ handleBack, handleAdd }: { handleBack: () => void, handleA
 
 // USER SCREEN
 
-function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveStatus, handleBack, handleEdit, handleDelete, onTake, onTakeNow, onTakeAtTime, onUpdateTakenAt, onClear }: {
+function UserView({ medication, drugInfo, catalogMedication, occurrenceId, doseRecord, effectiveStatus, handleBack, handleEdit, handleDelete, onTake, onTakeNow, onTakeAtTime, onUpdateTakenAt, onClear }: {
    medication: Medication | undefined,
    drugInfo: MedicationInfo | undefined,
+   catalogMedication: CatalogMedication | null,
    occurrenceId: string | null,
    doseRecord: DoseRecord | undefined,
    effectiveStatus: DoseStatus | null,
@@ -319,22 +298,12 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
                <InfoTile title="Substância" subtitle={drugInfo?.activeIngredient ?? '—'} />
             </div>
 
-            {/* Como usar */}
-            {drugInfo?.instructions && (
-               <section className="flex flex-col gap-3">
-                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Como usar</h2>
-                  <div className="bg-offwhite rounded-[22px] border border-black/5 px-4.5 py-4">
-                     <p className="font-inter font-medium text-[17px] leading-[1.55] text-inkblack">
-                        {drugInfo.instructions}
-                     </p>
-                     {drugInfo.canSplit !== undefined && (
-                        <span className="inline-flex items-center mt-3 px-3.5 py-2 rounded-full bg-yellow-alert/25 font-inter font-bold text-[15px] text-[#7a5000]">
-                           {drugInfo.canSplit ? 'Pode partir o comprimido' : 'Não parta nem mastigue'}
-                        </span>
-                     )}
-                  </div>
-               </section>
-            )}
+            {/* Bula: os textos da ANVISA passam de dois mil caracteres, então
+                entram recolhidos em vez de esticar a tela */}
+            <section className="flex flex-col gap-3">
+               <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Bula</h2>
+               <LeafletSections leaflet={catalogMedication?.leaflet} />
+            </section>
 
             {/* Frequência */}
             <section className="flex flex-col gap-3">
@@ -404,19 +373,6 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
                   />
                </div>
             </section>
-
-            {/* Detalhes do catálogo que já existem hoje */}
-            {drugInfo?.sideEffects && (
-               <AccordionSection label="Efeitos colaterais" hasToggle={true}>
-                  {drugInfo.sideEffects}
-               </AccordionSection>
-            )}
-
-            {drugInfo?.contraindications && (
-               <AccordionSection label="Contraindicações" hasToggle={true}>
-                  {drugInfo.contraindications}
-               </AccordionSection>
-            )}
 
             {/* Ações */}
             <div className="flex gap-3 mt-2">
