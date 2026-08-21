@@ -21,7 +21,7 @@ export function StockStep({
    return (
       <div className="flex flex-col gap-5">
          <div>
-            <label className="font-merriweather text-base text-ghostcolor mb-1 block">Quantos você tem agora</label>
+            <p className="font-inter text-[15px] text-ghostcolor mb-1">Quantos você tem agora</p>
             <NumberInput
                value={currentStock}
                onChange={(v) => onChangeCurrentStock(typeof v === 'number' ? v : 0)}
@@ -37,10 +37,8 @@ export function StockStep({
          />
 
          {reminderEnabled && (
-            <div>
-               <label className="font-merriweather text-base text-ghostcolor mb-1 block">
-                  Avisar quando chegar a
-               </label>
+            <div className="animate-fade-slide-up">
+               <p className="font-inter text-[15px] text-ghostcolor mb-1">Avisar quando restar</p>
                <NumberInput
                   value={reminderThreshold}
                   onChange={(v) => onChangeReminderThreshold(typeof v === 'number' ? v : 0)}

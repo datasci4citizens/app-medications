@@ -5,6 +5,7 @@ import { DateSelector } from '../components/medication/DateSelector.tsx';
 import { Header } from '../components/layout/Header';
 import { MedicationCard } from '../components/medication/MedicationCard';
 import { DoneRow } from '../components/medication/DoneRow.tsx';
+import { LowStockAlert } from '../components/medication/LowStockAlert.tsx';
 import { useMedications } from '../../viewmodel/hooks/useMedications.ts';
 import { ConfirmModal } from '../components/common/Modal.tsx';
 import { calculateDosesForDay, type DailyDose } from '../../model/utils/medicationCalculations';
@@ -23,6 +24,7 @@ export function Medications() {
   const { medications, isLoading, markDoseAsTaken, markDoseAsSkipped, clearDoseStatus } = useMedications();
   const [doseConfirm, setDoseConfirm] = useState<DoseConfirm | null>(null);
   const [showDone, setShowDone] = useState(false);
+  const [stockAlertDismissed, setStockAlertDismissed] = useState(false);
   const [isFutureModalOpen, setIsFutureModalOpen] = useState(false);
   const navigate = useNavigate();
   const [isEarlyModalOpen, setIsEarlyModalOpen] = useState(false);
@@ -90,6 +92,10 @@ export function Medications() {
     return selectedDate > now;
   }, [selectedDate]);
 
+  // Dia concluído: existem doses e nenhuma está em aberto
+  const allDosesDone = dailyDoses.length > 0
+    && upcomingDoses.length === 0 && lateDoses.length === 0 && pendingDoses.length === 0;
+
   // Doses já resolvidas no dia — tomadas e esquecidas juntas, em ordem de horário
   const doneDoses = useMemo(
     () => [...takenDoses, ...skippedDoses].sort((a, b) => a.time.localeCompare(b.time)),
@@ -154,6 +160,10 @@ export function Medications() {
 
       <main className="max-w-md mx-auto px-4 py-6">
 
+        {!stockAlertDismissed && (
+          <LowStockAlert medications={medications} onDismiss={() => setStockAlertDismissed(true)} />
+        )}
+
         {/* Lista de Medicamentos Pendentes */}
         <div className="flex flex-col gap-4 mb-10">
           {Object.entries(groupedDoses).map(([horario, doses], index) => {
@@ -198,6 +208,24 @@ export function Medications() {
             )
           })}
         </div>
+
+        {allDosesDone && (
+          <div className="flex flex-col items-center text-center py-8 animate-fade-slide-up">
+            <div className="w-20 h-20 rounded-full bg-green-take flex items-center justify-center text-white mb-4 shadow-[0_10px_24px_rgba(36,189,118,0.35)]">
+              <FiCheck size={40} strokeWidth={3} />
+            </div>
+            <p className="font-merriweather font-extrabold text-[24px] text-inkblack leading-tight">
+              {takenDoses.length === dailyDoses.length
+                ? 'Tudo certo por hoje!'
+                : 'Dia encerrado'}
+            </p>
+            <p className="font-inter text-[16px] text-ghostcolor mt-2 max-w-xs">
+              {takenDoses.length === dailyDoses.length
+                ? `Você tomou ${dailyDoses.length === 1 ? 'sua dose' : `todas as ${dailyDoses.length} doses`}.`
+                : `${takenDoses.length} de ${dailyDoses.length} doses tomadas.`}
+            </p>
+          </div>
+        )}
 
         {/* Doses já resolvidas — recolhidas por padrão, para o foco ficar no que falta */}
         {doneDoses.length > 0 && (

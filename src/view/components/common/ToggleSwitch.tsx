@@ -1,27 +1,30 @@
-
 interface ToggleSwitchProps {
    label: string;
    onClick: () => void;
-   value: boolean
+   value: boolean;
 }
 
-
 export function ToggleSwitch({ label, onClick, value }: ToggleSwitchProps) {
-
-
    return (
-      <div className="flex justify-between items-center text-[20px]">
-         {label}
-         <div className="h-11 bg-[#ebe7ee]  w-20 rounded-4xl border-darkpurple border-b-3"
+      <button
          onClick={onClick}
-         > 
-            <div className={` rounded-full bg-darkpurple w-10 h-10
-            transition-transform duration-250 ease-in-out active:scale-90
-            ${value ? 'translate-x-0 bg-offwhite border-2 border-lightpurple': "translate-x-10"}
-            `
-            }/>
+         role="switch"
+         aria-checked={value}
+         className="w-full flex justify-between items-center gap-4 text-left"
+      >
+         <span className="font-merriweather font-bold text-[19px] text-inkblack">{label}</span>
 
-         </div>
-      </div>
-   )
+         <span
+            className={`relative w-19 h-11 rounded-full shrink-0 transition-colors duration-200
+               ${value ? 'bg-green-take' : 'bg-ghost-gray/40'}`}
+         >
+            {/* Ligado à direita, desligado à esquerda — o sentido esperado */}
+            <span
+               className={`absolute top-1 w-9 h-9 rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.25)]
+                  transition-[left] duration-200 ease-[cubic-bezier(.32,.72,0,1)]
+                  ${value ? 'left-9' : 'left-1'}`}
+            />
+         </span>
+      </button>
+   );
 }
