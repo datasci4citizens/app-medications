@@ -48,6 +48,15 @@ export const MEDICATION_TYPE_LABELS: Record<string, string> = {
   [MEDICATION_TYPES.INJECTION]: 'Injeção',
 };
 
+// Cor de cada forma farmacêutica, usada nos medalhões da busca
+export const MEDICATION_TYPE_COLORS: Record<string, string> = {
+  'Comprimido': '#9254AD',
+  'Cápsula': '#5B2A78',
+  'Líquido': '#06b6d4',
+  'Injeção': '#ef4444',
+  'Ampola': '#ef4444',
+};
+
 // Rótulos curtos para o card — linguagem simples, sem jargão de bula
 export const MEAL_LABELS: Record<string, string> = {
   'Antes da Refeição': 'Antes de comer',

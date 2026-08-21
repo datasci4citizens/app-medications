@@ -1,17 +1,18 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiChevronRight, FiX, FiSearch } from "react-icons/fi";
+import { FiArrowLeft, FiChevronRight, FiSearch, FiX } from "react-icons/fi";
 import { getPopularMedications, searchMedication } from "../../model/utils/medicationUtils";
+import { PillTypeIcon } from "../components/medication/PillTypeIcon";
+import { MEDICATION_TYPE_COLORS } from "../../constants";
 import type { MedicationInfo } from "../../types";
 
-const TYPE_FILTERS = [
-  { id: 'all',       label: 'Todos'       },
+const TYPE_FILTERS: { id: string; label: string }[] = [
+  { id: 'all', label: 'Todos' },
   { id: 'Comprimido', label: 'Comprimido' },
-  { id: 'Cápsula',   label: 'Cápsula'    },
-  { id: 'Líquido',   label: 'Líquido'    },
-  { id: 'Injeção',   label: 'Injeção'    },
+  { id: 'Cápsula', label: 'Cápsula' },
+  { id: 'Líquido', label: 'Líquido' },
+  { id: 'Injeção', label: 'Injeção' },
 ];
-
 
 function highlight(text: string, query: string) {
   if (!query) return text;
@@ -20,7 +21,7 @@ function highlight(text: string, query: string) {
   return (
     <>
       {text.slice(0, i)}
-      <mark style={{ background: 'rgba(255,194,73,0.45)', color: 'inherit', padding: '0 2px', borderRadius: 3 }}>
+      <mark className="bg-yellow-alert/45 text-inherit px-0.5 rounded-[3px]">
         {text.slice(i, i + query.length)}
       </mark>
       {text.slice(i + query.length)}
@@ -28,44 +29,64 @@ function highlight(text: string, query: string) {
   );
 }
 
-function MedRow({ med, query, onClick }: { med: MedicationInfo; query?: string; onClick: () => void }) {
+function Tag({ children, color }: { children: ReactNode; color?: string }) {
+  return (
+    <span
+      className="px-2.5 py-0.5 rounded-full font-inter font-bold text-[11px] whitespace-nowrap"
+      style={color
+        ? { background: `${color}22`, color }
+        : { background: 'rgba(0,0,0,0.04)', color: '#666' }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function MedRow({ med, query, onClick, delay = 0 }: { med: MedicationInfo; query?: string; onClick: () => void; delay?: number }) {
+  const typeColor = MEDICATION_TYPE_COLORS[med.type] ?? '#9254AD';
+
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-4 p-4 bg-white rounded-[22px] border border-[rgba(0,0,0,0.05)] text-left active:scale-[0.98] transition-transform"
-      style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.07)', animationFillMode: 'both' }}
+      className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-offwhite rounded-[22px] border border-black/5 text-left shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-transform active:scale-[0.98]"
+      style={{ animation: `fadeSlideUp 320ms ease-out ${delay}ms both` }}
     >
-      {/* Textos */}
+      {/* Medalhão da forma farmacêutica */}
+      <span
+        className="relative w-13.5 h-13.5 rounded-2xl flex items-center justify-center text-white shrink-0 overflow-hidden"
+        style={{
+          background: `linear-gradient(160deg, ${typeColor}, ${typeColor}aa)`,
+          boxShadow: `0 6px 14px ${typeColor}55`,
+        }}
+      >
+        <span className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent to-50%" />
+        <PillTypeIcon type={med.type} size={26} />
+      </span>
+
       <div className="flex-1 min-w-0">
-        <div className="font-merriweather font-bold text-[19px] text-inkblack leading-tight truncate">
+        <p className="font-merriweather font-extrabold text-[19px] text-inkblack leading-tight truncate">
           {highlight(med.name, query ?? '')}
-        </div>
-        <div className="font-inter text-sm text-gray-500 mt-0.5 truncate">
+        </p>
+        <p className="font-inter text-[13px] text-[#666] mt-0.5 truncate">
           {highlight(med.activeIngredient, query ?? '')}
-        </div>
+        </p>
         <div className="flex gap-1.5 mt-2 flex-wrap">
-          <span className="text-[11px] font-bold font-inter px-2 py-0.5 rounded-full bg-[rgba(91,42,120,0.10)] text-darkpurple">
-            {med.type}
-          </span>
-          {med.commonBrands?.[0] && (
-            <span className="text-[11px] font-bold font-inter px-2 py-0.5 rounded-full bg-[rgba(0,0,0,0.04)] text-gray-500">
-              {med.commonBrands[0]}
-            </span>
-          )}
+          <Tag color={typeColor}>{med.type}</Tag>
+          {med.commonBrands?.[0] && <Tag>{med.commonBrands[0]}</Tag>}
         </div>
       </div>
 
-      <FiChevronRight size={20} className="text-darkpurple shrink-0" />
+      <FiChevronRight size={18} className="text-darkpurple shrink-0" />
     </button>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="mb-6">
-      <h3 className="font-merriweather font-bold text-[18px] text-inkblack tracking-tight mb-3 px-1">
+    <div className="mb-5.5">
+      <h2 className="font-merriweather font-extrabold text-[18px] text-inkblack mb-3 px-1">
         {title}
-      </h3>
+      </h2>
       <div className="flex flex-col gap-2">{children}</div>
     </div>
   );
@@ -78,13 +99,12 @@ function EmptyState({ query }: { query: string }) {
         <FiSearch size={34} />
       </div>
       <p className="font-merriweather font-bold text-[22px] text-inkblack mb-2">Nenhum resultado</p>
-      <p className="font-inter text-sm text-gray-500 leading-relaxed">
+      <p className="font-inter text-[15px] text-ghostcolor leading-relaxed">
         Não encontramos nada para <b>"{query}"</b>.<br />Tente outro nome ou substância.
       </p>
     </div>
   );
 }
-
 
 export function SearchMedication() {
   const [query, setQuery] = useState('');
@@ -95,7 +115,6 @@ export function SearchMedication() {
   const queryLower = query.trim().toLowerCase();
 
   const results = useMemo(() => searchMedication(queryLower, typeFilter), [queryLower, typeFilter]);
-
   const popular = useMemo(() => getPopularMedications(), []);
 
   const showSections = !queryLower && typeFilter === 'all';
@@ -105,84 +124,93 @@ export function SearchMedication() {
     setTimeout(() => navigate(-1), 250);
   }
 
-  function goToMed(med: MedicationInfo) {
-    navigate(`/medication/search/${med.id}`);
-  }
-
   return (
-    <div className={`min-h-screen bg-[#ffffff] px-6 py-8 ${isExiting ? 'page-exit-right' : 'page-transition-right'}`}>
+    <div className={`min-h-screen bg-graybg pb-10 ${isExiting ? 'page-exit-right' : 'page-transition-right'}`}>
 
-      {/* Cabeçalho — mantido original */}
-      <div className="flex gap-4 items-center mb-8">
-        <button
-          onClick={handleBack}
-          className="p-3 bg-darkpurple rounded-full text-offwhite transition-all duration-300 shadow-sm active:scale-90"
-        >
-          <FiX size={32} />
-        </button>
-        <h1 className="text-2xl font-merriweather font-bold text-darkpurple tracking-tight">
-          Buscar Medicamento
-        </h1>
-      </div>
-
-      {/* Barra de Busca */}
-      <div className="relative mb-4">
-        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-          <FiSearch className="text-offwhite font-black" size={24} />
-        </div>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar por nome, marca ou substância"
-          autoFocus
-          className="w-full bg-[#CEC7DD] border-none rounded-xl py-4 pl-12 pr-10 text-white font-bold placeholder-white focus:ring-2 ring-purple-500 transition-all outline-none"
+      {/* Cabeçalho roxo, com a busca dentro dele */}
+      <div className="relative overflow-hidden bg-darkpurple rounded-b-[36px] pt-13 pb-5.5 shadow-[0_8px_20px_rgba(91,42,120,0.25)]">
+        <div
+          className="absolute -top-8 -right-8 w-40 h-40 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(206,199,221,0.30), transparent 70%)' }}
         />
-        {query && (
+
+        <div className="relative flex items-center gap-2.5 px-4">
           <button
-            onClick={() => setQuery('')}
-            className="absolute inset-y-0 right-3 flex items-center text-white opacity-70 active:opacity-100"
+            onClick={handleBack}
+            aria-label="Voltar"
+            className="w-11 h-11 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center shrink-0 active:scale-90 transition-transform"
           >
-            <FiX size={18} />
+            <FiArrowLeft size={22} />
           </button>
-        )}
+          <h1 className="font-merriweather font-extrabold text-[24px] text-offwhite">
+            Pesquisar
+          </h1>
+        </div>
+
+        {/* Campo apoiado sobre a emenda do cabeçalho */}
+        <div className="relative px-4 pt-3.5">
+          <div
+            className={`flex items-center gap-2.5 bg-offwhite rounded-full px-4.5 py-3.5 shadow-[0_10px_24px_rgba(0,0,0,0.18)] border-2 transition-colors duration-200 ${query ? 'border-yellow-alert' : 'border-transparent'}`}
+          >
+            <FiSearch size={22} className="text-darkpurple shrink-0" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar por nome, marca ou substância"
+              autoFocus
+              className="flex-1 min-w-0 bg-transparent border-none outline-none font-merriweather font-semibold text-[17px] text-inkblack placeholder:text-ghost-gray"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery('')}
+                aria-label="Limpar busca"
+                className="w-7 h-7 rounded-full bg-black/8 text-[#666] flex items-center justify-center shrink-0 animate-scale-in"
+              >
+                <FiX size={14} strokeWidth={3} />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Filter chips */}
-      <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-1 mb-5">
-        {TYPE_FILTERS.map(f => (
-          <button
-            key={f.id}
-            onClick={() => setTypeFilter(f.id)}
-            className="shrink-0 px-4 py-2 rounded-full font-inter font-bold text-[13px] transition-all duration-150 active:scale-95"
-            style={{
-              background: typeFilter === f.id ? 'var(--color-darkpurple)' : '#fff',
-              color: typeFilter === f.id ? '#fff' : 'var(--color-darkpurple)',
-              border: typeFilter === f.id ? 'none' : '1px solid rgba(91,42,120,0.20)',
-              boxShadow: typeFilter === f.id ? '0 4px 12px rgba(91,42,120,0.30)' : '0 1px 4px rgba(0,0,0,0.06)',
-            }}
-          >
-            {f.label}
-          </button>
-        ))}
+      {/* Filtros por forma */}
+      <div className="hide-scrollbar flex gap-2 overflow-x-auto px-4 pt-3.5 pb-1.5">
+        {TYPE_FILTERS.map(filter => {
+          const isActive = typeFilter === filter.id;
+          return (
+            <button
+              key={filter.id}
+              onClick={() => setTypeFilter(filter.id)}
+              className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full font-inter font-bold text-[13px] whitespace-nowrap transition-colors duration-150 active:scale-95
+                ${isActive
+                  ? 'bg-darkpurple text-offwhite border border-darkpurple'
+                  : 'bg-offwhite text-darkpurple border border-black/6'}`}
+            >
+              {filter.id !== 'all' && (
+                <PillTypeIcon type={filter.id as MedicationInfo['type']} size={15} />
+              )}
+              {filter.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Body */}
-      <div>
+      <div className="px-4 pt-2 pb-5">
         {showSections ? (
           <Section title="Mais comuns">
-            {popular.map(m => (
-              <MedRow key={m.id} med={m} onClick={() => goToMed(m)} />
+            {popular.map((med, i) => (
+              <MedRow key={med.id} med={med} delay={i * 60} onClick={() => navigate(`/medication/search/${med.id}`)} />
             ))}
           </Section>
         ) : results.length > 0 ? (
           <>
-            <p className="font-inter text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 px-1">
+            <p className="font-inter text-[13px] font-semibold text-[#888] uppercase tracking-[0.08em] mb-3 px-1">
               {results.length} {results.length === 1 ? 'resultado' : 'resultados'}
             </p>
             <div className="flex flex-col gap-2">
-              {results.map(m => (
-                <MedRow key={m.id} med={m} query={queryLower} onClick={() => goToMed(m)} />
+              {results.map((med, i) => (
+                <MedRow key={med.id} med={med} query={queryLower} delay={i * 50} onClick={() => navigate(`/medication/search/${med.id}`)} />
               ))}
             </div>
           </>
