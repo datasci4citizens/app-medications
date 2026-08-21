@@ -1,7 +1,8 @@
+import { useCatalogMedication } from "./useCatalogMedication";
+import { toMedicationInfo } from "../../model/repositories/CatalogRepository";
 import { useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMedications } from "./useMedications";
-import { medicationsDatabase } from "../../model/data/mockMedicationsDatabase";
 import type { Medication, WeekDay } from "../../types";
 
 export type AddMedicationStep =
@@ -61,9 +62,12 @@ export function useAddMedication() {
          ? (location.state as { medicationInfoId: string }).medicationInfoId
          : undefined) ?? editingMedication?.medicationInfoId;
 
+   // Vem do catálogo da API; enquanto carrega, drugInfo fica indefinido e o
+   // formulário simplesmente abre sem preenchimento prévio.
+   const { medication: catalogMedication } = useCatalogMedication(medicationInfoId);
    const drugInfo = useMemo(
-      () => medicationsDatabase.find(d => d.id === medicationInfoId),
-      [medicationInfoId]
+      () => (catalogMedication ? toMedicationInfo(catalogMedication) : undefined),
+      [catalogMedication]
    );
 
    const [stepIndex, setStepIndex] = useState(0);

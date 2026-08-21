@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FiChevronRight, FiClock, FiMinusCircle } from 'react-icons/fi';
 import type { DailyDose } from '../../../model/utils/medicationCalculations';
 import { getBrandColor } from '../../../model/utils/brandColorHelper';
-import { getMedicationInfoById } from '../../../model/utils/medicationUtils';
-import { MEAL_LABELS, MEDICATION_TYPE_LABELS } from '../../../constants';
+import { MEDICATION_TYPE_LABELS } from '../../../constants';
 
 interface MedicationCardProps {
   dose: DailyDose;
@@ -42,9 +41,6 @@ export function MedicationCard({ dose, onTake, onSkip, onClick }: MedicationCard
 
   const typeLabel = MEDICATION_TYPE_LABELS[medication.type] || 'Dose';
 
-  const drugInfo = getMedicationInfoById(medication.medicationInfoId);
-  const mealLabel = drugInfo?.whenToTake ? MEAL_LABELS[drugInfo.whenToTake] : undefined;
-
   const timeChipColor = isLate
     ? 'bg-[rgba(211,34,49,0.10)] text-red-skip'
     : 'bg-[rgba(91,42,120,0.08)] text-darkpurple';
@@ -78,15 +74,7 @@ export function MedicationCard({ dose, onTake, onSkip, onClick }: MedicationCard
                   {medication.dosage}
                 </span>
               </h3>
-              <p className={`font-merriweather font-normal text-[18px] mt-1 flex items-center gap-1.5 flex-wrap ${subTextColor}`}>
-                <span>{typeLabel}</span>
-                {mealLabel && (
-                  <>
-                    <span className="opacity-50">·</span>
-                    <span>{mealLabel}</span>
-                  </>
-                )}
-              </p>
+              <p className={`font-merriweather font-normal text-[18px] mt-1 ${subTextColor}`}>{typeLabel}</p>
               {medication.brand && (
                 <p className={`font-merriweather text-[16px] ${subTextColor}`}>Marca: {medication.brand}</p>
               )}

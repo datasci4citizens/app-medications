@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiCheck, FiChevronRight } from 'react-icons/fi';
+import { FiCheck, FiChevronRight, FiPlus } from 'react-icons/fi';
 import { DateSelector } from '../components/medication/DateSelector.tsx';
 import { Header } from '../components/layout/Header';
 import { MedicationCard } from '../components/medication/MedicationCard';
@@ -233,11 +233,40 @@ export function Medications() {
             )}
           </div>
         )}
-        {/* Estado vazio */}
+        {/* Estado vazio: distingue "ainda não cadastrou nada" de
+            "cadastrou, mas nada cai neste dia" — a ação certa é diferente */}
         {dailyDoses.length === 0 && (
-          <div className=" font-merriweather font-bold text-[28px] text-center mt-20 animate-fade-slide-up">
-            <p className="text-gray-400 text-lg">Nenhum medicamento para este dia.</p>
-          </div>
+          medications.length === 0 ? (
+            <div className="flex flex-col items-center text-center mt-16 px-4 animate-fade-slide-up">
+              <div className="w-24 h-24 rounded-full bg-lightpurple flex items-center justify-center text-darkpurple mb-6">
+                <FiPlus size={44} />
+              </div>
+              <h2 className="font-merriweather font-extrabold text-[26px] text-inkblack leading-tight">
+                Vamos começar?
+              </h2>
+              <p className="font-inter text-[17px] text-ghostcolor leading-relaxed mt-3 max-w-xs">
+                Cadastre seu primeiro medicamento para o Lembramed avisar na hora certa.
+              </p>
+              <button
+                onClick={() => navigate('/search')}
+                className="mt-7 h-14 px-7 rounded-full bg-darkpurple text-offwhite font-merriweather font-extrabold text-[19px] flex items-center justify-center gap-2 shadow-[0_10px_24px_rgba(91,42,120,0.45)] transition-transform active:scale-95"
+              >
+                <FiPlus size={22} /> Adicionar medicamento
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center text-center mt-16 px-4 animate-fade-slide-up">
+              <div className="w-20 h-20 rounded-full bg-lightpurple flex items-center justify-center text-darkpurple mb-5">
+                <FiCheck size={38} strokeWidth={2.5} />
+              </div>
+              <p className="font-merriweather font-bold text-[22px] text-inkblack">
+                Nada marcado para este dia
+              </p>
+              <p className="font-inter text-[16px] text-ghostcolor mt-2">
+                Seus medicamentos não têm dose prevista aqui.
+              </p>
+            </div>
+          )
         )}
       </main>
 

@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import type { Medication } from '../../types';
 import { medicationStorage } from '../../model/repositories/MedicationRepository'
-import { mockMedication } from '../../model/data/mockMedication';
 
 // ============================================
 // TIPOS
@@ -41,17 +40,12 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     const loadMedications = () => {
       try {
-        const saved = medicationStorage.getMedications();
-
-        if (saved && saved.length > 0) {
-          setMedications(saved);
-        } else {
-          setMedications(mockMedication);
-          medicationStorage.saveMedications(mockMedication);
-        }
+        // Quem entra pela primeira vez começa sem nada: o app pede que a
+        // pessoa cadastre o primeiro medicamento em vez de inventar dados.
+        setMedications(medicationStorage.getMedications() ?? []);
       } catch (error) {
         console.error('Erro ao carregar medicamentos:', error);
-        setMedications(mockMedication);
+        setMedications([]);
       } finally {
         setIsLoading(false);
       }

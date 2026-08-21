@@ -1,8 +1,4 @@
 import boxImage from '../assets/medications/caixa_generica_1.png';
-import comprimidoImage from '../assets/medications/comprimido.png';
-import ampolaImage from '../assets/medications/ampola.png';
-import capsulaImage from '../assets/medications/capsula.png';
-import liquidoImage from '../assets/medications/liquido.png';
 
 
 export const COLORS = {
@@ -153,17 +149,5 @@ export const STORAGE_KEYS = {
 //   NEO_QUIMICA: '#242B6B', // Azul escuro
 // } as const;
 
-
-export const MEDICATION_TYPE_IMAGES: Record<string, { 
-  image: string; 
-  position: string;
-  size: string;
-}> = {
-  'Comprimido': { image: comprimidoImage, position: 'bottom-0 right-2', size: 'w-28' },
-  'Cápsula':    { image: capsulaImage,    position: 'bottom-0 right-2', size: 'w-24' },
-  'Ampola':     { image: ampolaImage,     position: 'bottom-2 right-4', size: 'w-20' },
-  'Líquido':    { image: liquidoImage,    position: 'bottom-0 right-2', size: 'w-20' },
-  'Injeção':    { image: comprimidoImage, position: 'bottom-0 right-2', size: 'w-20' }, // fallback
-};
 
 export const BOX_IMAGE = boxImage;

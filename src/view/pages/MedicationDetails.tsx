@@ -1,7 +1,8 @@
 
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { FiArrowLeft, FiClock, FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
+import { useParams } from "react-router-dom";
+import { FiAlertCircle, FiArrowLeft, FiClock, FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import { InfoTile } from "../components/common/InfoTile";
 import { WeekDaySelector } from "../components/common/WeekDaySelector";
@@ -9,10 +10,13 @@ import { AccordionSection } from "../components/common/AccordionSection";
 import { ConfirmModal } from "../components/common/Modal";
 
 import { useMedicationDetails } from "../../viewmodel/hooks/useMedicationDetails";
+import { useCatalogMedication } from "../../viewmodel/hooks/useCatalogMedication";
+import { activeIngredients, displayName } from "../../model/repositories/CatalogRepository";
 import { DoseActionPanel } from "../components/medication/DoseActionPanel";
+import { MedicationTypeMedallion } from "../components/medication/MedicationTypeMedallion";
 import { calculateAdherence, parseOccurrenceId } from "../../model/utils/medicationCalculations";
 import { getBrandColor } from "../../model/utils/brandColorHelper";
-import { MEAL_LABELS, MEDICATION_TYPE_IMAGES, MEDICATION_TYPE_LABELS } from "../../constants";
+import { MEAL_LABELS, MEDICATION_TYPE_LABELS } from "../../constants";
 import type { MedicationInfo, Medication, DoseRecord, DoseStatus } from '../../types/index'
 
 /** Tempo que o usuário tem para desfazer a exclusão antes dela valer. */
@@ -43,7 +47,7 @@ export function MedicationDetails() {
 
    return (<div>
       {mode === 'search'
-         ? <SearchView drugInfo={drugInfo} handleAdd={handleAdd} handleBack={handleBack} />
+         ? <SearchView handleAdd={handleAdd} handleBack={handleBack} />
          : <UserView
               drugInfo={drugInfo}
               handleBack={handleBack}
@@ -64,10 +68,62 @@ export function MedicationDetails() {
 }
 
 
-function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationInfo | undefined, handleBack: () => void, handleAdd: () => void }) {
+function SearchView({ handleBack, handleAdd }: { handleBack: () => void, handleAdd: () => void }) {
 
-   const productImage = drugInfo ? MEDICATION_TYPE_IMAGES[drugInfo.type]?.image : undefined;
-   const mealLabel = drugInfo?.whenToTake ? MEAL_LABELS[drugInfo.whenToTake] : undefined;
+   const { id } = useParams();
+   const { medication, isLoading, error } = useCatalogMedication(id);
+
+   if (isLoading || error || !medication) {
+      return (
+         <div className="min-h-screen bg-graybg flex flex-col">
+            <div className="relative overflow-hidden rounded-b-[36px] pt-13 pb-8 bg-gradient-to-br from-darkpurple to-deepplum">
+               <button
+                  onClick={handleBack}
+                  aria-label="Voltar"
+                  className="absolute top-14 left-4 w-11 h-11 rounded-full bg-white/25 backdrop-blur-md text-white flex items-center justify-center active:scale-90 transition-transform"
+               >
+                  <FiArrowLeft size={22} />
+               </button>
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+               {isLoading ? (
+                  <>
+                     <span className="w-12 h-12 rounded-full border-4 border-lightpurple border-t-darkpurple animate-spin" />
+                     <p className="font-inter text-[16px] text-ghostcolor mt-5">Carregando a bula…</p>
+                  </>
+               ) : (
+                  <>
+                     <FiAlertCircle size={40} className="text-red-skip" />
+                     <p className="font-merriweather font-bold text-[20px] text-inkblack mt-4">{error}</p>
+                     <button
+                        onClick={handleBack}
+                        className="mt-6 h-13 px-6 rounded-full bg-darkpurple text-offwhite font-merriweather font-bold text-[17px] active:scale-95 transition-transform"
+                     >
+                        Voltar
+                     </button>
+                  </>
+               )}
+            </div>
+         </div>
+      );
+   }
+
+   const title = displayName(medication);
+   const ingredients = activeIngredients(medication);
+   const leaflet = medication.leaflet;
+
+   // Só entram as seções com texto: a ANVISA deixa várias em branco.
+   const sections: { label: string; text: string }[] = leaflet ? [
+      { label: 'Para que serve',        text: leaflet.indicacoes_para_uso },
+      { label: 'Como usar',             text: leaflet.como_usar_medicamento },
+      { label: 'Se esquecer uma dose',  text: leaflet.esqueceu_medicamento },
+      { label: 'Quando não usar',       text: leaflet.quando_nao_usar },
+      { label: 'Efeitos colaterais',    text: leaflet.efeitos_colaterais },
+      { label: 'Se tomar demais',       text: leaflet.quantidade_a_mais },
+      { label: 'Como funciona',         text: leaflet.funcionamento_medicamento },
+      { label: 'Antes de usar',         text: leaflet.conhecimento_previo_necessario },
+      { label: 'Como guardar',          text: leaflet.como_guardar_medicamento },
+   ].filter(sec => sec.text?.trim()) : [];
 
    return (
       <div className="min-h-screen bg-graybg pb-32 animate-slide-in-right">
@@ -86,76 +142,57 @@ function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationI
             </button>
 
             <div className="relative z-1 pl-19 pr-5 pt-4 pb-6 text-white">
-               <p className="font-inter text-[12px] font-bold uppercase tracking-[0.14em] opacity-80">
-                  {drugInfo?.activeIngredient}
-               </p>
-               <h1 className="font-merriweather font-extrabold text-[32px] uppercase leading-[1.05] mt-1">
-                  {drugInfo?.name}
+               {ingredients.length > 0 && (
+                  <p className="font-inter text-[12px] font-bold uppercase tracking-[0.14em] opacity-80 line-clamp-2">
+                     {ingredients.join(' + ')}
+                  </p>
+               )}
+               <h1 className="font-merriweather font-extrabold text-[30px] uppercase leading-[1.05] mt-1">
+                  {title}
                </h1>
-               <p className="font-merriweather font-semibold text-[20px] mt-1.5 opacity-90">
-                  {drugInfo?.type}
-               </p>
+               {medication.formato && (
+                  <p className="font-merriweather font-semibold text-[20px] mt-1.5 opacity-90">
+                     {medication.formato}
+                  </p>
+               )}
             </div>
-
-            {productImage && (
-               <img
-                  src={productImage}
-                  alt=""
-                  className="absolute right-5 top-20 w-28 z-1 drop-shadow-[0_8px_22px_rgba(0,0,0,0.25)]"
-               />
-            )}
          </div>
 
          <div className="max-w-md mx-auto px-4 flex flex-col gap-6 pt-5">
 
             {/* Resumo */}
             <div className="grid grid-cols-2 gap-2.5">
-               <InfoTile title="Substância" subtitle={drugInfo?.activeIngredient ?? '—'} />
-               <InfoTile title="Forma" subtitle={drugInfo?.type ?? '—'} />
-               <InfoTile title="Refeição" subtitle={mealLabel ?? 'Livre'} />
-               <InfoTile title="Pode partir?" subtitle={drugInfo?.canSplit ? 'Sim' : 'Não'} />
+               <InfoTile title="Substância" subtitle={ingredients[0] ?? '—'} />
+               <InfoTile title="Forma" subtitle={medication.formato ?? 'Não informada'} />
+               <InfoTile title="Fabricante" subtitle={medication.company ?? '—'} />
+               <InfoTile title="Categoria" subtitle={medication.category ?? '—'} />
             </div>
 
-            {/* Marcas */}
-            {drugInfo?.commonBrands && drugInfo.commonBrands.length > 0 && (
+            {medication.therapeutic_class && (
                <section className="flex flex-col gap-3">
-                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Marcas comuns</h2>
-                  <div className="flex flex-wrap gap-2">
-                     {drugInfo.commonBrands.map(brand => (
-                        <span
-                           key={brand}
-                           className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-offwhite border border-card-border font-inter font-bold text-[16px] text-inkblack"
-                        >
-                           <span className="w-3 h-3 rounded-full" style={{ backgroundColor: getBrandColor(brand) }} />
-                           {brand}
-                        </span>
-                     ))}
-                  </div>
-               </section>
-            )}
-
-            {/* Como usar */}
-            {drugInfo?.instructions && (
-               <section className="flex flex-col gap-3">
-                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Como usar</h2>
+                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Classe terapêutica</h2>
                   <div className="bg-offwhite rounded-[22px] border border-black/5 px-4.5 py-4">
-                     <p className="font-inter font-medium text-[17px] leading-[1.55] text-inkblack">
-                        {drugInfo.instructions}
+                     <p className="font-inter text-[16px] leading-[1.5] text-inkblack">
+                        {medication.therapeutic_class}
                      </p>
                   </div>
                </section>
             )}
 
-            {drugInfo?.sideEffects && (
-               <AccordionSection label="Efeitos colaterais" hasToggle={true}>
-                  {drugInfo.sideEffects}
-               </AccordionSection>
-            )}
-
-            {drugInfo?.contraindications && (
-               <AccordionSection label="Contraindicações" hasToggle={true}>
-                  {drugInfo.contraindications}
-               </AccordionSection>
+            {/* Bula da ANVISA */}
+            {sections.length > 0 ? (
+               <section className="flex flex-col gap-2.5">
+                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Bula</h2>
+                  {sections.map(sec => (
+                     <AccordionSection key={sec.label} label={sec.label} hasToggle={true}>
+                        <p className="whitespace-pre-line">{sec.text.trim()}</p>
+                     </AccordionSection>
+                  ))}
+               </section>
+            ) : (
+               <p className="font-inter text-[15px] text-ghostcolor text-center py-4">
+                  Este medicamento ainda não tem bula cadastrada.
+               </p>
             )}
 
          </div>
@@ -211,7 +248,6 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
 
    const brandColor = getBrandColor(medication?.brand);
    const typeLabel = medication ? MEDICATION_TYPE_LABELS[medication.type] ?? '—' : '—';
-   const productImage = MEDICATION_TYPE_IMAGES[typeLabel]?.image;
 
    const doseTime = occurrenceId ? parseOccurrenceId(occurrenceId)?.time : undefined;
    const mealLabel = drugInfo?.whenToTake ? MEAL_LABELS[drugInfo.whenToTake] : undefined;
@@ -240,7 +276,7 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
                <FiArrowLeft size={22} />
             </button>
 
-            <div className="relative z-1 pl-19 pr-5 pt-4 pb-6 text-white">
+            <div className="relative z-1 pl-19 pr-27 pt-4 pb-6 text-white">
                <p className="font-inter text-[12px] font-bold uppercase tracking-[0.14em] opacity-80">
                   {medication?.brand || 'Genérico'}
                </p>
@@ -252,11 +288,11 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
                </p>
             </div>
 
-            {productImage && (
-               <img
-                  src={productImage}
-                  alt=""
-                  className="absolute right-5 top-20 w-28 z-1 drop-shadow-[0_8px_22px_rgba(0,0,0,0.25)]"
+            {medication && (
+               <MedicationTypeMedallion
+                  type={typeLabel as MedicationInfo['type']}
+                  size={88}
+                  className="absolute right-5 top-18 z-1 drop-shadow-[0_6px_16px_rgba(0,0,0,0.18)]"
                />
             )}
          </div>

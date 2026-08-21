@@ -1,6 +1,7 @@
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { useMedications } from "./useMedications";
-import { medicationsDatabase } from "../../model/data/mockMedicationsDatabase";
+import { useCatalogMedication } from "./useCatalogMedication";
+import { toMedicationInfo } from "../../model/repositories/CatalogRepository";
 import { getAutomaticStatus, parseOccurrenceId } from "../../model/utils/medicationCalculations";
 import type { DoseStatus } from "../../types";
 
@@ -22,7 +23,11 @@ export function useMedicationDetails() {
    const safeId = id ?? '';
    const medication = mode === 'user' ? context.getMedicationById(safeId) : null;
 
-   const drugInfo = medicationsDatabase.find((item) => item.id === (mode === 'user' ? medication?.medicationInfoId : safeId));
+   // A bula vem do catálogo da API. No modo usuário, pelo id que ficou salvo
+   // no medicamento; no modo busca, o próprio id da rota.
+   const catalogId = mode === 'user' ? medication?.medicationInfoId : safeId;
+   const { medication: catalogMedication } = useCatalogMedication(catalogId);
+   const drugInfo = catalogMedication ? toMedicationInfo(catalogMedication) : undefined;
 
    const doseRecord = medication && occurrenceId ? medication.doseStatus[occurrenceId] : undefined;
 
@@ -59,7 +64,7 @@ export function useMedicationDetails() {
       navigate(`/edit/${safeId}`);
    }
    const handleAdd = () => {
-      navigate(`/add`, { state: { medicationInfoId: drugInfo?.id } });
+      navigate(`/add`, { state: { medicationInfoId: safeId } });
    }
 
    // Marca como tomado considerando o status atual (pending → taken; late → taken_late)
