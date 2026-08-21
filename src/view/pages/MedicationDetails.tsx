@@ -1,18 +1,23 @@
 
 
-import { useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { FiArrowLeft, FiClock, FiEdit2, FiTrash2 } from "react-icons/fi";
 import { NavBottom } from "../components/layout/NavBottom";
 
 import { InfoTile } from "../components/common/InfoTile";
 import { WeekDaySelector } from "../components/common/WeekDaySelector";
 import { AccordionSection } from "../components/common/AccordionSection";
-import { ToggleSwitch } from "../components/common/ToggleSwitch";
-import { NumberInput } from "../components/common/InputBar";
 import { ConfirmModal } from "../components/common/Modal";
 
 import { useMedicationDetails } from "../../viewmodel/hooks/useMedicationDetails";
 import { DoseActionPanel } from "../components/medication/DoseActionPanel";
+import { calculateAdherence, parseOccurrenceId } from "../../model/utils/medicationCalculations";
+import { getBrandColor } from "../../model/utils/brandColorHelper";
+import { MEAL_LABELS, MEDICATION_TYPE_IMAGES, MEDICATION_TYPE_LABELS } from "../../constants";
 import type { MedicationInfo, Medication, DoseRecord, DoseStatus } from '../../types/index'
+
+/** Tempo que o usuário tem para desfazer a exclusão antes dela valer. */
+const UNDO_WINDOW_MS = 6000;
 
 
 
@@ -147,144 +152,251 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
    onUpdateTakenAt: (time: string) => void,
    onClear: () => void,
 }) {
-   const [remember, setRemember] = useState<boolean>(false);
-   const [stock, setStock] = useState<number>(0);
-   const [reminderThreshold, setReminderThreshold] = useState<number>(0);
    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+   const [pendingDelete, setPendingDelete] = useState(false);
+   const deleteTimer = useRef<number | undefined>(undefined);
+
+   useEffect(() => () => clearTimeout(deleteTimer.current), []);
+
+   // A exclusão só acontece depois da janela de desfazer
+   const startDelete = () => {
+      setDeleteModalOpen(false);
+      setPendingDelete(true);
+      clearTimeout(deleteTimer.current);
+      deleteTimer.current = setTimeout(() => handleDelete(), UNDO_WINDOW_MS);
+   };
+   const cancelDelete = () => {
+      clearTimeout(deleteTimer.current);
+      setPendingDelete(false);
+   };
+
+   const brandColor = getBrandColor(medication?.brand);
+   const typeLabel = medication ? MEDICATION_TYPE_LABELS[medication.type] ?? '—' : '—';
+   const productImage = MEDICATION_TYPE_IMAGES[typeLabel]?.image;
+
+   const doseTime = occurrenceId ? parseOccurrenceId(occurrenceId)?.time : undefined;
+   const mealLabel = drugInfo?.whenToTake ? MEAL_LABELS[drugInfo.whenToTake] : undefined;
+   const adherence = medication ? calculateAdherence(medication) : null;
+
+   const stockLeft = medication?.currentStock;
+   const stockThreshold = medication?.stockReminderThreshold ?? 5;
+   const isLowStock = stockLeft !== undefined && stockLeft <= stockThreshold;
 
    return (
-      <div className="p-4 flex gap-4 self-stretch flex-col pb-48 animate-slide-in-right">
+      <div className="min-h-screen bg-graybg pb-40 animate-slide-in-right">
 
-         <NavBottom OnClick={() => handleBack()} type='back' size={55} />
-         <div className="font-merriweather text-[44px] font-bold text-darkpurple text-center border-b-2">
-            {/* Medicine Name */}
-            <p className="font-merriweather text-2xl font-bold text-gray-400 text-right ">
-               {drugInfo?.activeIngredient}
-            </p>
-            {medication?.name}
-         </div>
+         {/* Capa com a cor da marca */}
+         <div
+            className="relative overflow-hidden rounded-b-[36px] pt-13 shadow-[0_10px_28px_rgba(0,0,0,0.18)]"
+            style={{ background: `linear-gradient(160deg, ${brandColor}, ${brandColor}cc)` }}
+         >
+            <div className="absolute -right-12 -top-8 w-55 h-55 rounded-full bg-white/10" />
+            <div className="absolute right-8 -bottom-12 w-35 h-35 rounded-full bg-black/8" />
 
-
-         {/* InfoCards TileCard*/}
-         <div className="bg-lightpurple w-full mx-auto rounded-2xl grid grid-cols-2 gap-2 px-3.5 py-2.5">
-
-            <InfoTile title="Dosage:" subtitle={`${medication?.dosage}`} />
-            <InfoTile title="Forma:" subtitle={`${medication?.type}`} />
-            <InfoTile title="Marca:" subtitle={`${medication?.brand} `} />
-            <InfoTile title="Tem no SUS?" subtitle="Sim" />
-         </div>
-
-         {occurrenceId && (
-            <DoseActionPanel
-               effectiveStatus={effectiveStatus}
-               doseRecord={doseRecord}
-               onTake={onTake}
-               onTakeNow={onTakeNow}
-               onTakeAtTime={onTakeAtTime}
-               onUpdateTakenAt={onUpdateTakenAt}
-               onClear={onClear}
-            />
-         )}
-
-         <div className="flex flex-col gap-4 font-merriweather  text-2xl">
-            <h1 className="font-bold ">Frequência do uso:</h1>
-            <WeekDaySelector isReadOnly={true} values={medication?.weekDays ?? []} />
-            <div className="flex flex-wrap gap-2 justify-center">
-               {medication?.times?.map(time => (
-                  <span
-                     key={time}
-                     className="px-4 py-2 rounded-full bg-lightpurple text-darkpurple font-merriweather font-bold text-xl"
-                  >
-                     {time}
-                  </span>
-               ))}
-            </div>
-         </div>
-
-         {/* Duration */}
-         <div className="font-merriweather text-2xl">
-            <AccordionSection label="Duração do tratamento" hasToggle={true}>
-               <div className="grid grid-cols-2 gap-2">
-                  <InfoTile title="Início:" subtitle={medication?.startDate ?? '-'} />
-                  <InfoTile title="Fim:" subtitle={medication?.endDate ?? 'Contínuo'} />
-               </div>
-            </AccordionSection>
-         </div>
-
-         {/* Instructions */}
-         {drugInfo && (
-            <div className="font-merriweather text-2xl">
-               <AccordionSection label="Instruções" hasToggle={true}>
-                  <div className="grid grid-cols-2 gap-2">
-                     <InfoTile title="Quando tomar:" subtitle={drugInfo.whenToTake ?? '-'} />
-                     <InfoTile title="Pode partir?" subtitle={drugInfo.canSplit ? 'Sim' : 'Não'} />
-                  </div>
-                  {drugInfo.instructions && <div className="mt-4 text-lg font-light">{drugInfo.instructions}</div>}
-               </AccordionSection>
-            </div>
-         )}
-
-         {/* Stock Reminder */}
-         <div className="font-merriweather flex flex-col gap-4">
-            <AccordionSection label="Lembre de repor estoque" hasToggle={true}>
-               <div className="flex flex-col gap-4">
-                  <ToggleSwitch label="Habilitar lembrete" value={remember} onClick={() => setRemember(!remember)} />
-                  <div className="text-[1.25rem] font-light">
-                     Estoque Atual
-                  </div>
-                  <NumberInput value={stock} label="unidades" onChange={(val) => setStock(Number(val) || 0)} />
-                  <div className="text-[1.25rem] font-light">
-                     Lembrete quando chegar à
-                  </div>
-                  <NumberInput value={reminderThreshold} label="unidades" onChange={(val) => setReminderThreshold(Number(val) || 0)} />
-               </div>
-            </AccordionSection>
-         </div>
-
-         {/* Buttons */}
-         <div className="fixed bottom-0 left-0 right-0 mx-auto w-[calc(100%-2rem)] max-w-md mb-4 flex gap-3">
             <button
-               onClick={() => setDeleteModalOpen(true)}
-               className="
-                  flex-1
-                  bg-graybg
-                  font-merriweather font-bold text-red-500 text-2xl text-center
-                  border-[3px] border-red-400 rounded-[0.625rem]
-                  py-2
-                  transition-colors duration-300
-                  active:bg-red-500 active:text-offwhite
-               "
+               onClick={handleBack}
+               aria-label="Voltar"
+               className="absolute top-14 left-4 w-11 h-11 rounded-full bg-white/25 backdrop-blur-md text-white flex items-center justify-center z-2 active:scale-90 transition-transform"
             >
-               Excluir
+               <FiArrowLeft size={22} />
             </button>
-            <button
-               onClick={handleEdit}
-               className="
-                  flex-[2]
-                  bg-graybg
-                  font-merriweather font-bold text-darkpurple text-2xl text-center
-                  border-[3px] border-darkpurple rounded-[0.625rem]
-                  py-2
-                  transition-colors duration-300
-                  active:bg-darkpurple active:text-offwhite
-               "
-            >
-               Editar
-            </button>
+
+            <div className="relative z-1 pl-19 pr-5 pt-4 pb-6 text-white">
+               <p className="font-inter text-[12px] font-bold uppercase tracking-[0.14em] opacity-80">
+                  {medication?.brand || 'Genérico'}
+               </p>
+               <h1 className="font-merriweather font-extrabold text-[32px] uppercase leading-[1.05] mt-1">
+                  {medication?.name}
+               </h1>
+               <p className="font-merriweather font-semibold text-[20px] mt-1.5 opacity-90">
+                  {medication?.dosage} · {typeLabel}
+               </p>
+            </div>
+
+            {productImage && (
+               <img
+                  src={productImage}
+                  alt=""
+                  className="absolute right-5 top-20 w-28 z-1 drop-shadow-[0_8px_22px_rgba(0,0,0,0.25)]"
+               />
+            )}
+         </div>
+
+         <div className="max-w-md mx-auto px-4 flex flex-col gap-6 pt-5">
+
+            {occurrenceId && (
+               <DoseActionPanel
+                  effectiveStatus={effectiveStatus}
+                  doseRecord={doseRecord}
+                  onTake={onTake}
+                  onTakeNow={onTakeNow}
+                  onTakeAtTime={onTakeAtTime}
+                  onUpdateTakenAt={onUpdateTakenAt}
+                  onClear={onClear}
+               />
+            )}
+
+            {/* Resumo */}
+            <div className="grid grid-cols-2 gap-2.5">
+               <InfoTile title="Horário" subtitle={doseTime ?? medication?.times?.[0] ?? '—'} icon={<FiClock size={14} />} />
+               <InfoTile title="Tipo" subtitle={typeLabel} />
+               <InfoTile title="Refeição" subtitle={mealLabel ?? 'Livre'} />
+               <InfoTile title="Substância" subtitle={drugInfo?.activeIngredient ?? '—'} />
+            </div>
+
+            {/* Como usar */}
+            {drugInfo?.instructions && (
+               <section className="flex flex-col gap-3">
+                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Como usar</h2>
+                  <div className="bg-offwhite rounded-[22px] border border-black/5 px-4.5 py-4">
+                     <p className="font-inter font-medium text-[17px] leading-[1.55] text-inkblack">
+                        {drugInfo.instructions}
+                     </p>
+                     {drugInfo.canSplit !== undefined && (
+                        <span className="inline-flex items-center mt-3 px-3.5 py-2 rounded-full bg-yellow-alert/25 font-inter font-bold text-[15px] text-[#7a5000]">
+                           {drugInfo.canSplit ? 'Pode partir o comprimido' : 'Não parta nem mastigue'}
+                        </span>
+                     )}
+                  </div>
+               </section>
+            )}
+
+            {/* Frequência */}
+            <section className="flex flex-col gap-3">
+               <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Frequência do uso</h2>
+               <WeekDaySelector isReadOnly={true} values={medication?.weekDays ?? []} />
+               <div className="flex flex-wrap gap-2 justify-center">
+                  {medication?.times?.map(time => (
+                     <span
+                        key={time}
+                        className="px-4 py-2 rounded-full bg-lightpurple text-darkpurple font-merriweather font-bold text-xl"
+                     >
+                        {time}
+                     </span>
+                  ))}
+               </div>
+            </section>
+
+            {/* Estoque */}
+            {stockLeft !== undefined && (
+               <section className="flex flex-col gap-3">
+                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Estoque</h2>
+                  <div className={`bg-offwhite rounded-[22px] px-4.5 py-4 flex items-center gap-4 ${isLowStock ? 'border-2 border-yellow-alert' : 'border border-black/5'}`}>
+                     <span className={`font-merriweather font-black text-[44px] leading-none ${isLowStock ? 'text-red-skip' : 'text-darkpurple'}`}>
+                        {stockLeft}
+                     </span>
+                     <div>
+                        <p className="font-merriweather font-bold text-[18px] text-inkblack">unidades restantes</p>
+                        <p className="font-inter text-[15px] text-ghostcolor mt-0.5">
+                           {isLowStock ? 'Está acabando — peça na farmácia' : 'Avisaremos quando estiver acabando'}
+                        </p>
+                     </div>
+                  </div>
+               </section>
+            )}
+
+            {/* Tratamento */}
+            <section className="flex flex-col gap-3">
+               <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Tratamento</h2>
+               <div className="bg-offwhite rounded-[22px] border border-black/5 px-4.5 py-4 flex flex-col gap-3.5">
+                  <TreatmentRow label="Início" value={medication?.startDate ?? '—'} />
+                  <div className="h-px bg-black/6" />
+                  <TreatmentRow label="Fim" value={medication?.endDate ?? 'Sem término'} />
+                  <div className="h-px bg-black/6" />
+                  <TreatmentRow
+                     label="Aderência"
+                     value={
+                        adherence === null
+                           ? <span className="text-ghostcolor font-normal">sem histórico ainda</span>
+                           : <span className="flex items-center gap-1.5">
+                                <span className="text-green-take font-extrabold">{adherence}%</span>
+                                <span className="text-[11px] text-ghostcolor font-normal">últimos 30 dias</span>
+                             </span>
+                     }
+                  />
+               </div>
+            </section>
+
+            {/* Detalhes do catálogo que já existem hoje */}
+            {drugInfo?.sideEffects && (
+               <div className="font-merriweather text-2xl">
+                  <AccordionSection label="Efeitos Colaterais" hasToggle={true}>
+                     <div className="text-lg font-light">{drugInfo.sideEffects}</div>
+                  </AccordionSection>
+               </div>
+            )}
+
+            {drugInfo?.contraindications && (
+               <div className="font-merriweather text-2xl">
+                  <AccordionSection label="Contraindicações" hasToggle={true}>
+                     <div className="text-lg font-light">{drugInfo.contraindications}</div>
+                  </AccordionSection>
+               </div>
+            )}
+
+            {/* Ações */}
+            <div className="flex gap-3 mt-2">
+               <button
+                  onClick={handleEdit}
+                  className="flex-1 h-13.5 rounded-[20px] bg-yellow-alert text-deepplum font-merriweather font-extrabold text-[17px] flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(255,194,73,0.35)] transition-transform active:scale-95"
+               >
+                  <FiEdit2 size={18} /> Editar
+               </button>
+               <button
+                  onClick={() => setDeleteModalOpen(true)}
+                  className="flex-1 h-13.5 rounded-[20px] bg-red-skip text-white font-merriweather font-extrabold text-[17px] flex items-center justify-center gap-2 shadow-[0_8px_18px_rgba(211,34,49,0.35)] transition-transform active:scale-95"
+               >
+                  <FiTrash2 size={18} /> Excluir
+               </button>
+            </div>
+
          </div>
 
          <ConfirmModal
             isOpen={deleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}
-            onConfirm={handleDelete}
-            title="Excluir medicamento?"
-            message={`"${medication?.name}" será removido permanentemente do seu tratamento.`}
+            onConfirm={startDelete}
+            title="Excluir este medicamento?"
+            message={`Você terá alguns segundos para desfazer depois. O histórico de doses de ${medication?.name} será removido.`}
             confirmText="Excluir"
             cancelText="Cancelar"
             variant="danger"
          />
 
+         {pendingDelete && (
+            <div className="fixed left-3 right-3 bottom-6 z-120 max-w-md mx-auto bg-deepplum text-white rounded-[26px] px-4.5 pt-4.5 pb-5 overflow-hidden border-2 border-white/20 shadow-[0_18px_44px_rgba(0,0,0,0.4)] animate-fade-slide-up">
+               <div className="flex items-center gap-3.5">
+                  <span className="w-13 h-13 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                     <FiTrash2 size={24} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                     <p className="font-merriweather font-extrabold text-[21px] leading-tight">{medication?.name} excluído</p>
+                     <p className="font-inter text-[16px] opacity-90 mt-0.5">Toque em desfazer se foi sem querer</p>
+                  </div>
+               </div>
+               <button
+                  onClick={cancelDelete}
+                  className="w-full h-13.5 mt-3.5 rounded-full bg-white/20 border-2 border-white/35 font-merriweather font-extrabold text-[19px] active:scale-95 transition-transform"
+               >
+                  Desfazer
+               </button>
+               <div
+                  className="absolute left-0 bottom-0 h-1.5 bg-white/55"
+                  style={{ animation: `toastShrink ${UNDO_WINDOW_MS}ms linear forwards` }}
+               />
+            </div>
+         )}
+
       </div>
    );
 
+}
+
+function TreatmentRow({ label, value }: { label: string, value: ReactNode }) {
+   return (
+      <div className="flex justify-between items-center font-inter">
+         <span className="text-[15px] text-ghostcolor">{label}</span>
+         <span className="text-[16px] font-bold text-inkblack">{value}</span>
+      </div>
+   );
 }

@@ -1,33 +1,25 @@
-
+import type { ReactNode } from 'react';
 
 interface InfoTileProps {
    title: string;
    subtitle: string;
-   accentColor?: string;
+   icon?: ReactNode;
 }
 
-export function InfoTile({ title, subtitle, accentColor }: InfoTileProps) {
+export function InfoTile({ title, subtitle, icon }: InfoTileProps) {
 
    return (
-      <div className="w-full  min-h-21 bg-offwhite rounded-[10px] border-b-4 flex justify-between font-merriweather border-darkpurple px-3 ">
+      <div className="w-full bg-offwhite rounded-[18px] border border-black/5 px-3.5 py-3">
 
-         <div className="py-3">
-            <h1 className="text-[#6d6d6d] text-[20px] text-balance">
-               {title}
-            </h1>
-            <p className="text-inkblack text-[20px] text-balance">
-               {subtitle}
-            </p>
+         <div className="flex items-center gap-1.5 font-inter text-[12px] font-bold uppercase tracking-[0.08em] text-[#999]">
+            {icon}
+            {title}
          </div>
-         {accentColor && 
-         <div 
-         // bg-[${accentColor}] not works in runtime
-         className={`h-full `}
-         
-         style={{ backgroundColor: accentColor }}
-> 
-         
-         </div>}
+
+         <p className="font-merriweather font-extrabold text-[20px] text-inkblack mt-1 break-words">
+            {subtitle}
+         </p>
+
       </div>
    )
 
