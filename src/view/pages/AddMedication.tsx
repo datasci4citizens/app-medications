@@ -13,6 +13,9 @@ import { ConfirmStep } from "../components/addMedication/steps/ConfirmStep";
 export function AddMedication() {
    const {
       step,
+      stepIndex,
+      totalSteps,
+      isLastStep,
       formData,
       drugInfo,
       isEditing,
@@ -43,11 +46,15 @@ export function AddMedication() {
             <StepLayout
                title={title}
                question="Qual a marca?"
+               hint={drugInfo?.name ? `Você está adicionando ${drugInfo.name}.` : undefined}
                onBack={onBackClick}
                onNext={handleNext}
                isValid={isValid}
                stepKey={step}
                direction={direction}
+               stepIndex={stepIndex}
+               totalSteps={totalSteps}
+               isLastStep={isLastStep}
             >
                <BrandStep
                   value={formData.brand}
@@ -78,6 +85,9 @@ export function AddMedication() {
                isValid={isValid}
                stepKey={step}
                direction={direction}
+               stepIndex={stepIndex}
+               totalSteps={totalSteps}
+               isLastStep={isLastStep}
             >
                <DosageStep
                   value={formData.dosage}
@@ -97,6 +107,9 @@ export function AddMedication() {
                isValid={isValid}
                stepKey={step}
                direction={direction}
+               stepIndex={stepIndex}
+               totalSteps={totalSteps}
+               isLastStep={isLastStep}
             >
                <WeekDaysStep
                   value={formData.weekDays}
@@ -115,6 +128,9 @@ export function AddMedication() {
                isValid={isValid}
                stepKey={step}
                direction={direction}
+               stepIndex={stepIndex}
+               totalSteps={totalSteps}
+               isLastStep={isLastStep}
             >
                <ScheduleStep
                   scheduleType={formData.scheduleType}
@@ -139,6 +155,9 @@ export function AddMedication() {
                isValid={isValid}
                stepKey={step}
                direction={direction}
+               stepIndex={stepIndex}
+               totalSteps={totalSteps}
+               isLastStep={isLastStep}
             >
                <PeriodStep
                   startDate={formData.startDate}
@@ -159,6 +178,9 @@ export function AddMedication() {
                isValid={isValid}
                stepKey={step}
                direction={direction}
+               stepIndex={stepIndex}
+               totalSteps={totalSteps}
+               isLastStep={isLastStep}
             >
                <StockStep
                   currentStock={formData.currentStock}
@@ -180,6 +202,11 @@ export function AddMedication() {
                onNext={handleNext}
                isValid={isValid}
                nextLabel={isEditing ? 'Salvar' : 'Adicionar'}
+               stepKey={step}
+               direction={direction}
+               stepIndex={stepIndex}
+               totalSteps={totalSteps}
+               isLastStep={isLastStep}
             >
                <ConfirmStep
                   formData={formData}

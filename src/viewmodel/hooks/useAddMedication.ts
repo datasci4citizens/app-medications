@@ -104,7 +104,9 @@ export function useAddMedication() {
    const isStepValid = (): boolean => {
       switch (step) {
          case 'brand':
-            return formData.brand.trim().length > 0;
+            // Opcional: o nome vem do catálogo, e quem não sabe a marca não
+            // pode ficar preso no primeiro passo.
+            return true;
          case 'dosage':
             return formData.dosage.trim().length > 0;
          case 'weekDays':

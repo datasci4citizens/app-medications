@@ -106,6 +106,15 @@ body {
   to   { width: 0; }
 }
 
+/* Entrada de cima para baixo — volta entre passos do assistente */
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide-down {
+  animation: fadeSlideDown 0.26s ease-out forwards;
+}
+
 /* Chacoalhada sutil — chip de dose atrasada */
 @keyframes shakeGentle {
   0%, 100% { transform: translateX(0); }
