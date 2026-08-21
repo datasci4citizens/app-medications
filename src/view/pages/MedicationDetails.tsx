@@ -87,31 +87,25 @@ function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationI
 
       {/* Instruction */}
       {drugInfo && (
-         <div className="font-merriweather text-2xl mt-4">
-            <AccordionSection label="Instruções" hasToggle={true}>
-               <div className="grid grid-cols-2 gap-2">
-                  <InfoTile title="Quando tomar:" subtitle={drugInfo.whenToTake ?? '-'} />
-                  <InfoTile title="Pode partir?" subtitle={drugInfo.canSplit ? 'Sim' : 'Não'} />
-               </div>
-               {drugInfo.instructions && <div className="mt-4 text-lg font-light">{drugInfo.instructions}</div>}
-            </AccordionSection>
-         </div>
+         <AccordionSection label="Instruções" hasToggle={true}>
+            <div className="grid grid-cols-2 gap-2.5">
+               <InfoTile title="Quando tomar" subtitle={drugInfo.whenToTake ?? '—'} />
+               <InfoTile title="Pode partir?" subtitle={drugInfo.canSplit ? 'Sim' : 'Não'} />
+            </div>
+            {drugInfo.instructions && <p className="mt-4">{drugInfo.instructions}</p>}
+         </AccordionSection>
       )}
 
       {drugInfo?.sideEffects && (
-         <div className="font-merriweather text-2xl">
-            <AccordionSection label="Efeitos Colaterais" hasToggle={true}>
-               <div className="text-lg font-light">{drugInfo.sideEffects}</div>
-            </AccordionSection>
-         </div>
+         <AccordionSection label="Efeitos colaterais" hasToggle={true}>
+            {drugInfo.sideEffects}
+         </AccordionSection>
       )}
 
       {drugInfo?.contraindications && (
-         <div className="font-merriweather text-2xl">
-            <AccordionSection label="Contraindicações" hasToggle={true}>
-               <div className="text-lg font-light">{drugInfo.contraindications}</div>
-            </AccordionSection>
-         </div>
+         <AccordionSection label="Contraindicações" hasToggle={true}>
+            {drugInfo.contraindications}
+         </AccordionSection>
       )}
 
       {/* Add Button */}
@@ -264,23 +258,36 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
             {/* Frequência */}
             <section className="flex flex-col gap-3">
                <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Frequência do uso</h2>
-               <WeekDaySelector isReadOnly={true} values={medication?.weekDays ?? []} />
-               <div className="flex flex-wrap gap-2 justify-center">
-                  {medication?.times?.map(time => (
-                     <span
-                        key={time}
-                        className="px-4 py-2 rounded-full bg-lightpurple text-darkpurple font-merriweather font-bold text-xl"
-                     >
-                        {time}
-                     </span>
-                  ))}
+               <div className="bg-offwhite rounded-[22px] border border-black/5 px-4.5 py-4 flex flex-col gap-4">
+                  <WeekDaySelector isReadOnly={true} values={medication?.weekDays ?? []} />
+
+                  <div className="h-px bg-black/6" />
+
+                  <div className="flex flex-wrap gap-2">
+                     {medication?.times?.map(time => (
+                        <span
+                           key={time}
+                           className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[rgba(91,42,120,0.08)] text-darkpurple font-inter font-bold text-[16px]"
+                        >
+                           <FiClock size={15} />
+                           {time}
+                        </span>
+                     ))}
+                  </div>
                </div>
             </section>
 
             {/* Estoque */}
-            {stockLeft !== undefined && (
-               <section className="flex flex-col gap-3">
-                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Estoque</h2>
+            <section className="flex flex-col gap-3">
+               <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Estoque</h2>
+               {stockLeft === undefined ? (
+                  <div className="bg-offwhite rounded-[22px] border border-black/5 px-4.5 py-4">
+                     <p className="font-merriweather font-bold text-[18px] text-ghost-gray">Sem informação de estoque</p>
+                     <p className="font-inter text-[15px] text-ghostcolor mt-0.5">
+                        Informe quantas unidades você tem para ser avisado antes de acabar.
+                     </p>
+                  </div>
+               ) : (
                   <div className={`bg-offwhite rounded-[22px] px-4.5 py-4 flex items-center gap-4 ${isLowStock ? 'border-2 border-yellow-alert' : 'border border-black/5'}`}>
                      <span className={`font-merriweather font-black text-[44px] leading-none ${isLowStock ? 'text-red-skip' : 'text-darkpurple'}`}>
                         {stockLeft}
@@ -292,8 +299,8 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
                         </p>
                      </div>
                   </div>
-               </section>
-            )}
+               )}
+            </section>
 
             {/* Tratamento */}
             <section className="flex flex-col gap-3">
@@ -319,19 +326,15 @@ function UserView({ medication, drugInfo, occurrenceId, doseRecord, effectiveSta
 
             {/* Detalhes do catálogo que já existem hoje */}
             {drugInfo?.sideEffects && (
-               <div className="font-merriweather text-2xl">
-                  <AccordionSection label="Efeitos Colaterais" hasToggle={true}>
-                     <div className="text-lg font-light">{drugInfo.sideEffects}</div>
-                  </AccordionSection>
-               </div>
+               <AccordionSection label="Efeitos colaterais" hasToggle={true}>
+                  {drugInfo.sideEffects}
+               </AccordionSection>
             )}
 
             {drugInfo?.contraindications && (
-               <div className="font-merriweather text-2xl">
-                  <AccordionSection label="Contraindicações" hasToggle={true}>
-                     <div className="text-lg font-light">{drugInfo.contraindications}</div>
-                  </AccordionSection>
-               </div>
+               <AccordionSection label="Contraindicações" hasToggle={true}>
+                  {drugInfo.contraindications}
+               </AccordionSection>
             )}
 
             {/* Ações */}

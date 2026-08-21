@@ -1,11 +1,10 @@
-
-import { FaChevronDown } from 'react-icons/fa6';
-
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
+import { FiChevronDown } from 'react-icons/fi';
 
 interface AccordionSectionProps {
    label: string;
-   children: React.ReactNode;
+   children: ReactNode;
+   /** Quando false, a seção fica sempre aberta e sem botão. */
    hasToggle?: boolean;
 }
 
@@ -16,35 +15,48 @@ export function AccordionSection({
 }: AccordionSectionProps) {
 
    const [isOpen, setIsOpen] = useState<boolean>(false);
+   const isExpanded = hasToggle ? isOpen : true;
 
-   function handleToogleList() {
-      setIsOpen(!isOpen);
-   }
-
+   const header = (
+      <>
+         <span className="flex-1 text-left font-merriweather font-extrabold text-[18px] text-inkblack">
+            {label}
+         </span>
+         {hasToggle && (
+            <FiChevronDown
+               size={22}
+               className={`text-darkpurple shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+            />
+         )}
+      </>
+   );
 
    return (
-      <div className='font-merriweather '>
-         <div className='flex  font-inkblack justify-between bg-lightpurple rounded-[10px] text-[20px] px-3 h-12 tracking-[-0.288px] items-center'>  {label}
-            {hasToggle &&
-               <button
-                  aria-label={`${isOpen ? 'Recolher' : 'Expandir'} ${label}`}
-                  aria-expanded={isOpen}
-                  // pl-40 para aumentar area clicavel do botão TODO:verificar responsividade
-                  className='  h-full pl-30 flex items-center '
-                  onClick={handleToogleList}>
-                  <FaChevronDown
-                     className={`
-                  fill-darkpurple stroke-[3px]
-                  transition-transform duration-500 
-                  ${isOpen ? 'rotate-180' : 'rotate-0'}`} />
-               </button>}
-         </div>
-         <div className={` transition-[max-height] duration-600 ease-in-out overflow-hidden
-            ${isOpen ? 'max-h-125' : 'max-h-0'}
-            `}>
+      <div className="bg-offwhite rounded-[22px] border border-black/5 overflow-hidden">
 
-            <div className='p-4'> {children}</div>
+         {hasToggle ? (
+            <button
+               onClick={() => setIsOpen(!isOpen)}
+               aria-expanded={isOpen}
+               className="w-full flex items-center gap-3 px-4.5 py-4"
+            >
+               {header}
+            </button>
+         ) : (
+            <div className="flex items-center gap-3 px-4.5 py-4">{header}</div>
+         )}
+
+         {/* grid-rows anima até a altura real do conteúdo, sem chutar um max-height */}
+         <div
+            className={`grid transition-[grid-template-rows] duration-400 ease-in-out ${isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+         >
+            <div className="overflow-hidden">
+               <div className="px-4.5 pb-4 font-inter text-[16px] leading-[1.55] text-inkblack">
+                  {children}
+               </div>
+            </div>
          </div>
+
       </div>
    )
 }

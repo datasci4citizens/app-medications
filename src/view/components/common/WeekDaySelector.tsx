@@ -1,11 +1,8 @@
-
-
-
 /**
  * WeekDaySelector
  *
  * A row of buttons representing the days of the week (Sun–Sat, index 0–6).
- * Selected days are highlighted with a border. Supports read-only mode.
+ * Selected days are filled in; supports read-only mode.
  *
  * Props:
  *   - values: array of selected day indexes (0 = Sunday, 6 = Saturday)
@@ -22,9 +19,10 @@ interface WeekDaySelectorProps {
    onChange?: (days: number[]) => void;
 }
 
-export function WeekDaySelector({ values, isReadOnly, onChange }: WeekDaySelectorProps) {
+const DAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+const DAY_NAMES = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 
-   const days = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+export function WeekDaySelector({ values, isReadOnly, onChange }: WeekDaySelectorProps) {
 
    function handleToggle(index: number) {
       if (values.includes(index)) {
@@ -33,19 +31,28 @@ export function WeekDaySelector({ values, isReadOnly, onChange }: WeekDaySelecto
          onChange?.([...values, index])
       }
    }
-   // Todo: bug distancia maior que 16px (gap)
+
    return (
-      <div className="flex  bg-lightpurple rounded-4xl justify-around p-1  max-w-150 select-none">
-         {days.map((day, index) =>
-            <button key={index} onClick={() => handleToggle(index)} disabled={isReadOnly}
-               className={`bg-offwhite  max-w-10.5  h-10.5 flex-1 rounded-full list-none flex items-center justify-center
-       drop-shadow-lg font-merriweather text-2xl
-                   ${values.includes(index) ? 'border-darkpurple border-3' : ''}
-       `}
-            >
-               {day}
-            </button>)
-         }
+      <div className="flex justify-between gap-1.5 select-none">
+         {DAYS.map((day, index) => {
+            const isSelected = values.includes(index);
+            return (
+               <button
+                  key={index}
+                  onClick={() => handleToggle(index)}
+                  disabled={isReadOnly}
+                  aria-label={DAY_NAMES[index]}
+                  aria-pressed={isSelected}
+                  className={`flex-1 max-w-12 aspect-square rounded-full flex items-center justify-center
+                     font-merriweather font-bold text-[20px] transition-colors duration-200
+                     ${isSelected
+                        ? 'bg-darkpurple text-offwhite shadow-[0_4px_12px_rgba(91,42,120,0.30)]'
+                        : 'bg-offwhite text-ghost-gray border border-card-border'}`}
+               >
+                  {day}
+               </button>
+            );
+         })}
       </div>
    );
 }
