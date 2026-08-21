@@ -35,6 +35,9 @@ export interface Medication {
   // DoseStatus
   doseStatus: Record<string, DoseRecord>; // chave: 'medId-YYYY-MM-DD-HH:mm'
 
+  /** Id do tratamento no servidor. Ausente = ainda só existe neste aparelho. */
+  remoteId?: number;
+
   // Stock (optional)
   currentStock?: number;
   stockReminderEnabled?: boolean;

@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
 import type { Medication } from '../../types';
 import { medicationStorage } from '../../model/repositories/MedicationRepository'
+import { takeRepository, toTakePayload } from '../../model/repositories/TakeRepository';
 
 // ============================================
 // TIPOS
@@ -72,6 +73,28 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
     };
 
     setMedications((prev) => [...prev, newMedication]);
+    syncNewMedication(newMedication);
+  };
+
+  /**
+   * Envia o tratamento ao servidor depois de já ter salvo no aparelho.
+   *
+   * A gravação local não espera a rede: o app precisa continuar utilizável
+   * offline. Se o envio falhar, o medicamento fica sem `remoteId` e existe
+   * apenas aqui.
+   */
+  const syncNewMedication = async (medication: Medication) => {
+    const payload = toTakePayload(medication);
+    if (!payload) return;
+
+    try {
+      const { taken_id } = await takeRepository.create(payload);
+      setMedications((prev) =>
+        prev.map((med) => (med.id === medication.id ? { ...med, remoteId: taken_id } : med))
+      );
+    } catch (error) {
+      console.warn('Não foi possível enviar o medicamento ao servidor:', error);
+    }
   };
 
   const updateMedication = (id: string, updates: Partial<Medication>) => {
@@ -81,7 +104,14 @@ export function MedicationProvider({ children }: { children: React.ReactNode }) 
   };
 
   const deleteMedication = (id: string) => {
+    const removed = medications.find((med) => med.id === id);
     setMedications((prev) => prev.filter((med) => med.id !== id));
+
+    if (removed?.remoteId !== undefined) {
+      takeRepository.remove(removed.remoteId).catch((error: unknown) =>
+        console.warn('Não foi possível remover o medicamento do servidor:', error)
+      );
+    }
   };
 
   const markDoseAsTaken = (medicationId: string, occurrenceId: string, wasLate: boolean, takenAt?: string) => {
