@@ -45,6 +45,7 @@ export const MEDICATION_TYPE_LABELS: Record<string, string> = {
   [MEDICATION_TYPES.TABLET]: 'Comprimido',
   [MEDICATION_TYPES.CAPSULE]: 'Cápsula',
   [MEDICATION_TYPES.LIQUID]: 'Líquido',
+  [MEDICATION_TYPES.INJECTION]: 'Injeção',
 };
 
 // Rótulos curtos para o card — linguagem simples, sem jargão de bula

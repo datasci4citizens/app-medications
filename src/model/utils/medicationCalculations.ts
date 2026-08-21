@@ -151,3 +151,35 @@ export function parseOccurrenceId(occurrenceId: string): { date: string; time: s
   }
   return { date: `${year}-${month}-${day}`, time };
 }
+
+/**
+ * Percentual de doses tomadas entre as que já foram resolvidas, na janela de dias.
+ *
+ * Só entram no cálculo as doses com registro (tomada ou esquecida): uma dose que
+ * ainda não chegou a hora não conta como falha. Retorna null quando não há
+ * histórico suficiente para afirmar qualquer coisa.
+ */
+export function calculateAdherence(medication: Medication, days = 30): number | null {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  cutoff.setHours(0, 0, 0, 0);
+
+  let taken = 0;
+  let resolved = 0;
+
+  for (const [occurrenceId, record] of Object.entries(medication.doseStatus)) {
+    const parsed = parseOccurrenceId(occurrenceId);
+    if (!parsed) continue;
+
+    if (new Date(`${parsed.date}T00:00:00`) < cutoff) continue;
+
+    if (record.status === 'taken' || record.status === 'taken_late') {
+      taken++;
+      resolved++;
+    } else if (record.status === 'skipped') {
+      resolved++;
+    }
+  }
+
+  return resolved === 0 ? null : Math.round((taken / resolved) * 100);
+}
