@@ -23,7 +23,7 @@ interface DoseConfirm {
 export function Medications() {
   const { medications, isLoading, markDoseAsTaken, markDoseAsSkipped, clearDoseStatus } = useMedications();
   const [doseConfirm, setDoseConfirm] = useState<DoseConfirm | null>(null);
-  const [showDone, setShowDone] = useState(false);
+  const [showDone, setShowDone] = useState(true);
   const [stockAlertDismissed, setStockAlertDismissed] = useState(false);
   const [isFutureModalOpen, setIsFutureModalOpen] = useState(false);
   const navigate = useNavigate();

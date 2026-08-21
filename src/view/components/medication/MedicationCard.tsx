@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { FiChevronRight, FiClock, FiMinusCircle } from 'react-icons/fi';
-import type { DailyDose } from '../../../model/utils/medicationCalculations';
+import { parseOccurrenceId, type DailyDose } from '../../../model/utils/medicationCalculations';
+import { formatTimeUntil } from '../../../model/utils/dateHelpers';
 import { getBrandColor } from '../../../model/utils/brandColorHelper';
 import { MEDICATION_TYPE_LABELS } from '../../../constants';
+
+/** A partir de quantas horas de distância a dose deixa de oferecer ação. */
+const FAR_AWAY_HOURS = 12;
 
 interface MedicationCardProps {
   dose: DailyDose;
@@ -40,6 +44,23 @@ export function MedicationCard({ dose, onTake, onSkip, onClick }: MedicationCard
   const dosageColor = isSkipped ? 'text-offwhite' : 'text-purple-dose';
 
   const typeLabel = MEDICATION_TYPE_LABELS[medication.type] || 'Dose';
+
+  // Dose muito distante não oferece ação: um botão verde "Tomar" às 8h da
+  // manhã para uma dose das 22h convida ao registro errado, e "esquecer"
+  // algo que ainda nem chegou não faz sentido.
+  const doseDate = (() => {
+    const parsed = parseOccurrenceId(dose.occurrenceId);
+    if (!parsed) return null;
+    const [h, m] = parsed.time.split(':').map(Number);
+    const d = new Date(`${parsed.date}T00:00:00`);
+    d.setHours(h, m, 0, 0);
+    return d;
+  })();
+
+  const now = new Date();
+  const hoursAway = doseDate ? (doseDate.getTime() - now.getTime()) / 3600000 : 0;
+  const isFarAway = isUpcoming && hoursAway > FAR_AWAY_HOURS;
+  const timeUntil = doseDate ? formatTimeUntil(doseDate, now) : null;
 
   const timeChipColor = isLate
     ? 'bg-[rgba(211,34,49,0.10)] text-red-skip'
@@ -91,7 +112,16 @@ export function MedicationCard({ dose, onTake, onSkip, onClick }: MedicationCard
 
           {/* Footer: botão ou label de status */}
           <div key={status} className="animate-fade-slide-up">
-            {(isPending || isUpcoming || isLate) && (
+            {isFarAway && (
+              <div className="w-full h-[56px] rounded-full bg-ghostwhite flex items-center justify-center gap-2 text-darkpurple">
+                <FiClock size={20} />
+                <span className="font-merriweather font-bold text-[19px]">
+                  {timeUntil ? `Daqui a ${timeUntil}` : `Às ${dose.time}`}
+                </span>
+              </div>
+            )}
+
+            {!isFarAway && (isPending || isUpcoming || isLate) && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={e => { e.stopPropagation(); onTake(); }}
