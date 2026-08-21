@@ -1,8 +1,7 @@
 
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { FiArrowLeft, FiClock, FiEdit2, FiTrash2 } from "react-icons/fi";
-import { NavBottom } from "../components/layout/NavBottom";
+import { FiArrowLeft, FiClock, FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
 
 import { InfoTile } from "../components/common/InfoTile";
 import { WeekDaySelector } from "../components/common/WeekDaySelector";
@@ -66,66 +65,112 @@ export function MedicationDetails() {
 
 
 function SearchView({ drugInfo, handleBack, handleAdd }: { drugInfo: MedicationInfo | undefined, handleBack: () => void, handleAdd: () => void }) {
-   return (<div className="p-4 flex gap-4 self-stretch flex-col pb-48 animate-slide-in-right">
-      <NavBottom OnClick={() => handleBack()} type='back' size={55} />
-      <div className="font-merriweather text-[44px] font-bold text-darkpurple text-center border-b-2">
-         {/* Medicine Name */}
-         <p className="font-merriweather text-2xl font-bold text-gray-400 text-right ">
-            {drugInfo?.activeIngredient}
-         </p>
-         {drugInfo?.name}
-      </div>
 
-      {/* InfoCards TileCard*/}
-      <div className="bg-lightpurple w-full mx-auto rounded-2xl grid grid-cols-2 gap-2 px-3.5 py-2.5">
+   const productImage = drugInfo ? MEDICATION_TYPE_IMAGES[drugInfo.type]?.image : undefined;
+   const mealLabel = drugInfo?.whenToTake ? MEAL_LABELS[drugInfo.whenToTake] : undefined;
 
-         <InfoTile title="Princípio ativo:" subtitle={`${drugInfo?.activeIngredient}`} />
-         <InfoTile title="Forma:" subtitle={`${drugInfo?.type}`} />
-         <InfoTile title="Marcas:" subtitle={`${drugInfo?.commonBrands?.join(', ') || '-'}`} />
-         <InfoTile title="Tem no SUS?" subtitle="Sim" />
-      </div>
+   return (
+      <div className="min-h-screen bg-graybg pb-32 animate-slide-in-right">
 
-      {/* Instruction */}
-      {drugInfo && (
-         <AccordionSection label="Instruções" hasToggle={true}>
-            <div className="grid grid-cols-2 gap-2.5">
-               <InfoTile title="Quando tomar" subtitle={drugInfo.whenToTake ?? '—'} />
-               <InfoTile title="Pode partir?" subtitle={drugInfo.canSplit ? 'Sim' : 'Não'} />
+         {/* Capa roxa: item do catálogo, ainda não é um medicamento seu */}
+         <div className="relative overflow-hidden rounded-b-[36px] pt-13 bg-gradient-to-br from-darkpurple to-deepplum shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
+            <div className="absolute -right-12 -top-8 w-55 h-55 rounded-full bg-white/10" />
+            <div className="absolute right-8 -bottom-12 w-35 h-35 rounded-full bg-black/8" />
+
+            <button
+               onClick={handleBack}
+               aria-label="Voltar"
+               className="absolute top-14 left-4 w-11 h-11 rounded-full bg-white/25 backdrop-blur-md text-white flex items-center justify-center z-2 active:scale-90 transition-transform"
+            >
+               <FiArrowLeft size={22} />
+            </button>
+
+            <div className="relative z-1 pl-19 pr-5 pt-4 pb-6 text-white">
+               <p className="font-inter text-[12px] font-bold uppercase tracking-[0.14em] opacity-80">
+                  {drugInfo?.activeIngredient}
+               </p>
+               <h1 className="font-merriweather font-extrabold text-[32px] uppercase leading-[1.05] mt-1">
+                  {drugInfo?.name}
+               </h1>
+               <p className="font-merriweather font-semibold text-[20px] mt-1.5 opacity-90">
+                  {drugInfo?.type}
+               </p>
             </div>
-            {drugInfo.instructions && <p className="mt-4">{drugInfo.instructions}</p>}
-         </AccordionSection>
-      )}
 
-      {drugInfo?.sideEffects && (
-         <AccordionSection label="Efeitos colaterais" hasToggle={true}>
-            {drugInfo.sideEffects}
-         </AccordionSection>
-      )}
+            {productImage && (
+               <img
+                  src={productImage}
+                  alt=""
+                  className="absolute right-5 top-20 w-28 z-1 drop-shadow-[0_8px_22px_rgba(0,0,0,0.25)]"
+               />
+            )}
+         </div>
 
-      {drugInfo?.contraindications && (
-         <AccordionSection label="Contraindicações" hasToggle={true}>
-            {drugInfo.contraindications}
-         </AccordionSection>
-      )}
+         <div className="max-w-md mx-auto px-4 flex flex-col gap-6 pt-5">
 
-      {/* Add Button */}
-      <button
-         onClick={handleAdd}
-         className="
-            bg-blue-add
-            fixed bottom-0 left-0 right-0
-            mx-auto w-[calc(100%-2rem)] max-w-md mb-4
-            font-merriweather font-bold text-white text-2xl text-center
-            border-[3px] border-blue-add rounded-[0.625rem]
-            py-2
-            transition-colors duration-300
-            active:bg-deepplum active:text-offwhite
-         "
-      >
-         Adicionar
-      </button>
+            {/* Resumo */}
+            <div className="grid grid-cols-2 gap-2.5">
+               <InfoTile title="Substância" subtitle={drugInfo?.activeIngredient ?? '—'} />
+               <InfoTile title="Forma" subtitle={drugInfo?.type ?? '—'} />
+               <InfoTile title="Refeição" subtitle={mealLabel ?? 'Livre'} />
+               <InfoTile title="Pode partir?" subtitle={drugInfo?.canSplit ? 'Sim' : 'Não'} />
+            </div>
 
-   </div>
+            {/* Marcas */}
+            {drugInfo?.commonBrands && drugInfo.commonBrands.length > 0 && (
+               <section className="flex flex-col gap-3">
+                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Marcas comuns</h2>
+                  <div className="flex flex-wrap gap-2">
+                     {drugInfo.commonBrands.map(brand => (
+                        <span
+                           key={brand}
+                           className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-offwhite border border-card-border font-inter font-bold text-[16px] text-inkblack"
+                        >
+                           <span className="w-3 h-3 rounded-full" style={{ backgroundColor: getBrandColor(brand) }} />
+                           {brand}
+                        </span>
+                     ))}
+                  </div>
+               </section>
+            )}
+
+            {/* Como usar */}
+            {drugInfo?.instructions && (
+               <section className="flex flex-col gap-3">
+                  <h2 className="font-merriweather font-extrabold text-[20px] text-inkblack">Como usar</h2>
+                  <div className="bg-offwhite rounded-[22px] border border-black/5 px-4.5 py-4">
+                     <p className="font-inter font-medium text-[17px] leading-[1.55] text-inkblack">
+                        {drugInfo.instructions}
+                     </p>
+                  </div>
+               </section>
+            )}
+
+            {drugInfo?.sideEffects && (
+               <AccordionSection label="Efeitos colaterais" hasToggle={true}>
+                  {drugInfo.sideEffects}
+               </AccordionSection>
+            )}
+
+            {drugInfo?.contraindications && (
+               <AccordionSection label="Contraindicações" hasToggle={true}>
+                  {drugInfo.contraindications}
+               </AccordionSection>
+            )}
+
+         </div>
+
+         {/* Ação principal */}
+         <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 pt-6 bg-gradient-to-t from-graybg via-graybg/95 to-transparent">
+            <button
+               onClick={handleAdd}
+               className="w-full max-w-md mx-auto h-15 rounded-[20px] bg-darkpurple text-offwhite font-merriweather font-extrabold text-[20px] flex items-center justify-center gap-2 shadow-[0_10px_24px_rgba(91,42,120,0.45)] transition-transform active:scale-95"
+            >
+               <FiPlus size={22} /> Adicionar aos meus
+            </button>
+         </div>
+
+      </div>
    )
 }
 
