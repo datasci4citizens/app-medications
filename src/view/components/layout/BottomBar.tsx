@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import type { ComponentType } from 'react'
 import CapsuleIcon from '../../../assets/icons/svgs/capsule.svg?react'
 import ProfileIcon from '../../../assets/icons/svgs/profile.svg?react'
-import { FiBell, FiCalendar, FiPlus } from 'react-icons/fi'
+import { FiBell, FiPlus } from 'react-icons/fi'
 
 interface NavItem {
    id: string;
@@ -13,7 +13,6 @@ interface NavItem {
 
 const ITEMS: NavItem[] = [
    { id: 'home', label: 'Hoje', Icon: CapsuleIcon, path: '/home/medications' },
-   { id: 'agenda', label: 'Agenda', Icon: FiCalendar },
    { id: 'alerts', label: 'Alertas', Icon: FiBell },
    { id: 'profile', label: 'Eu', Icon: ProfileIcon, path: '/home/profile' },
 ];
